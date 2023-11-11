@@ -5,7 +5,6 @@ import pixell.enmap
 import healpy as hp
 import astropy.cosmology
 import astropy
-import bootstrapping
 import matplotlib
 
 plt.rcParams.update({
@@ -34,13 +33,6 @@ class __Mask(object):  # overwite this with pixell and healpy specific versions
         for i in range(int(num_points)):
             unmasked_points += self.gen_random_point()
         return unmasked_points / num_points
-
-    def bootstrap(self, co_ords, depth, iterations):
-        data = []
-        for point in co_ords:
-            data.append(self.lookup_point(*point))
-        mean, std = bootstrapping.bootstrapping(data, depth, iterations)
-        return mean, std
 
 
 class PixellMask(__Mask):
