@@ -1,4 +1,3 @@
-import numpy
 import numpy as np
 import matplotlib.pyplot as plt
 import pixell
@@ -7,7 +6,6 @@ import healpy as hp
 import astropy.cosmology
 import astropy
 import bootstrapping
-import pandas as pd
 import matplotlib
 
 plt.rcParams.update({
