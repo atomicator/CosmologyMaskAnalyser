@@ -1,7 +1,6 @@
 import random
-import toolkit
+from toolkit import toolkit
 import numpy as np
-import scipy
 
 sdss_mask = toolkit.HealpyMask("../../data/redmapper_dr8_public_v6.3_zmask.fits", mask_using_latlon=False,
                                hdu=1, partial=True)

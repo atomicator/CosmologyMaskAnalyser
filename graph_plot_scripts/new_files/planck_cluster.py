@@ -1,7 +1,5 @@
-import numpy
-import toolkit
+from toolkit import toolkit
 import matplotlib.pyplot as plt
-import astropy
 
 
 def planck_cat_selection_func(snr, pipe_det, cosmo, min_snr, pipe_det_val):

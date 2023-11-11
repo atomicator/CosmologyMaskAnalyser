@@ -1,7 +1,5 @@
 import matplotlib.pyplot as plt
 import numpy as np
-import toolkit
-import healpy
 
 
 def plot(fig, ax, x, y):

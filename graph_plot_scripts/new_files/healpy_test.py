@@ -1,4 +1,4 @@
-import toolkit
+from toolkit import toolkit
 import numpy as np
 
 data = toolkit.get_file_info("../data/planck_galactic_mask.fits", hdu=0)

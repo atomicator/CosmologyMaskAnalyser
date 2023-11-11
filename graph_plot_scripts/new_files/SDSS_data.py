@@ -1,7 +1,5 @@
-import toolkit
+from toolkit import toolkit
 import matplotlib.pyplot as plt
-import healpy
-import astropy
 
 fig = plt.figure()
 # ax = fig.add_subplot(111, projection="mollweide")

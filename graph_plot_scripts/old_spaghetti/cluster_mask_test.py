@@ -1,10 +1,6 @@
 import numpy as np
-import matplotlib.pyplot as plt
-import pixell
 import healpy as hp
-import astropy
-import pandas as pd
-import toolkit
+from toolkit import toolkit
 
 wmap_map_I, header = hp.read_map("../../data/planck_galactic_mask.fits", h=True, nest=False)
 print(header)

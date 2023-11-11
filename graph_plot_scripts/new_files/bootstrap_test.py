@@ -1,7 +1,5 @@
 import numpy as np
-import bootstrapping
-import toolkit
-import matplotlib.pyplot as plt
+from toolkit import toolkit, bootstrapping
 
 mask = toolkit.PixellMask("../../data/ACT_mask.fits", hdu=1)
 #mask = toolkit.HealpyMask("../../data/planck_galactic_mask.fits")

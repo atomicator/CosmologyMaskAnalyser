@@ -1,4 +1,4 @@
-import toolkit
+from toolkit import toolkit
 
 mask = toolkit.get_file_info("../../data/sdss_catalogue.fits")
 
