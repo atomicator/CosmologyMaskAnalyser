@@ -10,6 +10,8 @@ parser.add_argument("--mask_one", choices=["sdss_mask", "planck_point", "planck_
 parser.add_argument("--mask_two", choices=["sdss_mask", "planck_point", "planck_galactic"],
                     help="The second mask to use", default="planck_galactic")
 parser.add_argument("--path_raise", type=int, default=2)
+parser.add_argument("--bootstrap_iterations", type=int, default=1600)
+parser.add_argument("--save_path")
 
 args = parser.parse_args()
 mask_names = [args.mask_one, args.mask_two]
@@ -57,3 +59,6 @@ print(f"Fraction masked by SDSS only:   {mean_estimates[0][4]} +/- {np.std(mean_
 print(f"Fraction masked by neither:     {mean_estimates[0][5]} +/- {np.std(mean_estimates[:, 5])}")
 
 #TODO: Plot som eof the results from above as a histogram
+
+if args.save_path:
+    np.savetxt(args.save_path, mean_estimates, delimiter=",")
