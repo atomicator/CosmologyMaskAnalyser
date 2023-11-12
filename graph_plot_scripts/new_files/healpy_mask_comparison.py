@@ -9,14 +9,15 @@ parser.add_argument("--mask_one", choices=["sdss_mask", "planck_point", "planck_
                     help="The first mask to use", default="sdss_mask")
 parser.add_argument("--mask_two", choices=["sdss_mask", "planck_point", "planck_galactic"],
                     help="The second mask to use", default="planck_galactic")
+parser.add_argument("--path_raise", type=int, default=2)
 
 args = parser.parse_args()
 mask_names = [args.mask_one, args.mask_two]
 
 print(mask_names)
 
-mask = [toolkit.load_mask(mask_names[0]), toolkit.load_mask(mask_names[1])]
-
+mask = [toolkit.load_mask(mask_names[0], args.path_raise), toolkit.load_mask(mask_names[1], args.path_raise)]
+"""
 mask[0] = toolkit.HealpyMask("../../data/redmapper_dr8_public_v6.3_zmask.fits", mask_using_latlon=False,
                                hdu=1, partial=True)
 mask[1] = toolkit.HealpyMask("../../data/planck_point_mask.fits")
@@ -24,7 +25,7 @@ mask[1] = toolkit.HealpyMask("../../data/planck_point_mask.fits")
 mask[0].map[mask[0].map > 0.4] = 1.0
 mask[0].map[mask[0].map < 0.3] = 0
 mask[0].map = (mask[0].map - 1) * -1
-
+"""
 data = mask[1].compare(mask[0])
 
 bootstrap_samples = int(1e3)
