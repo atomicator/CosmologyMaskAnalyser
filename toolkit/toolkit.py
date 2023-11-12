@@ -401,6 +401,21 @@ def get_header_info(hdu_list):
         print(hdu.header)
 
 
+def load_mask(mask, raise_dir=2):
+    value = None
+    if mask == "planck_galactic":
+        value = HealpyMask("../" * raise_dir + "data/planck_galactic_mask.fits")
+    if mask == "planck_point":
+        value = HealpyMask("../" * raise_dir + "data/planck_point_mask.fits")
+    if mask == "sdss_mask":
+        value = HealpyMask("../" * raise_dir + "data/redmapper_dr8_public_v6.3_zmask.fits", mask_using_latlon=False,
+                           hdu=1, partial=True)
+        value.map[value.map > 0.4] = 1.0
+        value.map[value.map < 0.3] = 0
+        value.map = (value.map - 1) * -1
+    return value
+
+
 #  Define a black and white heatmap
 __cdict_bw = [(0, 0, 0), (1, 1, 1)]
 bw_heatmap = matplotlib.colors.LinearSegmentedColormap.from_list("black and white", __cdict_bw, N=2)

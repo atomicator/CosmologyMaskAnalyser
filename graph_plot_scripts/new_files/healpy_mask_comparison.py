@@ -1,16 +1,31 @@
 import random
 from toolkit import toolkit
 import numpy as np
+import argparse
 
-sdss_mask = toolkit.HealpyMask("../../data/redmapper_dr8_public_v6.3_zmask.fits", mask_using_latlon=False,
+parser = argparse.ArgumentParser()
+
+parser.add_argument("--mask_one", choices=["sdss_mask", "planck_point", "planck_galactic"],
+                    help="The first mask to use", default="sdss_mask")
+parser.add_argument("--mask_two", choices=["sdss_mask", "planck_point", "planck_galactic"],
+                    help="The second mask to use", default="planck_galactic")
+
+args = parser.parse_args()
+mask_names = [args.mask_one, args.mask_two]
+
+print(mask_names)
+
+mask = [toolkit.load_mask(mask_names[0]), toolkit.load_mask(mask_names[1])]
+
+mask[0] = toolkit.HealpyMask("../../data/redmapper_dr8_public_v6.3_zmask.fits", mask_using_latlon=False,
                                hdu=1, partial=True)
-planck_mask = toolkit.HealpyMask("../../data/planck_point_mask.fits")
+mask[1] = toolkit.HealpyMask("../../data/planck_point_mask.fits")
 
-sdss_mask.map[sdss_mask.map > 0.4] = 1.0
-sdss_mask.map[sdss_mask.map < 0.3] = 0
-sdss_mask.map = (sdss_mask.map - 1) * -1
+mask[0].map[mask[0].map > 0.4] = 1.0
+mask[0].map[mask[0].map < 0.3] = 0
+mask[0].map = (mask[0].map - 1) * -1
 
-data = planck_mask.compare(sdss_mask)
+data = mask[1].compare(mask[0])
 
 bootstrap_samples = int(1e3)
 
