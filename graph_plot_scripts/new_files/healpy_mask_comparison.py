@@ -10,13 +10,15 @@ parser.add_argument("--mask_one", choices=["sdss_mask", "planck_point", "planck_
 parser.add_argument("--mask_two", choices=["sdss_mask", "planck_point", "planck_galactic"],
                     help="The second mask to use", default="planck_galactic")
 parser.add_argument("--path_raise", type=int, default=2)
-parser.add_argument("--bootstrap_iterations", type=int, default=1600)
+parser.add_argument("--bootstrap_iterations", type=int, default=5)
 parser.add_argument("--save_path")
 
 args = parser.parse_args()
 mask_names = [args.mask_one, args.mask_two]
 
 print(mask_names)
+
+print(1 == 1.0)
 
 mask = [toolkit.load_mask(mask_names[0], args.path_raise), toolkit.load_mask(mask_names[1], args.path_raise)]
 """
@@ -31,19 +33,21 @@ mask[0].map = (mask[0].map - 1) * -1
 data = mask[1].compare(mask[0])
 
 bootstrap_samples = int(1e3)
-
-mean_estimates = [[np.real(np.sum(data) / len(data)), np.imag(np.sum(data) / len(data)),
-                   np.sum(data == 1 + 1j) / len(data), np.sum(data == 1j) / len(data), np.sum(data == 1) / len(data),
-                   np.sum(data == 0) / len(data)]]
+k = len(data)
+mean_estimates = [[np.real(np.sum(data) / k), np.imag(np.sum(data) / k),
+                   np.sum(data == 1 + 1j) / k, np.sum(data == 1j) / k, np.sum(data == 1) / k,
+                   np.sum(data == 0) / k]]
 
 # TODO: implement bootstrapping to estimate errors
 
 for i in range(bootstrap_samples):
     print(f"Bootstrap iteration: {i}")
-    new_data = random.choices(data, k=len(data))
-    mean_estimates.append([np.real(np.sum(new_data) / len(new_data)), np.imag(np.sum(new_data) / len(new_data)),
-                           np.sum(new_data == 1 + 1j) / len(new_data), np.sum(new_data == 1j) / len(new_data),
-                           np.sum(new_data == 1) / len(new_data), np.sum(new_data) / len(new_data)])
+    new_data = np.array(random.choices(data, k=k))
+    estimate = [np.real(np.sum(new_data) / k), np.imag(np.sum(new_data) / k),
+                           np.sum(new_data == 1 + 1j) / k, np.sum(new_data == 1j) / k,
+                           np.sum(new_data == 1) / k, np.sum(new_data) / k]
+    print(estimate)
+    mean_estimates.append(estimate)
 
 print("mean, std")
 for i in range(len(mean_estimates[0])):
@@ -58,7 +62,7 @@ print(f"Fraction masked by Planck only: {mean_estimates[0][3]} +/- {np.std(mean_
 print(f"Fraction masked by SDSS only:   {mean_estimates[0][4]} +/- {np.std(mean_estimates[:, 4])}")
 print(f"Fraction masked by neither:     {mean_estimates[0][5]} +/- {np.std(mean_estimates[:, 5])}")
 
-#TODO: Plot som eof the results from above as a histogram
+#TODO: Plot some of the results from above as a histogram
 
 if args.save_path:
     np.savetxt(args.save_path, mean_estimates, delimiter=",")
