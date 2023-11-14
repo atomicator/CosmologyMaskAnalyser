@@ -38,14 +38,14 @@ mean_estimates = [[np.real(np.sum(data) / k), np.imag(np.sum(data) / k),
                    np.sum(data == 1 + 1j) / k, np.sum(data == 1j) / k, np.sum(data == 1) / k,
                    np.sum(data == 0) / k]]
 
-# TODO: implement bootstrapping to estimate errors
+# TODO: convert code below into a method an parallelise it
 
 for i in range(bootstrap_samples):
     print(f"Bootstrap iteration: {i}")
     new_data = np.array(random.choices(data, k=k))
     estimate = [np.real(np.sum(new_data) / k), np.imag(np.sum(new_data) / k),
-                           np.sum(new_data == 1 + 1j) / k, np.sum(new_data == 1j) / k,
-                           np.sum(new_data == 1) / k, np.sum(new_data) / k]
+                np.sum(new_data == 1 + 1j) / k, np.sum(new_data == 1j) / k,
+                np.sum(new_data == 1) / k, np.sum(new_data == 0) / k]
     print(estimate)
     mean_estimates.append(estimate)
 
@@ -62,7 +62,7 @@ print(f"Fraction masked by Planck only: {mean_estimates[0][3]} +/- {np.std(mean_
 print(f"Fraction masked by SDSS only:   {mean_estimates[0][4]} +/- {np.std(mean_estimates[:, 4])}")
 print(f"Fraction masked by neither:     {mean_estimates[0][5]} +/- {np.std(mean_estimates[:, 5])}")
 
-#TODO: Plot some of the results from above as a histogram
+# TODO: Plot some of the results from above as a histogram
 
 if args.save_path:
     np.savetxt(args.save_path, mean_estimates, delimiter=",")
