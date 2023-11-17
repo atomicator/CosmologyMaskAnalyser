@@ -19,7 +19,7 @@ print(args.mask)
 print(args.catalogue)
 print(f"Bootstrap iterations: {args.bootstrap_iterations}")
 
-mask = toolkit.load_mask(args.mask)
+mask = toolkit.load_mask(args.mask, args.path_raise)
 cat = toolkit.StarCatalogue("../" * args.path_raise + args.catalogue, hdu=1)
 
 cat.load_lon_lat()
