@@ -29,7 +29,7 @@ mask[1] = toolkit.HealpyMask("../../data/planck_point_mask.fits")
 mask[0].map[mask[0].map > 0.4] = 1.0
 mask[0].map[mask[0].map < 0.3] = 0
 mask[0].map = (mask[0].map - 1) * -1
-"""
+
 data = mask[1].compare(mask[0])
 
 bootstrap_samples = int(1e3)
@@ -37,22 +37,23 @@ k = len(data)
 mean_estimates = [[np.real(np.sum(data) / k), np.imag(np.sum(data) / k),
                    np.sum(data == 1 + 1j) / k, np.sum(data == 1j) / k, np.sum(data == 1) / k,
                    np.sum(data == 0) / k]]
-
+"""
+mean_estimates = [toolkit.fraction_masked_pair(mask[0], mask[1])]
 # TODO: convert code below into a method an parallelise it
-
+"""
 for i in range(bootstrap_samples):
     print(f"Bootstrap iteration: {i}")
-    new_data = np.array(random.choices(data, k=k))
+    #new_data = np.array(random.choices(data, k=k))
+    new_data = np.random.choice(data, k)
     estimate = [np.real(np.sum(new_data) / k), np.imag(np.sum(new_data) / k),
                 np.sum(new_data == 1 + 1j) / k, np.sum(new_data == 1j) / k,
                 np.sum(new_data == 1) / k, np.sum(new_data == 0) / k]
     print(estimate)
     mean_estimates.append(estimate)
-
+"""
 print("mean, std")
-for i in range(len(mean_estimates[0])):
-    print(f"{np.mean(mean_estimates[i])}")
-
+print(mean_estimates)
+"""
 mean_estimates = np.array(mean_estimates)
 
 print(f"Planck masked fraction:         {mean_estimates[0][0]} +/- {np.std(mean_estimates[:, 0])}")
@@ -66,3 +67,4 @@ print(f"Fraction masked by neither:     {mean_estimates[0][5]} +/- {np.std(mean_
 
 if args.save_path:
     np.savetxt(args.save_path, mean_estimates, delimiter=",")
+"""

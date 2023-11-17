@@ -23,7 +23,7 @@ sdss_mask.map[sdss_mask.map < 0.3] = 0
 sdss_mask.set_fig_ax(fig, ax)
 sdss_mask.plot()
 plt.title("SDSS mask in RA-DEC")
-plt.savefig("../../graphs/SDSS_mask.png", dpi=1e3)
+#plt.savefig("../../graphs/SDSS_mask.png", dpi=1e3)
 plt.show()
 #sdss_mask = toolkit.StarCatalogue("../../data/redmapper_dr8_public_v6.3_zmask.fits", hdu=1)
 

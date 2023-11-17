@@ -7,9 +7,12 @@ import astropy.cosmology
 import astropy
 import matplotlib
 
-plt.rcParams.update({
-    "text.usetex": True,
-    "font.family": "serif"})
+
+def plt_use_tex():
+    plt.rcParams.update({
+        "text.usetex": True,
+        "font.family": "serif"})
+    return None
 
 
 class __Mask(object):  # overwite this with pixell and healpy specific versions
@@ -56,7 +59,7 @@ class PixellMask(__Mask):
         self.lon_max = lon_max
 
     def lookup_point(self, lat, lon):
-        #print(lon, lat)
+        # print(lon, lat)
         point = self.map[int(((90 + lat) / 180) * self.x)][int((lon / 360) * self.y)]
         return point
 
@@ -141,7 +144,7 @@ class HealpyMask(__Mask):
             c = astropy.coordinates.SkyCoord(lon, lat, unit="deg", frame="galactic")  # convert to galactic co ords
             ra = c.icrs.ra.degree
             dec = c.icrs.dec.degree
-            #print(ra, dec)
+            # print(ra, dec)
             pix = hp.ang2pix(self.NSIDE, ra, dec, lonlat=True, nest=self.nest)
         return self.map[pix]
 
@@ -180,8 +183,8 @@ class HealpyMask(__Mask):
         print("converted units")
         for i in range(x):
             for j in range(y):
-                #pixel_data[i, j] = self.map[hp.ang2pix(self.NSIDE, (j / y) * 360, (i / x) * 180 - 90, lonlat=True)]
-                #print(ra[j], dec[i])
+                # pixel_data[i, j] = self.map[hp.ang2pix(self.NSIDE, (j / y) * 360, (i / x) * 180 - 90, lonlat=True)]
+                # print(ra[j], dec[i])
                 pixel_data[i, j] = self.lookup_point(ra[i, j], dec[i, j], correction_applied=True)
         lon = np.linspace(0, 360, y + 1)
         lat = np.linspace(- 90, 90, x + 1)
@@ -191,7 +194,8 @@ class HealpyMask(__Mask):
         c = self.ax.pcolormesh(lon, lat, pixel_data, alpha=alpha, cmap=cmap)
         return c
 
-    def plot(self, resolution=(1000, 2000), clear=True, cbar=None, title=None, save_path=None, show=False, cmap="plasma", alpha=1):
+    def plot(self, resolution=(1000, 2000), clear=True, cbar=None, title=None, save_path=None, show=False,
+             cmap="plasma", alpha=1):
         if clear:
             self.ax.cla()
         c = self.plot_on_ax(alpha, resolution, cmap=cmap)
@@ -307,7 +311,7 @@ class StarCatalogue(object):
                 for j in range(y):
                     if self.cat_mask.lookup_point((j / y) * 360, (i / x) * 180 - 90) == 0:
                         pixel_data[i, j] = np.nan
-        #c = ax.pcolormesh(lon, lat, pixel_data, alpha=alpha, cmap=cmap,
+        # c = ax.pcolormesh(lon, lat, pixel_data, alpha=alpha, cmap=cmap,
         #                  norm=matplotlib.colors.LogNorm(vmin=None, vmax=None))
         c = ax.pcolormesh(lon, lat, pixel_data, vmin=1, alpha=alpha, cmap=cmap)
         return c
@@ -324,7 +328,8 @@ class StarCatalogue(object):
         print(f"Sum: {np.sum(self.heatmap)}")
         self.heatmap = self.heatmap / (resolution ** 2)
 
-    def plot_heatmap(self, nside, resolution=(1000, 2000), clear=True, cbar=None, title=None, save_path=None, show=False, cmap="plasma", alpha=1, cbar_label="", vmax=None):
+    def plot_heatmap(self, nside, resolution=(1000, 2000), clear=True, cbar=None, title=None, save_path=None,
+                     show=False, cmap="plasma", alpha=1, cbar_label="", vmax=None):
         self.gen_heatmap_data(nside)
         if clear:
             self.ax.cla()
@@ -370,7 +375,7 @@ class HealpyPlot(object):
             for j in range(y):
                 pixel_data[i, j] = self.heatmap[hp.ang2pix(self.NSIDE, (i / x) * 180 - 90, (j / y) * 2 * 360,
                                                            lonlat=True)]
-        lat = np.linspace(- 90,90, x + 1)
+        lat = np.linspace(- 90, 90, x + 1)
         lon = np.linspace(0, 360, y + 1)
         lon, lat = np.meshgrid(lon, lat)
         c = ax.pcolormesh(lon, lat, pixel_data, alpha=alpha, cmap=cmap)
@@ -412,8 +417,68 @@ def load_mask(mask, raise_dir=2):
                            hdu=1, partial=True)
         value.map[value.map > 0.4] = 1.0
         value.map[value.map < 0.3] = 0
-        value.map = (value.map - 1) * -1
+        # value.map = (value.map - 1) * -1
     return value
+
+
+def bootstrap(data, samples):
+    n = len(data)
+    mean_estimates = []
+    for i in range(samples):
+        print(f"Bootstrap iteration: {i}")
+        new_data = np.random.choice(data, n)
+        estimate = np.sum(new_data)
+        print(estimate)
+        mean_estimates.append(estimate)
+    return mean_estimates
+
+
+def fraction_masked_pair(mask1, mask2, n=int(1e3)):
+    if isinstance((mask1, mask2), HealpyMask) and mask2.NPIX == mask1.NPIX and mask1.using_latlon and mask2.using_latlon:
+        data = mask1.compare(mask2)
+        k = np.max((mask1.NPIX, mask2.NPIX))
+        results = [np.real(np.sum(data) / k), np.imag(np.sum(data) / k), np.sum(data == 1 + 1j) / k,
+                   np.sum(data == 1) / k, np.sum(data == 1j) / k,
+                   np.sum(data == 0) / k]
+    else:
+        x = np.linspace(-np.pi, np.pi, n)
+        y = np.linspace(-np.pi/2, np.pi/2, n)
+        x, y = np.meshgrid(x, y)
+        data1 = mask1.lookup_point(x * 180 / np.pi, y * 180 / np.pi)
+        data2 = mask2.lookup_point(x * 180 / np.pi, y * 180 / np.pi)
+        data = np.array(data1 + 1j * data2)
+        sums = np.array([0, 0, 0, 0, 0])
+        for i in range(len(y)):
+            s = np.sin(np.pi * (i + 0.5) / len(y))
+            sums[0] += len(x) * s
+            sums[1] += np.sum(data[i] == 1) * s
+            sums[2] += np.sum(data[i] == 1j) * s
+            sums[3] += np.sum(data[i] == 1+1j) * s
+            sums[4] += np.sum(data[i] == 0) * s
+        results = sums[1:] / sums[0]
+    return results
+
+
+def gen_random_coords(n, mask=None):
+    if mask:
+        n = n / mask.calc_exact_unmasked_fraction()  # correct for masked fraction
+    n = int(n * 6 / np.pi)  # correct for volume generation
+    x = 2 * np.random.rand(n) - 1
+    y = 2 * np.random.rand(n) - 1
+    z = 2 * np.random.rand(n) - 1
+    r = np.sqrt(x ** 2 + y ** 2 + z ** 2)
+    # filter out points outside of unit sphere
+    x = x[r < 1]
+    y = y[r < 1]
+    z = z[r < 1]
+    r = r[r < 1]
+    theta = np.arcsin(z / r) * 180 / np.pi
+    phi = np.arctan2(x, y) * 180 / np.pi
+    data = np.array((theta, phi))
+    # if a mask is being used, filter out masked points
+    if mask:
+        data = data[:, np.bool_(mask.lookup_point(phi, theta))]
+    return data
 
 
 #  Define a black and white heatmap
