@@ -35,7 +35,7 @@ data = masks[1].lookup_point(*co_ords[::-1])
 
 unmasked_fraction = np.sum(data) / len(data)
 
-print(f"The exact unmasked fraction is {unmasked_fraction}")
+print(f"The unmasked fraction is {unmasked_fraction}")
 
 mean_estimates = np.array(toolkit.bootstrap(data, args.bootstrap_iterations)) / len(data)
 
