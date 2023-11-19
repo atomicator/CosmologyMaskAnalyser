@@ -433,14 +433,14 @@ def bootstrap(data, samples):
     return mean_estimates
 
 
-def fraction_masked_pair(mask1, mask2, n=int(1e3)):
+def fraction_masked_pair(mask1, mask2, n=int(1e3), ram_limited=False):
     if isinstance((mask1, mask2), HealpyMask) and mask2.NPIX == mask1.NPIX and mask1.using_latlon and mask2.using_latlon:
         data = mask1.compare(mask2)
         k = np.max((mask1.NPIX, mask2.NPIX))
         results = [np.real(np.sum(data) / k), np.imag(np.sum(data) / k), np.sum(data == 1 + 1j) / k,
                    np.sum(data == 1) / k, np.sum(data == 1j) / k,
                    np.sum(data == 0) / k]
-    else:
+    elif not ram_limited:
         x = np.linspace(-np.pi, np.pi, n)
         y = np.linspace(-np.pi/2, np.pi/2, n)
         x, y = np.meshgrid(x, y)
@@ -450,11 +450,29 @@ def fraction_masked_pair(mask1, mask2, n=int(1e3)):
         sums = np.array([0, 0, 0, 0, 0])
         for i in range(len(y)):
             s = np.sin(np.pi * (i + 0.5) / len(y))
+            print(i)
             sums[0] += len(x) * s
             sums[1] += np.sum(data[i] == 1) * s
             sums[2] += np.sum(data[i] == 1j) * s
             sums[3] += np.sum(data[i] == 1+1j) * s
             sums[4] += np.sum(data[i] == 0) * s
+        results = sums[1:] / sums[0]
+    else:
+        x = np.linspace(-np.pi, np.pi, n)
+        y = np.linspace(-np.pi / 2, np.pi / 2, n)
+        sums = np.array([0, 0, 0, 0, 0])
+        for i in range(len(y)):
+            theta = np.pi * (i + 0.5) / len(y)
+            s = np.sin(theta)
+            print(i)
+            data1 = mask1.lookup_point(x * 180 / np.pi, (theta * 180 / np.pi) - 90)
+            data2 = mask2.lookup_point(x * 180 / np.pi, (theta * 180 / np.pi) - 90)
+            data = np.array(data1 + 1j * data2)
+            sums[0] += len(x) * s
+            sums[1] += np.sum(data == 1) * s
+            sums[2] += np.sum(data == 1j) * s
+            sums[3] += np.sum(data == 1 + 1j) * s
+            sums[4] += np.sum(data == 0) * s
         results = sums[1:] / sums[0]
     return results
 

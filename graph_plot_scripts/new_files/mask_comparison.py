@@ -19,7 +19,7 @@ mask_names = [args.mask_one, args.mask_two]
 
 masks = [toolkit.load_mask(mask_names[0], args.path_raise), toolkit.load_mask(mask_names[1], args.path_raise)]
 
-mask_frac = toolkit.fraction_masked_pair(masks[0], masks[1], n=args.resolution)
+mask_frac = toolkit.fraction_masked_pair(masks[0], masks[1], n=args.resolution, ram_limited=True)
 unmasked_fraction_exact = mask_frac[2] / (mask_frac[0] + mask_frac[2])
 
 print(mask_frac)
