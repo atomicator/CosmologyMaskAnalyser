@@ -37,7 +37,7 @@ unmasked_fraction = np.sum(data) / len(data)
 
 print(f"The exact unmasked fraction is {unmasked_fraction}")
 
-mean_estimates = toolkit.bootstrap(data, args.bootstrap_iterations)
+mean_estimates = np.array(toolkit.bootstrap(data, args.bootstrap_iterations)) / len(data)
 
 print(f"Final results: {mean_estimates[0]} +/- {np.std(mean_estimates)}")
 

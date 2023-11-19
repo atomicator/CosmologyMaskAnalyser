@@ -32,7 +32,7 @@ print(min(data))
 
 print(np.sum(data) / len(data))
 
-mean_estimates = toolkit.bootstrap(data, args.bootstrap_iterations)
+mean_estimates = np.array(toolkit.bootstrap(data, args.bootstrap_iterations)) / len(data)
 
 print(f"Final results: {mean_estimates[0]} +/- {np.std(mean_estimates)}")
 
