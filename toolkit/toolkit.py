@@ -599,6 +599,8 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, name="", res=int(1e4)):
     data1 = mask1.lookup_point(x, y)
     data2 = mask2.lookup_point(x, y)
     data = data1 + 1j * data2
+    data1[data1 > 0] = 1
+    data2[data2 > 0] = 1
     print(np.min(data1), np.max(data1))
     print(np.min(data2), np.max(data2))
     map = np.zeros((5, hp.nside2npix(NSIDE)))
