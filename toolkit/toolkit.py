@@ -613,6 +613,7 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, name="", res=int(1e4)):
         map[4, pixel] += np.sum(np.cos(temp[reduced_data == 1+1j]))
     print(map)
     results = map[1:] / (map[0] + 1e-100)
+    print(np.max(results[0]), np.max(results[1]), np.max(results[2]), np.max(results[3]))
     hp.fitsfunc.write_map(f"./{name}_{NSIDE}_1.fits", results[0], overwrite=True)
     hp.fitsfunc.write_map(f"./{name}_{NSIDE}_2.fits", results[1], overwrite=True)
     hp.fitsfunc.write_map(f"./{name}_{NSIDE}_3.fits", results[2], overwrite=True)
