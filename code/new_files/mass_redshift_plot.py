@@ -1,5 +1,6 @@
 from toolkit import toolkit
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 def planck_cat_selection_func(snr, pipe_det, cosmo, redshift, mass):
@@ -20,6 +21,9 @@ cat = toolkit.StarCatalogue("../../data/HFI_PCCS_SZ-union_R2.08.fits", hdu=1)
 
 labels = [r"$\sigma > 10$", r"$\sigma > 9$", r"$\sigma > 8$", r"$\sigma > 7$", r"$\sigma > 6$"]
 
+min_z = 1e100
+max_z = 0
+
 while min_snr >= 6:
     z = []
     m = []
@@ -27,6 +31,12 @@ while min_snr >= 6:
     plt.scatter(z, m, marker="+", s=10, label=labels[10 - min_snr])
     max_snr = min_snr
     min_snr -= 1
+    if np.max(z) > max_z:
+        max_z = np.max(z)
+    if 0 < np.min(z) < min_z:
+        min_z = np.min(z)
+
+print(min_z, max_z)
 
 plt.xlabel("Redshift")
 plt.ylabel(r"Mass $\left( 10^{14} M_{\odot} \right)$")

@@ -6,6 +6,7 @@ import healpy as hp
 import astropy.cosmology
 import astropy
 import matplotlib
+import copy
 
 
 def plt_use_tex():
@@ -17,6 +18,9 @@ def plt_use_tex():
 
 class __Mask(object):  # overwite this with pixell and healpy specific versions
     # Do not use this class outside of this file
+    fig = None
+    ax = None
+
     def lookup_point(self, lon, lat):
         pass
 
@@ -46,7 +50,7 @@ class PixellMask(__Mask):
         self.y = len(self.map[0])
         self.lat_min = -90
         self.lat_max = 90
-        self.lon_min = 0
+        self.lon_min = 00
         self.lon_max = 360
         self.fig = None
         self.ax = None
@@ -60,7 +64,7 @@ class PixellMask(__Mask):
 
     def lookup_point(self, lat, lon):
         # print(lon, lat)
-        point = self.map[int(((90 + lat) / 180) * self.x)][int((lon / 360) * self.y)]
+        point = self.map[int(((90 + lat) / 180) * self.x)][int(((lon - 180) / 360) * self.y)]
         return point
 
     def plot_on_ax(self, ax, alpha, cmap="plasma"):
@@ -178,14 +182,17 @@ class HealpyMask(__Mask):
         lat = np.linspace(0, 360, y)
         lat, lon = np.meshgrid(lat, lon)
         c = astropy.coordinates.SkyCoord(lat, lon, unit="deg", frame="galactic")  # convert to galactic co ords
-        ra = c.icrs.ra.degree
-        dec = c.icrs.dec.degree
+        # ra = c.icrs.ra.degree
+        # dec = c.icrs.dec.degree
         print("converted units")
-        for i in range(x):
+        """for i in range(x):
             for j in range(y):
                 # pixel_data[i, j] = self.map[hp.ang2pix(self.NSIDE, (j / y) * 360, (i / x) * 180 - 90, lonlat=True)]
                 # print(ra[j], dec[i])
-                pixel_data[i, j] = self.lookup_point(ra[i, j], dec[i, j], correction_applied=True)
+                pixel_data[i, j] = self.lookup_point(lat[i, j], lat[i, j], correction_applied=False)
+        """
+        pixel_data = self.lookup_point(lat, lon, correction_applied=False)
+        pixel_data[pixel_data == 1] = np.nan
         lon = np.linspace(0, 360, y + 1)
         lat = np.linspace(- 90, 90, x + 1)
         lon, lat = np.meshgrid(lon, lat)
@@ -211,6 +218,12 @@ class HealpyMask(__Mask):
     def compare(self, mask):
         data = self.map + 1j * mask.map
         return data
+
+    def clone(self):
+        fig, ax = self.fig, self.ax
+        new = copy.deepcopy(self)
+        new.fig, new.ax = fig, ax
+        return new
 
 
 class NotMaskError(TypeError):
@@ -291,7 +304,7 @@ class StarCatalogue(object):
             plt.show()
 
     def plot_on_ax(self, ax, alpha, resolution, cmap="plasma", vmax=None):
-        x, y = resolution
+        """x, y = resolution
         print(np.sum(self.heatmap))
         pixel_data = np.zeros((x, y))
         for i in range(x):
@@ -313,6 +326,19 @@ class StarCatalogue(object):
                         pixel_data[i, j] = np.nan
         # c = ax.pcolormesh(lon, lat, pixel_data, alpha=alpha, cmap=cmap,
         #                  norm=matplotlib.colors.LogNorm(vmin=None, vmax=None))
+        c = ax.pcolormesh(lon, lat, pixel_data, vmin=1, alpha=alpha, cmap=cmap)
+        return c"""
+        x = np.linspace(-90, 90, resolution[0])
+        y = np.linspace(0, 360, resolution[1])
+        x, y = np.meshgrid(x, y)
+        pixel_data = self.heatmap[hp.ang2pix(self.NSIDE, y, x, lonlat=True)]
+        if not self.cat_mask:
+            pixel_data[pixel_data == 0] = np.nan
+        else:
+            pixel_data[self.cat_mask.lookup_point(y, x) == 0] = np.nan
+        lat = np.linspace(-90, 90, resolution[0] + 1)
+        lon = np.linspace(0, 360, resolution[1] + 1)
+        lat, lon = np.meshgrid(lat, lon)
         c = ax.pcolormesh(lon, lat, pixel_data, vmin=1, alpha=alpha, cmap=cmap)
         return c
 
@@ -382,6 +408,217 @@ class HealpyPlot(object):
         return c
 
 
+class _BinMap(object):
+    map = []
+    weighted_map = []
+    mask_fraction_map = []
+    NSIDE = 0
+    binned_sample = [[]]
+
+    def load_catalogue(self, catalogue):
+        if self.NSIDE <= 8:
+            data = self.lookup_pix(*catalogue.lon_lat.transpose())
+            for i in range(len(self.map)):
+                self.map[i] = np.sum(data == i)
+        else:
+            for cluster in catalogue.lon_lat:
+                self.map[hp.ang2pix(self.NSIDE, *cluster, lonlat=True)] += 1
+
+    def lookup_point(self, lon, lat):
+        pass
+
+    def lookup_pix(self, lon, lat):
+        pass
+
+    def lookup_weighted_point(self, lon, lat):
+        pass
+
+    def calc_weighted_map(self, mask, resolution=(1000, 1000)):
+        pass
+
+    def bin_catalogue(self, catalogue):
+        self.binned_sample = []
+        for bin in range(hp.nside2npix(self.NSIDE)):
+            self.binned_sample.append([])
+        for cluster in catalogue.lon_lat:
+            self.binned_sample[self.lookup_pix(*cluster)].append(cluster)
+        for bin in range(hp.nside2npix(self.NSIDE)):
+            self.binned_sample[bin] = np.array(self.binned_sample[bin])
+
+    def calc_masked_fraction(self, mask):
+        self.calc_weighted_map(mask)
+        sample_masked_fraction = np.zeros(hp.nside2npix(self.NSIDE))
+        for bin in range(hp.nside2npix(self.NSIDE)):
+            try:
+                sample_masked_fraction[bin] = 1 - np.sum(mask.lookup_point(*self.binned_sample[bin].transpose())) / len(
+                    self.binned_sample[bin])
+            except TypeError:
+                sample_masked_fraction[bin] = np.NAN
+        # reduced_data = sample_masked_fraction[np.bitwise_and(np.bitwise_and(
+        #    sample_masked_fraction == sample_masked_fraction, sample_masked_fraction != 0), sample_masked_fraction != 1)]
+        #print(f"sample masked fraction: {sample_masked_fraction}")
+        #print(f"n: {self.map}")
+        #print(f"""test: {np.sum(sample_masked_fraction[sample_masked_fraction == sample_masked_fraction] *
+        #             self.map[sample_masked_fraction == sample_masked_fraction]) / np.sum(self.map)}""")
+
+        # Everything above this line works
+
+        # n = self.map[np.bitwise_and(np.bitwise_and(sample_masked_fraction == sample_masked_fraction,
+        # sample_masked_fraction != 0), sample_masked_fraction != 1)]
+        nan_filter = sample_masked_fraction == sample_masked_fraction
+        masked = sample_masked_fraction == 1
+        not_masked = sample_masked_fraction == 0
+
+        fully_masked_cluster_fraction = np.sum(self.map[masked + np.bitwise_not(nan_filter)]) / np.sum(self.map)
+        not_masked_cluster_fraction = np.sum(self.map[not_masked]) / np.sum(self.map)
+        mixed_bins = np.bitwise_not(masked + np.bitwise_not(nan_filter)) * np.bitwise_not(not_masked)
+
+        reduced_data = sample_masked_fraction[mixed_bins]
+        n = self.map[mixed_bins]
+        variance = reduced_data * (1 - reduced_data) / n
+        #variance = 1 / n
+        weighted_mean = np.sum(reduced_data / variance) / np.sum(1 / variance)
+        #weighted_mean = np.sum(reduced_data * n) / np.sum(n)
+        weighted_error = np.sqrt(1 / (np.sum(1 / variance)))
+        print(f"weighted mean: {weighted_mean} +/- {weighted_error}")
+        print(f"""final answer, NSIDE = {self.NSIDE}: {fully_masked_cluster_fraction + (1 - fully_masked_cluster_fraction - not_masked_cluster_fraction) *
+              weighted_mean} +/- {(1 - fully_masked_cluster_fraction - not_masked_cluster_fraction) * weighted_error}""")
+
+        print("Attempt 2")
+        reduced_data = sample_masked_fraction[mixed_bins] / (1 - self.mask_fraction_map[mixed_bins])
+        print(sample_masked_fraction)
+        print(self.mask_fraction_map)
+        print(reduced_data)
+        variance = reduced_data * (1 - reduced_data) / n
+        weighted_mean = np.sum(reduced_data / variance) / np.sum(1 / variance)
+        mixed_bins_sky_mask_frac_total = np.sum(self.mask_fraction_map[mixed_bins]) / len(self.mask_fraction_map[mixed_bins])
+        print(f"weighted mean: {weighted_mean} +/- {weighted_error}")
+        print(
+            f"""final answer, NSIDE = {self.NSIDE}: {fully_masked_cluster_fraction + (1 - fully_masked_cluster_fraction 
+                                                                                      - not_masked_cluster_fraction) *
+                                                     weighted_mean * mixed_bins_sky_mask_frac_total} +/- {
+            (1 - fully_masked_cluster_fraction - not_masked_cluster_fraction) 
+                                                      * weighted_error * mixed_bins_sky_mask_frac_total}""")
+
+        """print(np.sum(reduced_data * n) / np.sum(self.map))
+        print(nan_filter * np.bitwise_not(masked) * np.bitwise_not(not_masked))
+        reduced_data = sample_masked_fraction[nan_filter * np.bitwise_not(masked) * np.bitwise_not(not_masked)]
+        print(f"reduced data: {reduced_data}")
+        n = self.map[nan_filter * np.bitwise_not(masked) * np.bitwise_not(not_masked)]
+        print(f"n:{n}")
+        print(np.sum(reduced_data * n) / np.sum(self.map))
+        #variance = reduced_data * (1 - reduced_data) / n
+        variance = 1 / n
+        print(f"Variance: {variance}")
+        weighted_mean = np.sum(reduced_data / variance) / np.sum(1 / variance)
+        print(f"weighted mean: {weighted_mean}")
+        self.mask_fraction_map = 1 - self.mask_fraction_map
+        # self.mask_fraction_map = np.ones(hp.nside2npix(self.NSIDE))
+        #print(self.mask_fraction_map)
+        not_masked_bins = self.map == 0
+        full_bins = self.map == 1
+        region_fractions = (np.array([np.sum(self.mask_fraction_map[not_masked_bins] * self.map[not_masked_bins]),
+                                      np.sum(self.mask_fraction_map[full_bins] * self.map[full_bins]),
+                                      np.sum(self.mask_fraction_map[
+                                                 np.bitwise_not(full_bins) * np.bitwise_not(not_masked_bins)] *
+                                             self.map[
+                                                 np.bitwise_not(full_bins) * np.bitwise_not(not_masked_bins)])])
+                            ) / np.sum(self.mask_fraction_map * self.map)
+        print(f"Region fractions: {region_fractions}")
+        print(
+            f"Final answer: {(0 * region_fractions[0] + 1 * region_fractions[1] + weighted_mean * region_fractions[2])}")"""
+
+
+class BinaryMap(_BinMap):
+    def __init__(self):
+        self.map = np.array((0.0, 0.0))
+        self.weighted_map = np.array((0.0, 0.0))
+
+    def lookup_point(self, _lon, lat):
+        return self.map[np.int_(lat > 0)]
+
+    def lookup_weighted_point(self, _lon, lat):
+        return self.weighted_map[np.int_(lat > 0)]
+
+    def lookup_pix(self, _lon, lat):
+        return np.int_(lat > 0)
+
+    def calc_weighted_map(self, mask, resolution=(1000, 1000)):
+        bin = self.lookup_pix(*hp.pix2ang(mask.NSIDE, np.arange(hp.nside2npix(mask.NSIDE)), lonlat=True))
+        print(np.min(bin), np.max(bin))
+        self.mask_fraction_map = np.array([np.sum(mask.map[bin == 0]) / len(mask.map[bin == 0]),
+                                           np.sum(mask.map[bin == 1]) / len(mask.map[bin == 1])])
+        print(f"Mask fraction map: {self.mask_fraction_map}")
+        inverted_fraction_map = np.power(self.mask_fraction_map, -1)  # spits out inf/NaN values, ignore RuntimeWarning
+        inverted_fraction_map[np.bitwise_or(np.isnan(inverted_fraction_map), np.isinf(inverted_fraction_map))] = 0
+        self.weighted_map = self.map * inverted_fraction_map
+
+
+class _ConstantMap(_BinMap):
+    def __init__(self):
+        self.map = np.ones(1)
+        self.weighted_map = np.ones(1)
+
+    def lookup_point(self, _lon, lat):
+        return np.ones(len(lat))
+
+    def lookup_weighted_point(self, _lon, lat):
+        return np.ones(len(lat))
+
+    def lookup_pix(self, _lon, lat):
+        return np.zeros(len(lat))
+
+
+class HealpixBinMap(_BinMap):
+    def __init__(self, NSIDE):
+        self.NSIDE = NSIDE
+        self.map = np.zeros(hp.nside2npix(NSIDE))
+        self.weighted_map = np.zeros(hp.nside2npix(NSIDE))
+
+    def lookup_point(self, lon, lat):
+        return self.map[hp.ang2pix(self.NSIDE, lon, lat, lonlat=True)]
+
+    def lookup_weighted_point(self, lon, lat):
+        return self.weighted_map[hp.ang2pix(self.NSIDE, lon, lat, lonlat=True)]
+
+    def lookup_pix(self, lon, lat):
+        return hp.ang2pix(self.NSIDE, lon, lat, lonlat=True)
+
+    def calc_weighted_map(self, mask, resolution=(1000, 1000)):
+        self.mask_fraction_map = hp.pixelfunc.ud_grade(mask.map, self.NSIDE)
+        inverted_fraction_map = np.power(self.mask_fraction_map, -1)  # spits out inf/NaN values, ignore RuntimeWarning
+        inverted_fraction_map[np.bitwise_or(np.isnan(inverted_fraction_map), np.isinf(inverted_fraction_map))] = 0
+        self.weighted_map = self.map * inverted_fraction_map
+
+
+def gen_mask_comparison_map(mask1, mask2, NSIDE=512, res=int(1e4)):
+    print("test")
+    x = np.linspace(-180, 180, 2 * res)
+    y = np.linspace(-90, 90, res)
+    x, y = np.meshgrid(x, y)
+    data1 = mask1.lookup_point(x, y)
+    data2 = mask2.lookup_point(x, y)
+    data = data1 + 1j * data2
+    map = np.zeros((5, hp.nside2npix(NSIDE)))
+    bins = hp.ang2pix(NSIDE, x, y, lonlat=True)
+    for pixel in range(len(map)):
+        points = bins == pixel
+        reduced_data = data[points]
+        temp = y[points]
+        map[0, pixel] += np.sum(np.cos(temp))
+        map[1, pixel] += np.sum(np.cos(temp[reduced_data == 0]))
+        map[2, pixel] += np.sum(np.cos(temp[reduced_data == 1]))
+        map[3, pixel] += np.sum(np.cos(temp[reduced_data == 1j]))
+        map[4, pixel] += np.sum(np.cos(temp[reduced_data == 1+1j]))
+    print(map)
+    results = map[1:] / (map[0] + 1e-100)
+    hp.fitsfunc.write_map(f"./{NSIDE}_1.fits", results[0], overwrite=True)
+    hp.fitsfunc.write_map(f"./{NSIDE}_2.fits", results[1], overwrite=True)
+    hp.fitsfunc.write_map(f"./{NSIDE}_3.fits", results[2], overwrite=True)
+    hp.fitsfunc.write_map(f"./{NSIDE}_4.fits", results[3], overwrite=True)
+    print(results)
+
+
 def gen_random_coord():
     finished = False
     (lon, lat) = (0, 0)
@@ -409,16 +646,50 @@ def get_header_info(hdu_list):
 def load_mask(mask, raise_dir=2):
     value = None
     if mask == "planck_galactic":
-        value = HealpyMask("../" * raise_dir + "data/planck_galactic_mask.fits")
-    if mask == "planck_point":
-        value = HealpyMask("../" * raise_dir + "data/planck_point_mask.fits")
-    if mask == "sdss_mask":
+        # value = HealpyMask("../" * raise_dir + "data/HFI_PCCS_SZ-selfunc-union-survey_R2.08.fits", mask_using_latlon=True, hdu=1, partial=False)
+        value = HealpyMask("../" * raise_dir + "data/planck_galactic_mask.fits", partial=True, mask_using_latlon=True)
+    elif mask == "planck_point" or mask == "planck_modified_total":
+        value = HealpyMask("../" * raise_dir + "data/HFI_PCCS_SZ-selfunc-inter-cosmo_2.02.fits", partial=False,
+                           mask_using_latlon=True)
+    elif mask == "planck_survey":
+        value = HealpyMask("../" * raise_dir + "data/planck_survey_mask.fits", partial=True, mask_using_latlon=True)
+    elif mask == "sdss_mask":
         value = HealpyMask("../" * raise_dir + "data/redmapper_dr8_public_v6.3_zmask.fits", mask_using_latlon=False,
                            hdu=1, partial=True)
         value.map[value.map > 0.4] = 1.0
         value.map[value.map < 0.3] = 0
+        rotator = hp.Rotator(coord=["C", "G"])
+        value.map = rotator.rotate_map_pixel(value.map)
+        value.mask_using_latlon = True
         # value.map = (value.map - 1) * -1
+    elif mask == "planck_modified_galactic":
+        point_mask = load_mask("planck_point")
+        galactic_mask = load_mask("planck_galactic")
+        compound_map = load_mask("planck_point")
+        value = load_mask("planck_point")
+        compound_map.map = 2 * point_mask.map + galactic_mask.map
+        value.map = np.float_(compound_map.map == 0)
+        print(value.map)
+        print(compound_map.map)
+    elif mask == "planck_modified_point":
+        point_mask = load_mask("planck_point")
+        galactic_mask = load_mask("planck_galactic")
+        compound_map = load_mask("planck_point")
+        value = load_mask("planck_point")
+        compound_map.map = 2 * point_mask.map + galactic_mask.map
+        value.map = np.float_(compound_map.map == 1)
+    else:
+        raise ValueError(f"{mask} is not a recognised mask")
     return value
+
+
+def load_catalogue(cat, raise_dir=2):
+    if cat == "sdss":
+        data = StarCatalogue(raise_dir * "../" + "data/sdss_catalogue.fits", hdu=1)
+        data.load_lon_lat()
+    else:
+        raise ValueError(f"{cat} is not a recognised catalogue")
+    return data
 
 
 def bootstrap(data, samples):
@@ -433,16 +704,18 @@ def bootstrap(data, samples):
     return mean_estimates
 
 
-def fraction_masked_pair(mask1, mask2, n=int(1e3), ram_limited=False):
-    if isinstance((mask1, mask2), HealpyMask) and mask2.NPIX == mask1.NPIX and mask1.using_latlon and mask2.using_latlon:
+def fraction_masked_pair(mask1, mask2, n=int(1e3), ram_limited=False, weight_map=None):
+    if (isinstance((mask1, mask2),
+                   HealpyMask) and mask2.NPIX == mask1.NPIX and mask1.using_latlon and mask2.using_latlon
+            and not weight_map):
         data = mask1.compare(mask2)
         k = np.max((mask1.NPIX, mask2.NPIX))
         results = [np.real(np.sum(data) / k), np.imag(np.sum(data) / k), np.sum(data == 1 + 1j) / k,
                    np.sum(data == 1) / k, np.sum(data == 1j) / k,
                    np.sum(data == 0) / k]
-    elif not ram_limited:
+    elif not ram_limited and not weight_map:
         x = np.linspace(-np.pi, np.pi, n)
-        y = np.linspace(-np.pi/2, np.pi/2, n)
+        y = np.linspace(-np.pi / 2, np.pi / 2, n)
         x, y = np.meshgrid(x, y)
         data1 = mask1.lookup_point(x * 180 / np.pi, y * 180 / np.pi)
         data2 = mask2.lookup_point(x * 180 / np.pi, y * 180 / np.pi)
@@ -450,29 +723,31 @@ def fraction_masked_pair(mask1, mask2, n=int(1e3), ram_limited=False):
         sums = np.array([0, 0, 0, 0, 0])
         for i in range(len(y)):
             s = np.sin(np.pi * (i + 0.5) / len(y))
-            print(i)
             sums[0] += len(x) * s
             sums[1] += np.sum(data[i] == 1) * s
             sums[2] += np.sum(data[i] == 1j) * s
-            sums[3] += np.sum(data[i] == 1+1j) * s
+            sums[3] += np.sum(data[i] == 1 + 1j) * s
             sums[4] += np.sum(data[i] == 0) * s
         results = sums[1:] / sums[0]
     else:
+        if weight_map is None:
+            weight_map = _ConstantMap()
         x = np.linspace(-np.pi, np.pi, n)
         y = np.linspace(-np.pi / 2, np.pi / 2, n)
         sums = np.array([0, 0, 0, 0, 0])
         for i in range(len(y)):
             theta = np.pi * (i + 0.5) / len(y)
             s = np.sin(theta)
-            print(i)
             data1 = mask1.lookup_point(x * 180 / np.pi, (theta * 180 / np.pi) - 90)
             data2 = mask2.lookup_point(x * 180 / np.pi, (theta * 180 / np.pi) - 90)
+            weight = weight_map.lookup_weighted_point(x * 180 / np.pi, ((theta * 180 / np.pi) - 90) * np.ones(len(x)))
             data = np.array(data1 + 1j * data2)
-            sums[0] += len(x) * s
-            sums[1] += np.sum(data == 1) * s
-            sums[2] += np.sum(data == 1j) * s
-            sums[3] += np.sum(data == 1 + 1j) * s
-            sums[4] += np.sum(data == 0) * s
+            # data = np.array(data1 + 1j * data2)
+            sums[0] += np.sum(np.ones(n) * weight) * s
+            sums[1] += np.sum(np.float_(data == 1) * weight) * s
+            sums[2] += np.sum(np.float_(data == 1j) * weight) * s
+            sums[3] += np.sum(np.float_(data == 1 + 1j) * weight) * s
+            sums[4] += np.sum(np.float_(data == 0) * weight) * s
         results = sums[1:] / sums[0]
     return results
 
@@ -497,6 +772,18 @@ def gen_random_coords(n, mask=None):
     if mask:
         data = data[:, np.bool_(mask.lookup_point(phi, theta))]
     return data
+
+
+def ra_dec_to_lon_lat(ra, dec, reverse=False):
+    if not reverse:
+        c = astropy.coordinates.SkyCoord(ra=ra, dec=dec, unit="deg")  # convert to galactic co ords
+        lon = c.galactic.l.degree
+        lat = c.galactic.b.degree
+    else:
+        c = astropy.coordinates.SkyCoord(lon=ra, lat=dec)  # convert to galactic co ords
+        lon = c.icrs.ra.degree
+        lat = c.icrs.dec.degree
+    return lon, lat
 
 
 #  Define a black and white heatmap

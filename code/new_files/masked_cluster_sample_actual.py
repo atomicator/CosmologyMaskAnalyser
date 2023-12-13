@@ -24,9 +24,18 @@ cat = toolkit.StarCatalogue("../" * args.path_raise + args.catalogue, hdu=1)
 
 cat.load_lon_lat()
 
+plt.scatter(*cat.lon_lat.transpose()[:, :1000], 5, "r", "+")
+plt.xlim(0, 360)
+plt.ylim(-90, 90)
+plt.show()
+
 print(len(cat.lon_lat))
 
-data = mask.lookup_point(*cat.lon_lat.transpose())
+print(cat.lon_lat)
+
+cat.lon_lat[cat.lon_lat > 180] -= 360 # This has no affect on final result
+
+data = np.array(mask.lookup_point(*cat.lon_lat.transpose()))
 
 print(min(data))
 
@@ -34,7 +43,11 @@ print(np.sum(data) / len(data))
 
 mean_estimates = np.array(toolkit.bootstrap(data, args.bootstrap_iterations)) / len(data)
 
-print(f"Final results: {mean_estimates[0]} +/- {np.std(mean_estimates)}")
+print(f"Final results: {1 - mean_estimates[0]} +/- {np.std(mean_estimates)}")
 
 if args.save_path:
     np.savetxt("../" * args.path_raise + args.save_path, mean_estimates, delimiter=",")
+
+mask = toolkit.load_mask("sdss_mask")
+data = np.array(mask.lookup_point(*cat.lon_lat.transpose()))
+print(np.sum(data) / len(data))
