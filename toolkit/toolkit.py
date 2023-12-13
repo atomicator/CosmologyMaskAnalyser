@@ -610,7 +610,7 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, name="", res=int(1e4)):
     map = np.zeros((5, hp.nside2npix(NSIDE)))
     bins = hp.ang2pix(NSIDE, x, y, lonlat=True)
     print(np.min(bins), np.max(bins), len(map[0]))
-    for pixel in range(len(map)):
+    for pixel in range(len(map[0])):
         points = bins == pixel
         print(len(points))
         reduced_data = data[points]
