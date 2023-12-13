@@ -17,5 +17,5 @@ mask_names = [args.mask_one, args.mask_two]
 mask1 = toolkit.load_mask("sdss_mask")
 mask2 = toolkit.load_mask("planck_galactic")
 
-toolkit.gen_mask_comparison_map(mask1, mask2, NSIDE=1, res=int(1e3))
+toolkit.gen_mask_comparison_map(mask1, mask2, NSIDE=1, res=int(1e3), name=f"{args.mask1}_{args.mask2}")
 
