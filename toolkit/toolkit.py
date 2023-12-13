@@ -603,16 +603,10 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, name="", res=int(1e4)):
     data1[data1 > 0] = 1.0
     data2[data2 > 0] = 1.0
     data = data1 + 1j * data2
-    print(np.min(data1), np.max(data1))
-    print(np.min(data2), np.max(data2))
-    print(data)
-    print(np.array((np.sum(data == 0), np.sum(data == 1), np.sum(data == 1j), np.sum(data == 1 + 1j))) / len(data))
     map = np.zeros((5, hp.nside2npix(NSIDE)))
     bins = hp.ang2pix(NSIDE, x, y, lonlat=True)
-    print(np.min(bins), np.max(bins), len(map[0]))
     for pixel in range(len(map[0])):
         points = bins == pixel
-        print(len(points))
         reduced_data = data[points]
         temp = y[points] * np.pi / 180
         map[0, pixel] += np.sum(np.cos(temp))
