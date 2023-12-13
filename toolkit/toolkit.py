@@ -456,9 +456,9 @@ class _BinMap(object):
                 sample_masked_fraction[bin] = np.NAN
         # reduced_data = sample_masked_fraction[np.bitwise_and(np.bitwise_and(
         #    sample_masked_fraction == sample_masked_fraction, sample_masked_fraction != 0), sample_masked_fraction != 1)]
-        #print(f"sample masked fraction: {sample_masked_fraction}")
-        #print(f"n: {self.map}")
-        #print(f"""test: {np.sum(sample_masked_fraction[sample_masked_fraction == sample_masked_fraction] *
+        # print(f"sample masked fraction: {sample_masked_fraction}")
+        # print(f"n: {self.map}")
+        # print(f"""test: {np.sum(sample_masked_fraction[sample_masked_fraction == sample_masked_fraction] *
         #             self.map[sample_masked_fraction == sample_masked_fraction]) / np.sum(self.map)}""")
 
         # Everything above this line works
@@ -476,13 +476,14 @@ class _BinMap(object):
         reduced_data = sample_masked_fraction[mixed_bins]
         n = self.map[mixed_bins]
         variance = reduced_data * (1 - reduced_data) / n
-        #variance = 1 / n
+        # variance = 1 / n
         weighted_mean = np.sum(reduced_data / variance) / np.sum(1 / variance)
-        #weighted_mean = np.sum(reduced_data * n) / np.sum(n)
+        # weighted_mean = np.sum(reduced_data * n) / np.sum(n)
         weighted_error = np.sqrt(1 / (np.sum(1 / variance)))
         print(f"weighted mean: {weighted_mean} +/- {weighted_error}")
-        print(f"""final answer, NSIDE = {self.NSIDE}: {fully_masked_cluster_fraction + (1 - fully_masked_cluster_fraction - not_masked_cluster_fraction) *
-              weighted_mean} +/- {(1 - fully_masked_cluster_fraction - not_masked_cluster_fraction) * weighted_error}""")
+        print(
+            f"""final answer, NSIDE = {self.NSIDE}: {fully_masked_cluster_fraction + (1 - fully_masked_cluster_fraction - not_masked_cluster_fraction) *
+                                                     weighted_mean} +/- {(1 - fully_masked_cluster_fraction - not_masked_cluster_fraction) * weighted_error}""")
 
         print("Attempt 2")
         reduced_data = sample_masked_fraction[mixed_bins] / (1 - two_mask_fraction_map[mixed_bins])
@@ -492,14 +493,15 @@ class _BinMap(object):
         print(reduced_data)
         variance = reduced_data * (1 - reduced_data) / n
         weighted_mean = np.sum(reduced_data / variance) / np.sum(1 / variance)
-        mixed_bins_sky_mask_frac_total = np.sum(self.mask_fraction_map[mixed_bins]) / len(self.mask_fraction_map[mixed_bins])
+        mixed_bins_sky_mask_frac_total = np.sum(self.mask_fraction_map[mixed_bins]) / len(
+            self.mask_fraction_map[mixed_bins])
         print(f"weighted mean: {weighted_mean} +/- {weighted_error}")
         print(
-            f"""final answer, NSIDE = {self.NSIDE}: {fully_masked_cluster_fraction + (1 - fully_masked_cluster_fraction 
+            f"""final answer, NSIDE = {self.NSIDE}: {fully_masked_cluster_fraction + (1 - fully_masked_cluster_fraction
                                                                                       - not_masked_cluster_fraction) *
                                                      weighted_mean * mixed_bins_sky_mask_frac_total} +/- {
-            (1 - fully_masked_cluster_fraction - not_masked_cluster_fraction) 
-                                                      * weighted_error * mixed_bins_sky_mask_frac_total}""")
+            (1 - fully_masked_cluster_fraction - not_masked_cluster_fraction)
+            * weighted_error * mixed_bins_sky_mask_frac_total}""")
 
         """print(np.sum(reduced_data * n) / np.sum(self.map))
         print(nan_filter * np.bitwise_not(masked) * np.bitwise_not(not_masked))
@@ -598,11 +600,13 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, name="", res=int(1e4)):
     x, y = np.meshgrid(x, y)
     data1 = mask1.lookup_point(x, y)
     data2 = mask2.lookup_point(x, y)
+    data1[data1 > 0] = 1.0
+    data2[data2 > 0] = 1.0
     data = data1 + 1j * data2
-    data1[data1 > 0] = 1
-    data2[data2 > 0] = 1
     print(np.min(data1), np.max(data1))
     print(np.min(data2), np.max(data2))
+    print(data)
+    print(np.array((np.sum(data == 0), np.sum(data == 1), np.sum(data == 1j), np.sum(data == 1 + 1j))) / len(data))
     map = np.zeros((5, hp.nside2npix(NSIDE)))
     bins = hp.ang2pix(NSIDE, x, y, lonlat=True)
     for pixel in range(len(map)):
@@ -613,7 +617,7 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, name="", res=int(1e4)):
         map[1, pixel] += np.sum(np.cos(temp[reduced_data == 0.0]))
         map[2, pixel] += np.sum(np.cos(temp[reduced_data == 1.0]))
         map[3, pixel] += np.sum(np.cos(temp[reduced_data == 1j]))
-        map[4, pixel] += np.sum(np.cos(temp[reduced_data == 1.0+1j]))
+        map[4, pixel] += np.sum(np.cos(temp[reduced_data == 1.0 + 1j]))
     print(map)
     results = map[1:] / (map[0] + 1e-100)
     print(np.max(results[0]), np.max(results[1]), np.max(results[2]), np.max(results[3]))
