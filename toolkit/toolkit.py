@@ -610,10 +610,10 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, name="", res=int(1e4)):
         reduced_data = data[points]
         temp = y[points] * np.pi / 180
         map[0, pixel] += np.sum(np.cos(temp))
-        map[1, pixel] += np.sum(np.cos(temp[reduced_data == 0]))
-        map[2, pixel] += np.sum(np.cos(temp[reduced_data == 1]))
+        map[1, pixel] += np.sum(np.cos(temp[reduced_data == 0.0]))
+        map[2, pixel] += np.sum(np.cos(temp[reduced_data == 1.0]))
         map[3, pixel] += np.sum(np.cos(temp[reduced_data == 1j]))
-        map[4, pixel] += np.sum(np.cos(temp[reduced_data == 1+1j]))
+        map[4, pixel] += np.sum(np.cos(temp[reduced_data == 1.0+1j]))
     print(map)
     results = map[1:] / (map[0] + 1e-100)
     print(np.max(results[0]), np.max(results[1]), np.max(results[2]), np.max(results[3]))
