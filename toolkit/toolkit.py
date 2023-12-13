@@ -593,13 +593,14 @@ class HealpixBinMap(_BinMap):
 
 
 def gen_mask_comparison_map(mask1, mask2, NSIDE=512, name="", res=int(1e4)):
-    print("test")
     x = np.linspace(-180, 180, 2 * res)
     y = np.linspace(-90, 90, res)
     x, y = np.meshgrid(x, y)
     data1 = mask1.lookup_point(x, y)
     data2 = mask2.lookup_point(x, y)
     data = data1 + 1j * data2
+    print(np.min(data1), np.max(data1))
+    print(np.min(data2), np.max(data2))
     map = np.zeros((5, hp.nside2npix(NSIDE)))
     bins = hp.ang2pix(NSIDE, x, y, lonlat=True)
     for pixel in range(len(map)):
