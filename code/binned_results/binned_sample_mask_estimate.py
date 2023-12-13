@@ -6,6 +6,8 @@ mask = toolkit.load_mask("planck_galactic")
 cat = toolkit.load_catalogue("sdss")
 cat.load_lon_lat()
 
+comparison_mask = toolkit.load_mask("comparison_sdss_planck_galactic")
+
 """
 fig = plt.figure()
 ax = fig.add_subplot(111)

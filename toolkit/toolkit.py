@@ -445,7 +445,7 @@ class _BinMap(object):
         for bin in range(hp.nside2npix(self.NSIDE)):
             self.binned_sample[bin] = np.array(self.binned_sample[bin])
 
-    def calc_masked_fraction(self, mask):
+    def calc_masked_fraction(self, mask, two_mask_fraction_map):
         self.calc_weighted_map(mask)
         sample_masked_fraction = np.zeros(hp.nside2npix(self.NSIDE))
         for bin in range(hp.nside2npix(self.NSIDE)):
@@ -485,9 +485,10 @@ class _BinMap(object):
               weighted_mean} +/- {(1 - fully_masked_cluster_fraction - not_masked_cluster_fraction) * weighted_error}""")
 
         print("Attempt 2")
-        reduced_data = sample_masked_fraction[mixed_bins] / (1 - self.mask_fraction_map[mixed_bins])
+        reduced_data = sample_masked_fraction[mixed_bins] / (1 - two_mask_fraction_map[mixed_bins])
         print(sample_masked_fraction)
         print(self.mask_fraction_map)
+        print(two_mask_fraction_map)
         print(reduced_data)
         variance = reduced_data * (1 - reduced_data) / n
         weighted_mean = np.sum(reduced_data / variance) / np.sum(1 / variance)
@@ -604,7 +605,7 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, name="", res=int(1e4)):
     for pixel in range(len(map)):
         points = bins == pixel
         reduced_data = data[points]
-        temp = y[points]
+        temp = y[points] * np.pi / 180
         map[0, pixel] += np.sum(np.cos(temp))
         map[1, pixel] += np.sum(np.cos(temp[reduced_data == 0]))
         map[2, pixel] += np.sum(np.cos(temp[reduced_data == 1]))
@@ -643,7 +644,7 @@ def get_header_info(hdu_list):
         print(hdu.header)
 
 
-def load_mask(mask, raise_dir=2):
+def load_mask(mask, raise_dir=2, nside=8):
     value = None
     if mask == "planck_galactic":
         # value = HealpyMask("../" * raise_dir + "data/HFI_PCCS_SZ-selfunc-union-survey_R2.08.fits", mask_using_latlon=True, hdu=1, partial=False)
@@ -678,6 +679,25 @@ def load_mask(mask, raise_dir=2):
         value = load_mask("planck_point")
         compound_map.map = 2 * point_mask.map + galactic_mask.map
         value.map = np.float_(compound_map.map == 1)
+    elif mask == "comparison_sdss_planck_galactic":
+        sdss_mask_only = HealpyMask("../" * raise_dir + "code/binned_results/sdss_mask_planck_galactic_1_1.fits")
+        print(np.min(sdss_mask_only.map), np.max(sdss_mask_only.map))
+        sdss_mask_only = HealpyMask("../" * raise_dir + "code/binned_results/sdss_mask_planck_galactic_1_2.fits")
+        print(np.min(sdss_mask_only.map), np.max(sdss_mask_only.map))
+        both_masks = HealpyMask("../" * raise_dir + "code/binned_results/sdss_mask_planck_galactic_1_3.fits")
+        print(np.min(sdss_mask_only.map), np.max(both_masks.map))
+        sdss_mask_only = HealpyMask("../" * raise_dir + "code/binned_results/sdss_mask_planck_galactic_1_4.fits")
+        print(np.min(sdss_mask_only.map), np.max(sdss_mask_only.map))
+        sdss_mask_only = HealpyMask("../" * raise_dir + "data/cached_results/sdss_mask_planck_galactic_1024_1.fits")
+        print(np.min(sdss_mask_only.map), np.max(sdss_mask_only.map))
+        sdss_mask_only = HealpyMask("../" * raise_dir + "data/cached_results/sdss_mask_planck_galactic_1024_2.fits")
+        print(np.min(sdss_mask_only.map), np.max(sdss_mask_only.map))
+        both_masks = HealpyMask("../" * raise_dir + "data/cached_results/sdss_mask_planck_galactic_1024_3.fits")
+        print(np.min(sdss_mask_only.map), np.max(both_masks.map))
+        sdss_mask_only = HealpyMask("../" * raise_dir + "data/cached_results/sdss_mask_planck_galactic_1024_4.fits")
+        print(np.min(sdss_mask_only.map), np.max(sdss_mask_only.map))
+        new_map = (sdss_mask_only.map) / (both_masks.map + sdss_mask_only.map + 1e-100)
+        print(np.max(new_map))
     else:
         raise ValueError(f"{mask} is not a recognised mask")
     return value
