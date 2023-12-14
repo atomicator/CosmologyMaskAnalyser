@@ -607,6 +607,7 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, name="", res=int(1e4)):
     bins = hp.ang2pix(NSIDE, x, y, lonlat=True)
     for pixel in range(len(map[0])):
         points = bins == pixel
+        print(pixel / len(map[0]))
         reduced_data = data[points]
         temp = y[points] * np.pi / 180
         map[0, pixel] += np.sum(np.cos(temp))

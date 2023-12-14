@@ -9,7 +9,7 @@ parser.add_argument("--mask_two", choices=["sdss_mask", "planck_point", "planck_
                     help="The second mask to use", default="planck_galactic")
 parser.add_argument("--path_raise", type=int, default=2)
 parser.add_argument("--res", type=int, default=1e3)
-parser.add_argument("--nside", type=int, default=1)
+parser.add_argument("--nside", type=int, default=1024)
 parser.add_argument("--save_path")
 
 args = parser.parse_args()
