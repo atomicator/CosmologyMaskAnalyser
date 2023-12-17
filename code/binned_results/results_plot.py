@@ -41,6 +41,19 @@ results = np.array([[0.9922, 2.3232],
                     [1.1915, 2.5156],
                     [1.1780, 2.4723]])
 
+results = np.array([[0.9922, 2.3232],
+                    [1.0226, 2.3479],
+                    [1.1730, 2.3110],
+                    [1.1042, 2.3142],
+                    [1.1283, 2.3443],
+                    [1.1347, 2.3900],
+                    [1.1286, 2.4481],
+                    [1.1250, 2.4826],
+                    [1.1722, 2.5100],
+                    [1.1880, 2.5336],
+                    [1.1961, 2.5156],
+                    [1.1780, 2.4723]])
+
 galactic_mean = 1.1977
 galactic_error = 0.017
 
@@ -74,6 +87,6 @@ ax.set_ylabel(r"$\sigma$")
 ax.set_ylim(0, 14)
 plt.title("The effects of weighting the masked fraction using a binning algorithm")
 
-plt.savefig("../../graphs/binned_results.png")
+#plt.savefig("../../graphs/binned_results.png")
 
 plt.show()

@@ -15,8 +15,8 @@ parser.add_argument("--save_path")
 args = parser.parse_args()
 mask_names = [args.mask_one, args.mask_two]
 
-mask1 = toolkit.load_mask("sdss_mask")
-mask2 = toolkit.load_mask("planck_galactic")
+mask1 = toolkit.load_mask(args.mask_one)
+mask2 = toolkit.load_mask(args.mask_two)
 
 toolkit.gen_mask_comparison_map(mask1, mask2, NSIDE=args.nside, res=int(1e3), name=f"{args.mask_one}_{args.mask_two}")
 
