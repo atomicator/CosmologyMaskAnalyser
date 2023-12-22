@@ -41,20 +41,33 @@ results = np.array([[0.9922, 2.3232],
                     [1.1915, 2.5156],
                     [1.1780, 2.4723]])
 
-results = np.array([[0.9922, 2.3232],
-                    [1.0226, 2.3479],
-                    [1.1730, 2.3110],
-                    [1.1042, 2.3142],
-                    [1.1283, 2.3443],
-                    [1.1347, 2.3900],
-                    [1.1286, 2.4481],
-                    [1.1250, 2.4826],
-                    [1.1722, 2.5100],
-                    [1.1880, 2.5336],
-                    [1.1961, 2.5156],
+results = np.array([[0.9922, 2.3232], #
+                    [1.0226, 2.3479], # These values are skipped
+                    [1.1730, 2.3296],
+                    [1.1042, 2.2243],
+                    [1.1283, 2.1544],
+                    [1.1347, 1.9725],
+                    [1.1286, 1.7633],
+                    [1.1250, 1.9059],
+                    [1.1722, 2.1700],
+                    [1.1880, 2.4221],
+                    [1.1961, 2.519],
                     [1.1780, 2.4723]])
 
-galactic_mean = 1.1977
+results = np.array([[0.9922, 2.3232], #
+                    [1.0226, 2.3479], # These values are skipped
+                    [1.198, 2.3296],
+                    [1.127, 2.2243],
+                    [1.150, 2.1544],
+                    [1.1911, 1.9725],
+                    [1.1286, 1.7633],
+                    [1.1250, 1.9059],
+                    [1.1722, 2.1700],
+                    [1.1880, 2.4221],
+                    [1.1961, 2.519],
+                    [1.1780, 2.4723]])
+
+galactic_mean = 1.1976871570404612
 galactic_error = 0.017
 
 total_mean = 2.5142
@@ -68,25 +81,30 @@ x = np.power(2, n)
 
 print(n)
 print(x)
+a = 2
+b = -1
+temp = x[a:b]
+ax.plot(temp, galactic_data[a:b], label="Galactic", color="red")
+ax.plot(temp, total_data[a:b], label="Total", color="blue")
 
-ax.plot(x, galactic_data, label="Galactic", color="red")
-ax.plot(x, total_data, label="Total", color="blue")
-
-ax.plot(x, np.ones(len(x)) * 3, linestyle="dotted", color="black", label=r"$\sigma = 3$")
-ax.plot(x, np.ones(len(x)) * 2, linestyle="dashdot", color="black", label=r"$\sigma = 2$")
-ax.plot(x, np.ones(len(x)), linestyle="dashed", color="black", label=r"$\sigma = 1$")
+ax.plot(temp, np.ones(len(temp)) * 3, linestyle="dotted", color="black", label=r"$\sigma = 3$")
+ax.plot(temp, np.ones(len(temp)) * 2, linestyle="dashdot", color="black", label=r"$\sigma = 2$")
+ax.plot(temp, np.ones(len(temp)), linestyle="dashed", color="black", label=r"$\sigma = 1$")
 
 ax.legend()
 #ax.set_yscale("log")
 ax.set_xscale("log", base=2)
 
-ax.set_xticks(x, ["Const", "Hemi"] + list(np.int_(x)[2:]))
+#ax.set_xticks(x, ["Const", "Hemi"] + list(np.int_(x)[2:]))
+ax.set_xticks(x[a:b], list(np.int_(x)[a:b]))
 
 ax.set_xlabel("NSIDE")
 ax.set_ylabel(r"$\sigma$")
-ax.set_ylim(0, 14)
-plt.title("The effects of weighting the masked fraction using a binning algorithm")
+ax.set_ylim(0, 15)
+plt.title("The effects of weighting the masked fraction using a binning algorithm to\nestimate the ratio")
 
 #plt.savefig("../../graphs/binned_results.png")
 
 plt.show()
+
+# TODO: Number of clusters, weight of binomial distribution, take mean of masked fraction
