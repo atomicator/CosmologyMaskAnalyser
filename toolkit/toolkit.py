@@ -793,7 +793,7 @@ def load_mask(mask, raise_dir=2, nside=8):
         compound_map = load_mask("planck_point")
         value = load_mask("planck_point")
         compound_map.map = 2 * point_mask.map + galactic_mask.map
-        value.map = np.float_(compound_map.map == 0)
+        value.map = np.float_(np.bitwise_not(compound_map.map == 0))
         print(value.map)
         print(compound_map.map)
     elif mask == "planck_modified_point":
@@ -802,7 +802,7 @@ def load_mask(mask, raise_dir=2, nside=8):
         compound_map = load_mask("planck_point")
         value = load_mask("planck_point")
         compound_map.map = 2 * point_mask.map + galactic_mask.map
-        value.map = np.float_(compound_map.map == 1)
+        value.map = np.float_(np.bitwise_not(compound_map.map == 1))
     elif mask == "comparison_sdss_planck_galactic":
         # masked by
         planck_only = HealpyMask("../../data/cached_results/sdss_mask_planck_point_32_2.fits")

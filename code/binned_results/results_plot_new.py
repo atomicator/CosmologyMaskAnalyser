@@ -4,9 +4,11 @@ import numpy as np
 import healpy as hp
 
 toolkit.plt_use_tex()
+mask_name = "planck_modified_galactic"
+raise_dir = 2
 
 #mask = toolkit.load_mask("planck_galactic")
-mask = toolkit.load_mask("planck_point")
+mask = toolkit.load_mask(mask_name)
 cat = toolkit.load_catalogue("sdss")
 cat.load_lon_lat()
 
@@ -29,10 +31,10 @@ for n in NSIDES:
     binmap.bin_catalogue(cat)
     binmap.load_catalogue(cat)
     data = np.array((
-        hp.pixelfunc.ud_grade(toolkit.HealpyMask("../../data/cached_results/sdss_mask_planck_point_512_1.fits").map, n),
-        hp.pixelfunc.ud_grade(toolkit.HealpyMask("../../data/cached_results/sdss_mask_planck_point_512_2.fits").map, n),
-        hp.pixelfunc.ud_grade(toolkit.HealpyMask("../../data/cached_results/sdss_mask_planck_point_512_3.fits").map, n),
-        hp.pixelfunc.ud_grade(toolkit.HealpyMask("../../data/cached_results/sdss_mask_planck_point_512_4.fits").map, n)
+        hp.pixelfunc.ud_grade(toolkit.HealpyMask("../" * raise_dir + f"data/cached_results/sdss_mask_{mask_name}_512_1.fits").map, n),
+        hp.pixelfunc.ud_grade(toolkit.HealpyMask("../" * raise_dir + f"data/cached_results/sdss_mask_{mask_name}_512_1.fits").map, n),
+        hp.pixelfunc.ud_grade(toolkit.HealpyMask("../" * raise_dir + f"data/cached_results/sdss_mask_{mask_name}_512_1.fits").map, n),
+        hp.pixelfunc.ud_grade(toolkit.HealpyMask("../" * raise_dir + f"data/cached_results/sdss_mask_{mask_name}_512_1.fits").map, n)
     ))
     results.append(binmap.calc_masked_fraction_new(mask, data))
 

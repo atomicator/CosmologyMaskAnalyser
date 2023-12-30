@@ -11,16 +11,20 @@ cat = toolkit.StarCatalogue("../../data/sdss_catalogue.fits", hdu=1)
 # load the masks
 #mask = toolkit.PixellMask("../../data/ACT_mask.fits", step=10, hdu=1)
 #mask = toolkit.HealpyMask("../../data/planck_galactic_mask.fits")
-mask = toolkit.HealpyMask("../../data/planck_point_mask.fits")
+#mask = toolkit.HealpyMask("../../data/planck_point_mask.fits")
+mask = toolkit.load_mask("planck_modified_point")
+#mask = toolkit.load_mask("planck_modified_galactic")
 
-sdss_mask = toolkit.HealpyMask("../../data/redmapper_dr8_public_v6.3_zmask.fits", mask_using_latlon=False, hdu=1, partial=True)
+#sdss_mask = toolkit.HealpyMask("../../data/redmapper_dr8_public_v6.3_zmask.fits", mask_using_latlon=False, hdu=1, partial=True)
 
 # Make the values of the masked / not masked regions more normal - use the convention 1 = masked
-sdss_mask.map[sdss_mask.map > 0.4] = 1.0
-sdss_mask.map[sdss_mask.map < 0.3] = 0
+#sdss_mask.map[sdss_mask.map > 0.4] = 1.0
+#sdss_mask.map[sdss_mask.map < 0.3] = 0
 
-sdss_mask.set_fig_ax(fig, ax)
-sdss_mask.plot()
+#sdss_mask.set_fig_ax(fig, ax)
+#sdss_mask.plot(cbar=True)
+mask.set_fig_ax(fig, ax)
+mask.plot(cbar=True)
 plt.title("SDSS mask in GLAT-GLON")
 #plt.savefig("../../graphs/SDSS_mask.png", dpi=1e3)
 plt.show()
