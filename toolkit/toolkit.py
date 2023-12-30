@@ -438,12 +438,12 @@ class _BinMap(object):
 
     def bin_catalogue(self, catalogue):
         self.binned_sample = []
-        for bin in range(hp.nside2npix(self.NSIDE)):
+        for map_bin in range(hp.nside2npix(self.NSIDE)):
             self.binned_sample.append([])
         for cluster in catalogue.lon_lat:
             self.binned_sample[self.lookup_pix(*cluster)].append(cluster)
-        for bin in range(hp.nside2npix(self.NSIDE)):
-            self.binned_sample[bin] = np.array(self.binned_sample[bin])
+        for map_bin in range(hp.nside2npix(self.NSIDE)):
+            self.binned_sample[map_bin] = np.array(self.binned_sample[map_bin])
 
     def calc_masked_fraction(self, mask, two_mask_fraction_map, area_masked_fraction):
         self.calc_weighted_map(mask)
@@ -568,7 +568,7 @@ class _BinMap(object):
 
         nan_filter = np.bitwise_not(np.bitwise_or(np.isnan(sample_masked_fraction), np.isinf(sample_masked_fraction)))
         masked = sample_masked_fraction == 1
-        #not_masked = np.bitwise_and(np.bitwise_or(sample_masked_fraction == 0, planck_masked_only == 0), nan_filter)
+        # not_masked = np.bitwise_and(np.bitwise_or(sample_masked_fraction == 0, planck_masked_only == 0), nan_filter)
         not_masked = sample_masked_fraction == 0
 
         # All sky fractions are fractions of the region allowed through the SDSS mask
@@ -578,41 +578,76 @@ class _BinMap(object):
         fully_masked_cluster_fraction = np.sum(self.map[np.bitwise_and(masked, nan_filter)]) / np.sum(self.map)
         not_masked_cluster_fraction = np.sum(self.map[not_masked]) / np.sum(self.map)
 
-        print(fully_masked_sky_fraction, not_masked_sky_fraction, fully_masked_cluster_fraction, not_masked_cluster_fraction)
+        print(fully_masked_sky_fraction, not_masked_sky_fraction, fully_masked_cluster_fraction,
+              not_masked_cluster_fraction)
 
         mixed_bins = (np.bitwise_not(np.bitwise_or(masked, np.bitwise_not(nan_filter))) * np.bitwise_not(not_masked) *
-                      np.bitwise_not(np.bitwise_or(planck_masked_only == 0, planck_masked_only == 1)))
+                      np.bitwise_not(np.bitwise_or(planck_masked_only == 0, planck_masked_only == sdss_allowed_region)))
 
         # print(sample_masked_fraction[mixed_bins])
 
-        #print(f"Mixed bin sky fraction: {1 - fully_masked_sky_fraction - not_masked_sky_fraction}")
-        #print(f"Mixed bin cluster fraction: {1 - fully_masked_cluster_fraction - not_masked_cluster_fraction}")
+        # print(f"Mixed bin sky fraction: {1 - fully_masked_sky_fraction - not_masked_sky_fraction}")
+        # print(f"Mixed bin cluster fraction: {1 - fully_masked_cluster_fraction - not_masked_cluster_fraction}")
 
         mixed_bin_sky_mask_fraction = np.sum(planck_masked_only[mixed_bins]) / np.sum(sdss_allowed_region[mixed_bins])
         n = self.map[mixed_bins]
 
-        #print(mixed_bin_sky_mask_fraction)
-        #print(f"n: {n}")
-        #print(planck_masked_only[mixed_bins])
-        #print(sdss_allowed_region[mixed_bins])
+        # print(mixed_bin_sky_mask_fraction)
+        # print(f"n: {n}")
+        # print(planck_masked_only[mixed_bins])
+        # print(sdss_allowed_region[mixed_bins])
 
         # cluster fraction over area fraction
         ratio = sample_masked_fraction[mixed_bins] / (
                 planck_masked_only[mixed_bins] / sdss_allowed_region[mixed_bins])
         variance = (sample_masked_fraction[mixed_bins] * (1 - sample_masked_fraction[mixed_bins]) / n) \
                    / (planck_masked_only[mixed_bins] / sdss_allowed_region[mixed_bins])
-        variance = mixed_bin_sky_mask_fraction * (1 - mixed_bin_sky_mask_fraction) / n
-        #print(ratio)
-        #print(variance)
-
-        weighted_error = np.sqrt(1 / (np.sum(1 / variance)))
-        weighted_mean = np.sum(ratio / variance) / np.sum(1 / variance)
+        # variance = mixed_bin_sky_mask_fraction * (1 - mixed_bin_sky_mask_fraction) / n
+        # print(ratio)
+        # print(variance)
+        not_normalised_weight = 1 / variance
+        weight = not_normalised_weight / np.sum(not_normalised_weight)
+        # weighted_error = np.sqrt(1 / (np.sum(variance * np.square(weight))))
+        variance_error = np.sum(np.square(weight) * variance)
+        weighted_error = np.sqrt(variance_error)
+        weighted_mean = np.sum(ratio * weight) / np.sum(weight)
         fraction = (1 - fully_masked_cluster_fraction - not_masked_cluster_fraction) * \
                    weighted_mean * mixed_bin_sky_mask_fraction + fully_masked_cluster_fraction
         fraction_error = (1 - fully_masked_cluster_fraction - not_masked_cluster_fraction) * \
                          weighted_error * mixed_bin_sky_mask_fraction
-        print(f"Ratio: {weighted_mean}")
+        #print(f"Ratio: {weighted_mean} +/- {weighted_error}")
+        #print(f"""NSIDE: {self.NSIDE} | Fraction: {fraction} +/- {fraction_error}""")
+
+        #print("Attempt 2:")
+        variance = sample_masked_fraction[mixed_bins] * (1 - sample_masked_fraction[mixed_bins]) / n
+        not_normalised_weight = variance / ((1 - (planck_masked_only[mixed_bins] / sdss_allowed_region[mixed_bins]))
+                                            * (planck_masked_only[mixed_bins] / sdss_allowed_region[mixed_bins]))
+        weight = not_normalised_weight / np.sum(not_normalised_weight)
+        weighted_mean = np.sum(sample_masked_fraction[mixed_bins] * weight)
+        weighted_variance = np.sum(variance * np.square(weight))
+        weighted_error = np.sqrt(weighted_variance)
+
+        fraction = fully_masked_cluster_fraction + (1 - fully_masked_cluster_fraction - not_masked_cluster_fraction) * \
+            weighted_mean
+        fraction_error = (1 - fully_masked_cluster_fraction - not_masked_cluster_fraction) * weighted_error
+        #print(f"Ratio: {weighted_mean} +/- {weighted_error}")
+        #print(f"""NSIDE: {self.NSIDE} | Fraction: {fraction} +/- {fraction_error}""")
+
+        print("Attempt 3:")
+        masked_area = planck_masked_only[mixed_bins] / sdss_allowed_region[mixed_bins]
+        variance = masked_area * (1 - masked_area) / n
+        not_normalised_weight = n
+        weight = not_normalised_weight / np.sum(not_normalised_weight)
+        weighted_mean = np.sum(masked_area * weight)
+        weighted_variance = np.sum(variance * weight)
+        weighted_error = np.sqrt(weighted_variance)
+
+        fraction = fully_masked_cluster_fraction + (1 - fully_masked_cluster_fraction - not_masked_cluster_fraction) * \
+                   weighted_mean
+        fraction_error = (1 - fully_masked_cluster_fraction - not_masked_cluster_fraction) * weighted_error
+        print(f"Ratio: {weighted_mean} +/- {weighted_error}")
         print(f"""NSIDE: {self.NSIDE} | Fraction: {fraction} +/- {fraction_error}""")
+
         return fraction, fraction_error, weighted_mean, weighted_error
 
 
