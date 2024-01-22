@@ -47,7 +47,7 @@ NSIDES = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
 
 results = []
 for mask_name in mask_names:
-    mask = toolkit.load_mask(mask_name)
+    mask = toolkit.load_mask(mask_name, raise_dir=args.raise_path)
     results.append([])
     f.append((1 - np.sum(mask.lookup_point(*cat.lon_lat.transpose())) / len(cat.lon_lat)) * 100)
     binmap = toolkit._ConstantMap()
