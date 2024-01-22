@@ -21,7 +21,7 @@ title = [f"Estimating the masked fraction using the ratio ({args.catalogue})", f
 y_axis_label = [r"Absolute masked fraction difference $(\%)$", "Ratio", r"Absolute masked fraction difference $(\%)$", "Gradient"][v - 1]
 line_colors = ["xkcd:aqua blue", "orange"]
 error_bar_colors = ["xkcd:electric blue", "red"]
-raise_dir = 2
+raise_dir = args.raise_path
 y_multiplicative_factor = [100, 1, 100][v - 1]
 
 #mask = toolkit.load_mask("planck_galactic")
