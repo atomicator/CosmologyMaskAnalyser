@@ -2,20 +2,34 @@ import matplotlib.pyplot as plt
 from toolkit import toolkit
 import numpy as np
 import healpy as hp
+import argparse
 
-v = 3
+parser = argparse.ArgumentParser()
+
+parser.add_argument("--catalogue", default="sdss")
+parser.add_argument("--save_path")
+parser.add_argument("--weight_version", type=int, choices=[1, 2, 3, 4], default=3)
+parser.add_argument("--raise_path", type=int, default=2)
+
+args = parser.parse_args()
+
+v = args.weight_version
 toolkit.plt_use_tex()
 mask_names = ["planck_modified_point", "planck_modified_galactic"]
 labels = ["point", "galactic"]
-title = ["Estimating the masked fraction using the ratio", "Estimating the masked ratio", "Estimating the masked fraction directly"][v - 1]
-y_axis_label = [r"Absolute masked fraction difference $(\%)$", "Ratio", r"Absolute masked fraction difference $(\%)$"][v - 1]
+title = [f"Estimating the masked fraction using the ratio ({args.catalogue})", f"Estimating the masked ratio ({args.catalogue})", f"Estimating the masked fraction directly ({args.catalogue})", f"Regression analysis ({({args.catalogue})})"][v - 1]
+y_axis_label = [r"Absolute masked fraction difference $(\%)$", "Ratio", r"Absolute masked fraction difference $(\%)$", "Gradient"][v - 1]
 line_colors = ["xkcd:aqua blue", "orange"]
 error_bar_colors = ["xkcd:electric blue", "red"]
 raise_dir = 2
 y_multiplicative_factor = [100, 1, 100][v - 1]
 
 #mask = toolkit.load_mask("planck_galactic")
-cat = toolkit.load_catalogue("sdss")
+
+try:
+    cat = toolkit.load_catalogue(args.catalogue, raise_dir=args.path_raise)
+except ValueError:
+    cat = toolkit.StarCatalogue(args=args.catalogue)
 cat.load_lon_lat()
 
 fig = plt.figure()
@@ -60,7 +74,7 @@ for mask_name in mask_names:
 
 results = np.array(results) * y_multiplicative_factor
 
-if v == 2:
+if v not in [2, 4]:
     f = np.zeros(len(f))
 
 print(np.shape(results))
@@ -75,7 +89,7 @@ for i in range(len(mask_names)):
 
 #ax.plot([0] + NSIDES, np.ones(len(NSIDES)) * sample_error, label="Total sky fraction", linestyle="dashdot", color="black")
 #ax.plot([0] + NSIDES, np.ones(len(NSIDES)) * np.abs(f - sky_frac), label="Sample error", linestyle="dashed", color="black")
-if v != 2:
+if v not in [2, 4]:
     ax.plot([0.5] + NSIDES, np.zeros(len(NSIDES) + 1), linestyle="solid", color="black")
 else:
     ax.plot([0.5] + NSIDES, np.ones(len(NSIDES) + 1), linestyle="solid", color="black")
@@ -91,6 +105,10 @@ ax.set_xticks([0.5] + NSIDES, ["C"] + NSIDES)
 ax.set_xlabel("NSIDE")
 ax.set_ylabel(y_axis_label)
 ax.set_title(title)
+
+if args.save_path:
+    plt.savefig(args.save_path)
+
 plt.show()
 
 print(f, results)

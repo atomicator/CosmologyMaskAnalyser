@@ -611,9 +611,9 @@ class _BinMap(object):
             # cluster fraction over area fraction
             ratio = sample_masked_fraction[mixed_bins] / (
                     planck_masked_only[mixed_bins] / sdss_allowed_region[mixed_bins])
-            variance = (sample_masked_fraction[mixed_bins] * (1 - sample_masked_fraction[mixed_bins]) / n) \
-                       / (planck_masked_only[mixed_bins] / sdss_allowed_region[mixed_bins])
-            # variance = mixed_bin_sky_mask_fraction * (1 - mixed_bin_sky_mask_fraction) / n
+            #variance = (sample_masked_fraction[mixed_bins] * (1 - sample_masked_fraction[mixed_bins]) / n) \
+            #           / (planck_masked_only[mixed_bins] / sdss_allowed_region[mixed_bins])
+            variance = mixed_bin_sky_mask_fraction * (1 - mixed_bin_sky_mask_fraction) / n
             # print(ratio)
             # print(variance)
             not_normalised_weight = 1 / variance
@@ -635,7 +635,7 @@ class _BinMap(object):
             ratio = sample_masked_fraction[mixed_bins] / (
                     planck_masked_only[mixed_bins] / sdss_allowed_region[mixed_bins])
             variance = (sample_masked_fraction[mixed_bins] * (1 - sample_masked_fraction[mixed_bins]) / n) / (
-                    planck_masked_only[mixed_bins] / sdss_allowed_region[mixed_bins])
+                    planck_masked_only[mixed_bins] / sdss_allowed_region[mixed_bins]) ** 2
             #not_normalised_weight = variance / ((1 - (planck_masked_only[mixed_bins] / sdss_allowed_region[mixed_bins]))
             #                                    * (planck_masked_only[mixed_bins] / sdss_allowed_region[mixed_bins]))
             not_normalised_weight = 1 / variance
@@ -657,7 +657,9 @@ class _BinMap(object):
         elif v == 3:
             print("Attempt 3:")
             masked_area = planck_masked_only[mixed_bins] / sdss_allowed_region[mixed_bins]
-            variance = masked_area * (1 - masked_area) / n
+            #variance = masked_area * (1 - masked_area) / n
+            variance = (sample_masked_fraction[mixed_bins] * (1 - sample_masked_fraction[mixed_bins]) / n) / (
+                    planck_masked_only[mixed_bins] / sdss_allowed_region[mixed_bins]) ** 2
             #not_normalised_weight = n
             #not_normalised_weight = sample_masked_fraction[mixed_bins] * (1 - sample_masked_fraction[mixed_bins]) / variance
             not_normalised_weight = 1 / variance
