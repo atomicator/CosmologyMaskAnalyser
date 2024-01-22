@@ -27,7 +27,7 @@ y_multiplicative_factor = [100, 1, 100][v - 1]
 #mask = toolkit.load_mask("planck_galactic")
 
 try:
-    cat = toolkit.load_catalogue(args.catalogue, raise_dir=args.path_raise)
+    cat = toolkit.load_catalogue(args.catalogue, raise_dir=args.raise_path)
 except ValueError:
     cat = toolkit.StarCatalogue(args=args.catalogue)
 cat.load_lon_lat()
