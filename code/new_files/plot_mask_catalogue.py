@@ -42,7 +42,7 @@ plt.ylabel("Latitude")
 
 plt.title(r"The SDSS clusters and the point mask")
 
-plt.savefig("../../graphs/PlanckMaskSDSSData.png")
+#plt.savefig("../../graphs/PlanckMaskSDSSData.png")
 #plt.savefig("../../graphs/ACTMaskSDSSData.png")
 
 plt.show()

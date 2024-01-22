@@ -6,7 +6,11 @@ fig = plt.figure()
 ax = fig.add_subplot(111)
 
 # load the catalogue
-cat = toolkit.StarCatalogue("../../data/sdss_catalogue.fits", hdu=1)
+#cat = toolkit.StarCatalogue("../../data/sdss_catalogue.fits", hdu=1)
+cat = toolkit.StarCatalogue("../binned_results/test.fits", hdu=1)
+cat.load_lon_lat()
+
+print(cat.lon_lat)
 
 # load the masks
 #mask = toolkit.PixellMask("../../data/ACT_mask.fits", step=10, hdu=1)
@@ -23,20 +27,20 @@ mask = toolkit.load_mask("planck_modified_point")
 
 #sdss_mask.set_fig_ax(fig, ax)
 #sdss_mask.plot(cbar=True)
-mask.set_fig_ax(fig, ax)
-mask.plot(cbar=True)
-plt.title("SDSS mask in GLAT-GLON")
+#mask.set_fig_ax(fig, ax)
+#mask.plot(cbar=True)
+#plt.title("SDSS mask in GLAT-GLON")
 #plt.savefig("../../graphs/SDSS_mask.png", dpi=1e3)
-plt.show()
+#plt.show()
 #sdss_mask = toolkit.StarCatalogue("../../data/redmapper_dr8_public_v6.3_zmask.fits", hdu=1)
 
 #print(sdss_mask.data.field("HPIX"))
 
-'''
+
 cat.set_fig_ax(fig, ax)
-cat.set_cat_mask(sdss_mask)
+#cat.set_cat_mask(m)
 #cat.load_ra_dec()
-cat.load_lon_lat()
+#cat.load_lon_lat()
 cat.plot_heatmap(256, cmap="rainbow", resolution=(1000, 2000), cbar=True, cbar_label="Clusters per "
                                                                                      "square degree")
 
@@ -45,6 +49,5 @@ mask.plot(alpha=0.35, cbar=False, cmap=toolkit.bw_heatmap, clear=False)
 plt.xlabel("Galactic Longitude")
 plt.ylabel("Galactic Latitude")
 plt.title("SDSS clusters and the Planck point mask")
-plt.savefig("../../graphs/PlanckPointMaskSDSSData.png", dpi=1e3)
+#plt.savefig("../../graphs/PlanckPointMaskSDSSData.png", dpi=1e3)
 plt.show()
-'''

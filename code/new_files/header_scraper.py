@@ -6,10 +6,15 @@ import numpy as np
 import astropy
 import healpy as hp
 
-mask = astropy.io.fits.open("../../data/planck_galactic_mask.fits")
+toolkit.load_catalogue("sdss")
+
+mask = astropy.io.fits.open("../binned_results/test.fits")
 
 toolkit.get_header_info(mask)
 
-mask = astropy.io.fits.open("../../data/planck_point_mask.fits")
+mask = astropy.io.fits.open("../binned_results/test.fits")
 
-print(mask)
+cat = toolkit.StarCatalogue("../binned_results/test.fits", hdu=1)
+cat.load_lon_lat()
+
+print(np.shape(cat.lon_lat))

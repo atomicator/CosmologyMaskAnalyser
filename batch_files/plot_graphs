@@ -1,0 +1,2 @@
+#!/bin/bash
+python3 "../code/binned_results/weighted_random_distribution.py"
