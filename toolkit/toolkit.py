@@ -827,19 +827,19 @@ def load_mask(mask, raise_dir=2, nside=8):
         value.mask_using_latlon = True
         # value.map = (value.map - 1) * -1
     elif mask == "planck_modified_galactic":
-        point_mask = load_mask("planck_point")
-        galactic_mask = load_mask("planck_galactic")
-        compound_map = load_mask("planck_point")
-        value = load_mask("planck_point")
+        point_mask = load_mask("planck_point", raise_dir=raise_dir)
+        galactic_mask = load_mask("planck_galactic", raise_dir=raise_dir)
+        compound_map = load_mask("planck_point", raise_dir=raise_dir)
+        value = load_mask("planck_point", raise_dir=raise_dir)
         compound_map.map = 2 * point_mask.map + galactic_mask.map
         value.map = np.float_(np.bitwise_not(compound_map.map == 0))
         print(value.map)
         print(compound_map.map)
     elif mask == "planck_modified_point":
-        point_mask = load_mask("planck_point")
-        galactic_mask = load_mask("planck_galactic")
-        compound_map = load_mask("planck_point")
-        value = load_mask("planck_point")
+        point_mask = load_mask("planck_point", raise_dir=raise_dir)
+        galactic_mask = load_mask("planck_galactic", raise_dir=raise_dir)
+        compound_map = load_mask("planck_point", raise_dir=raise_dir)
+        value = load_mask("planck_point", raise_dir=raise_dir)
         compound_map.map = 2 * point_mask.map + galactic_mask.map
         value.map = np.float_(np.bitwise_not(compound_map.map == 1))
     elif mask == "comparison_sdss_planck_galactic":
