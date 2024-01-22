@@ -1,8 +1,8 @@
 #!/bin/bash
 # Generate random distributions
-python3 "./../code/binned_results/weighted_random_distribution.py" --raise_path=1 --nside=2 --target=10 --save_path="./../data/binned_random_catalogues/sdss_nside_2.fits"
-python3 "./../code/binned_results/weighted_random_distribution.py" --raise_path=1 --nside=8 --target=10 --save_path="./../data/binned_random_catalogues/sdss_nside_8.fits"
-python3 "./../code/binned_results/weighted_random_distribution.py" --raise_path=1 --nside=32 --target=10 --save_path="./../data/binned_random_catalogues/sdss_nside_32.fits"
+python3 "./../code/binned_results/weighted_random_distribution.py" --raise_path=1 --nside=2 --target=10000000 --save_path="./../data/binned_random_catalogues/sdss_nside_2.fits"
+python3 "./../code/binned_results/weighted_random_distribution.py" --raise_path=1 --nside=8 --target=10000000 --save_path="./../data/binned_random_catalogues/sdss_nside_8.fits"
+python3 "./../code/binned_results/weighted_random_distribution.py" --raise_path=1 --nside=32 --target=10000000 --save_path="./../data/binned_random_catalogues/sdss_nside_32.fits"
 
 # Write new graphs
 
