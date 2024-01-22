@@ -99,7 +99,7 @@ else:
 ax.set_xscale("log", base=2)
 ax.legend()
 #ax.set_ylim(0.01, 10)
-ax.set_xlim(0, NSIDES[-1])
+ax.set_xlim(0.5, NSIDES[-1])
 ax.set_xticks([0.5] + NSIDES, ["C"] + NSIDES)
 
 ax.set_xlabel("NSIDE")
