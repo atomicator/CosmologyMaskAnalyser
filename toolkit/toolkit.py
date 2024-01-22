@@ -240,6 +240,7 @@ class StarCatalogue(object):
             self.fits = astropy.io.fits.open(path, **kwargs)
             self.h = dict(self.fits[hdu].header)
             self.data = self.fits[hdu].data
+            print("test2")
         else:
             print("test")
             self.fits = None
