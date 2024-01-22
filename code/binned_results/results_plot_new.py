@@ -54,10 +54,10 @@ for mask_name in mask_names:
     binmap.bin_catalogue(cat)
     binmap.load_catalogue(cat)
     data = np.array((
-        np.mean(toolkit.HealpyMask("../" * raise_dir + f"data/cached_results/sdss_mask_{mask_name}_512_1.fits").map),
-        np.mean(toolkit.HealpyMask("../" * raise_dir + f"data/cached_results/sdss_mask_{mask_name}_512_2.fits").map),
-        np.mean(toolkit.HealpyMask("../" * raise_dir + f"data/cached_results/sdss_mask_{mask_name}_512_3.fits").map),
-        np.mean(toolkit.HealpyMask("../" * raise_dir + f"data/cached_results/sdss_mask_{mask_name}_512_4.fits").map)
+        np.mean(toolkit.HealpyMask("./" + "../" * raise_dir + f"data/cached_results/sdss_mask_{mask_name}_512_1.fits").map),
+        np.mean(toolkit.HealpyMask("./" + "../" * raise_dir + f"data/cached_results/sdss_mask_{mask_name}_512_2.fits").map),
+        np.mean(toolkit.HealpyMask("./" + "../" * raise_dir + f"data/cached_results/sdss_mask_{mask_name}_512_3.fits").map),
+        np.mean(toolkit.HealpyMask("./" + "../" * raise_dir + f"data/cached_results/sdss_mask_{mask_name}_512_4.fits").map)
     ))
     results[-1].append(binmap.calc_masked_fraction_new(mask, data, v, const=True))
     for n in NSIDES:
@@ -65,10 +65,10 @@ for mask_name in mask_names:
         binmap.bin_catalogue(cat)
         binmap.load_catalogue(cat)
         data = np.array((
-            hp.pixelfunc.ud_grade(toolkit.HealpyMask("../" * raise_dir + f"data/cached_results/sdss_mask_{mask_name}_512_1.fits").map, n),
-            hp.pixelfunc.ud_grade(toolkit.HealpyMask("../" * raise_dir + f"data/cached_results/sdss_mask_{mask_name}_512_2.fits").map, n),
-            hp.pixelfunc.ud_grade(toolkit.HealpyMask("../" * raise_dir + f"data/cached_results/sdss_mask_{mask_name}_512_3.fits").map, n),
-            hp.pixelfunc.ud_grade(toolkit.HealpyMask("../" * raise_dir + f"data/cached_results/sdss_mask_{mask_name}_512_4.fits").map, n)
+            hp.pixelfunc.ud_grade(toolkit.HealpyMask("./" + "../" * raise_dir + f"data/cached_results/sdss_mask_{mask_name}_512_1.fits").map, n),
+            hp.pixelfunc.ud_grade(toolkit.HealpyMask("./" + "../" * raise_dir + f"data/cached_results/sdss_mask_{mask_name}_512_2.fits").map, n),
+            hp.pixelfunc.ud_grade(toolkit.HealpyMask("./" + "../" * raise_dir + f"data/cached_results/sdss_mask_{mask_name}_512_3.fits").map, n),
+            hp.pixelfunc.ud_grade(toolkit.HealpyMask("./" + "../" * raise_dir + f"data/cached_results/sdss_mask_{mask_name}_512_4.fits").map, n)
         ))
         results[-1].append(binmap.calc_masked_fraction_new(mask, data, v))
 
