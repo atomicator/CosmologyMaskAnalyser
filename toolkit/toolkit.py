@@ -241,6 +241,7 @@ class StarCatalogue(object):
             self.h = dict(self.fits[hdu].header)
             self.data = self.fits[hdu].data
         else:
+            print("test")
             self.fits = None
             self.h = None
             self.data = None
