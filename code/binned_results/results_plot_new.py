@@ -29,7 +29,7 @@ y_multiplicative_factor = [100, 1, 100][v - 1]
 if args.catalogue in ["sdss"]:
     cat = toolkit.load_catalogue(args.catalogue, raise_dir=args.raise_path)
 else:
-    cat = toolkit.StarCatalogue(path=args.catalogue)
+    cat = toolkit.StarCatalogue(path=args.catalogue, table=True)
 cat.load_lon_lat()
 
 fig = plt.figure()
