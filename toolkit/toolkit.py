@@ -245,7 +245,7 @@ class StarCatalogue(object):
                 self.fits = astropy.table.Table.read(path)
                 self.data = self.fits
                 self.h = None
-            print("test2")
+                print("test2")
         else:
             print("test")
             self.fits = None
