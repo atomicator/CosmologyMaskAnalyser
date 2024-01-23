@@ -42,8 +42,8 @@ f = []
 #sky_frac = 2.3232
 #sky_frac = 2.3232 - 0.99223
 
-#NSIDES = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
-NSIDES = [1]
+NSIDES = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
+#NSIDES = [1]
 
 results = []
 for mask_name in mask_names:
