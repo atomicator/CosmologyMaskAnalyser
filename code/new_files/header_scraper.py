@@ -8,9 +8,13 @@ import healpy as hp
 
 toolkit.load_catalogue("sdss")
 
-mask = astropy.io.fits.open("../binned_results/test.fits")
+#mask = astropy.io.fits.open("../binned_results/test.fits", hdu=1)
+#mask = astropy.io.fits.open("../../data/sdss_catalogue.fits")
+mask = astropy.table.Table.read("../binned_results/test.fits")
 
-toolkit.get_header_info(mask)
+#toolkit.get_header_info(mask)
+print(mask.info)
+print(mask.field("GLON"))
 
 mask = astropy.io.fits.open("../binned_results/test.fits")
 

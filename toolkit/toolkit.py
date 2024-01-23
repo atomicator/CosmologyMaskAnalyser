@@ -235,11 +235,16 @@ class NoFigAx(TypeError):
 
 
 class StarCatalogue(object):
-    def __init__(self, path=None, hdu=0, **kwargs):
+    def __init__(self, path=None, hdu=00, table=False, **kwargs):
         if path:
-            self.fits = astropy.io.fits.open(path, **kwargs)
-            self.h = dict(self.fits[hdu].header)
-            self.data = self.fits[hdu].data
+            if not table:
+                self.fits = astropy.io.fits.open(path, **kwargs)
+                self.h = dict(self.fits[hdu].header)
+                self.data = self.fits[hdu].data
+            if table:
+                self.fits = astropy.table.Table.read(path)
+                self.data = self.fits
+                self.h = None
             print("test2")
         else:
             print("test")
