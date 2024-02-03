@@ -6,10 +6,10 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--mask_one", choices=["sdss_mask", "planck_point", "planck_galactic"],
                     help="The first mask to use", default="sdss_mask")
 parser.add_argument("--mask_two", choices=["sdss_mask", "planck_point", "planck_galactic", "planck_modified_galactic", "planck_modified_point"],
-                    help="The second mask to use", default="planck_galactic")
+                    help="The second mask to use", default="planck_modified_point")
 parser.add_argument("--path_raise", type=int, default=2)
 parser.add_argument("--res", type=int, default=1e3)
-parser.add_argument("--nside", type=int, default=1024)
+parser.add_argument("--nside", type=int, default=2048)
 parser.add_argument("--save_path")
 
 args = parser.parse_args()

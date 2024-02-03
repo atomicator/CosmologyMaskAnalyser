@@ -6,7 +6,7 @@ import argparse
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument("--catalogue", default="sdss")
+parser.add_argument("--catalogue", default="./test.fits")
 parser.add_argument("--save_path")
 parser.add_argument("--weight_version", type=int, choices=[1, 2, 3, 4], default=3)
 parser.add_argument("--raise_path", type=int, default=2)
@@ -15,17 +15,17 @@ args = parser.parse_args()
 
 v = args.weight_version
 toolkit.plt_use_tex()
-mask_names = ["planck_modified_point", "planck_modified_galactic"]
+#mask_names = ["planck_modified_point", "planck_modified_galactic"]
+mask_names = ["planck_modified_point"]
 labels = ["point", "galactic"]
 title = [f"Estimating the masked fraction using the ratio ({args.catalogue})", f"Estimating the masked ratio ({args.catalogue})", f"Estimating the masked fraction directly ({args.catalogue})", f"Regression analysis ({({args.catalogue})})"][v - 1]
 y_axis_label = [r"Absolute masked fraction difference $(\%)$", "Ratio", r"Absolute masked fraction difference $(\%)$", "Gradient"][v - 1]
 line_colors = ["xkcd:aqua blue", "orange"]
 error_bar_colors = ["xkcd:electric blue", "red"]
 raise_dir = args.raise_path
-y_multiplicative_factor = [100, 1, 100][v - 1]
+y_multiplicative_factor = [100, 1, 100, 1][v - 1]
 
 #mask = toolkit.load_mask("planck_galactic")
-
 if args.catalogue in ["sdss"]:
     cat = toolkit.load_catalogue(args.catalogue, raise_dir=args.raise_path)
 else:
@@ -42,15 +42,17 @@ f = []
 #sky_frac = 2.3232
 #sky_frac = 2.3232 - 0.99223
 
-NSIDES = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
-#NSIDES = [1]
+#NSIDES = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
+NSIDES = [1, 4, 16, 64]
+#NSIDES = [2]
+#NSIDES = []
 
 results = []
 for mask_name in mask_names:
     mask = toolkit.load_mask(mask_name, raise_dir=args.raise_path)
     results.append([])
     f.append((1 - np.sum(mask.lookup_point(*cat.lon_lat.transpose())) / len(cat.lon_lat)) * 100)
-    binmap = toolkit._ConstantMap()
+    binmap = toolkit.ConstantMap()
     binmap.bin_catalogue(cat)
     binmap.load_catalogue(cat)
     data = np.array((
@@ -74,7 +76,7 @@ for mask_name in mask_names:
 
 results = np.array(results) * y_multiplicative_factor
 
-if v not in [2, 4]:
+if v in [2, 4]:
     f = np.zeros(len(f))
 
 print(np.shape(results))
