@@ -38,7 +38,7 @@ elif args.catalogue == "sdss":
 elif args.catalogue == "sdss_filtered":
     cat = toolkit.load_catalogue("sdss", raise_dir)
     cat.load_with_selection(filter, ["ZRED", "R_LAMBDA"], lon_lat=True)
-    data_name = rf"Filtered: ${args.min_z} < z < {args.max_z}$, ${args.min_r} < r < {args.max_r}$"
+    data_name = "\n" + rf"Filtered: ${args.min_z} < z < {args.max_z}$, ${args.min_r} < r < {args.max_r}$"
 else:
     raise ValueError
 
@@ -173,4 +173,4 @@ ax.set_xlabel("NSIDE")
 ax.set_ylabel(y_axis_label)
 ax.set_title(f"Binning algorithm using weight: {weight_function.__name__} and data: {data_name}")
 plt.savefig(save_path)
-plt.show()
+#plt.show()
