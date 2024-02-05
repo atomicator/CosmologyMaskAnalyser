@@ -6,14 +6,14 @@ import argparse
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument("--catalogue", default="sdss")
+parser.add_argument("--catalogue", default="sdss_random")
 parser.add_argument("--save_path", default="test.pdf")
 parser.add_argument("--raise_path", type=int, default=2)
-parser.add_argument("--weight_function", default="density_weighting")
+parser.add_argument("--weight_function", default="excess_measurement")
 parser.add_argument("--min_z", type=float, default=0.0)
-parser.add_argument("--min_r", type=float, default=0.0)
-parser.add_argument("--max_z", type=float, default=1.0)
-parser.add_argument("--max_r", type=float, default=2.0)
+parser.add_argument("--min_r", type=float, default=10.0)
+parser.add_argument("--max_z", type=float, default=20.0)
+parser.add_argument("--max_r", type=float, default=10000.0)
 
 args = parser.parse_args()
 
@@ -29,7 +29,8 @@ if args.catalogue == "full_sky":
     data_name = "random full sky"
     cat.load_lon_lat()
 elif args.catalogue == "sdss_random":
-    cat = toolkit.StarCatalogue("./" + raise_dir * "../" + "code/binned_results/test.fits", table=True)
+    #cat = toolkit.StarCatalogue("./" + raise_dir * "../" + "code/binned_results/test.fits", table=True)
+    cat = toolkit.StarCatalogue("./" + raise_dir * "../" + "code/binned_results/random_sdss_10m.fits", table=True)
     cat.load_lon_lat()
     data_name = "sdss random"
 elif args.catalogue == "sdss":
@@ -37,7 +38,7 @@ elif args.catalogue == "sdss":
     data_name = "sdss actual"
 elif args.catalogue == "sdss_filtered":
     cat = toolkit.load_catalogue("sdss", raise_dir)
-    cat.load_with_selection(filter, ["ZRED", "R_LAMBDA"], lon_lat=True)
+    cat.load_with_selection(filter, ["ZRED", "LAMBDA"], lon_lat=True)
     data_name = "\n" + rf"Filtered: ${args.min_z} < z < {args.max_z}$, ${args.min_r} < r < {args.max_r}$"
 else:
     raise ValueError
@@ -49,24 +50,31 @@ if args.weight_function == "excess_measurement":
     weight_function = weights.excess_measurement
     set_f_zero = True
     convert_to_mask_frac = False
-    filter_set = "all"
+    filter_set = "overkill"
 elif args.weight_function == "density_weighting":
     y_axis_label = r"Error ($\%$)"
     weight_function = weights.density_weighting
     set_f_zero = False
     convert_to_mask_frac = True
     filter_set = "n_only"
+elif args.weight_function == "scatter":
+    y_axis_label = ""
+    weight_function = weights.regression_weighting
+    set_f_zero = True
+    convert_to_mask_frac = False
+    filter_set = "all"
 else:
     raise ValueError
 
-mask_names = ["planck_modified_point", "planck_modified_galactic", "planck_modified_total"]
+#mask_names = ["planck_modified_point", "planck_modified_galactic", "planck_modified_total"]
 #mask_names = ["planck_modified_point", "planck_modified_galactic", "planck_modified_total", "planck_galactic"]
-#mask_names = ["planck_galactic"]
+mask_names = ["planck_modified_point", "planck_modified_galactic"]
 labels = ["Point", "Galactic", "Total", "Old Galactic"]
 #NSIDES = [1, 2, 4, 8, 16, 32]
 #NSIDES = [2, 8, 32]
 #NSIDES = [32]
-NSIDES = [1, 2, 4, 8, 16, 32, 64, 128, 256]
+#NSIDES = [1, 2, 4, 8, 16, 32, 64, 128, 256]
+NSIDES = [1, 4, 8, 32, 128]
 run_const = True
 save_path = args.save_path
 f = []
@@ -79,6 +87,11 @@ line_colors = ["xkcd:electric blue", "red", "xkcd:grass green", "purple"]
 fig = plt.figure()
 ax = fig.add_subplot(111)
 
+"""NSIDES = [4]
+run_const = False
+weight_function = weights.scatter
+mask_names = ["planck_modified_galactic"]
+"""
 for mask_name in mask_names:
     mask = toolkit.load_mask(mask_name, raise_dir)
     if args.catalogue == "full_sky":
@@ -173,4 +186,4 @@ ax.set_xlabel("NSIDE")
 ax.set_ylabel(y_axis_label)
 ax.set_title(f"Binning algorithm using weight: {weight_function.__name__} and data: {data_name}")
 plt.savefig(save_path)
-#plt.show()
+plt.show()

@@ -7,7 +7,7 @@ ax = fig.add_subplot(111)
 
 # load the catalogue
 #cat = toolkit.StarCatalogue("../../data/sdss_catalogue.fits", hdu=1)
-cat = toolkit.StarCatalogue("../binned_results/test.fits", hdu=1, table=True)
+cat = toolkit.StarCatalogue("../binned_results/random_sdss_80k.fits", hdu=1, table=True)
 cat.load_lon_lat()
 
 print(cat.lon_lat)

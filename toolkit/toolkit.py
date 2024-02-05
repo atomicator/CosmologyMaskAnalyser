@@ -483,6 +483,7 @@ class _BinMap(object):
         planck_masked_only = area_masked_fraction[1]
 
         nan_filter = np.bitwise_or(np.isnan(sample_masked_fraction), np.isinf(sample_masked_fraction))
+        self.map = np.array(self.map)
 
         if filter_set == "all":
             not_masked = np.bitwise_or(np.bitwise_or(nan_filter, sample_masked_fraction == 0), planck_masked_only == 0)
@@ -504,9 +505,17 @@ class _BinMap(object):
                           np.bitwise_not(np.bitwise_or(planck_masked_only == 0, planck_masked_only == sdss_allowed_region)))"""
 
         elif filter_set == "n_only":
-            not_masked = np.bitwise_or(nan_filter, self.map == 0)
+            not_masked = np.bitwise_or(np.bitwise_or(nan_filter, self.map == 0), sdss_allowed_region == 0)
             masked = np.bitwise_and(not_masked, np.bitwise_not(not_masked))
-            mixed_bins = np.bitwise_not(not_masked)
+            mixed_bins = np.bitwise_and(np.bitwise_not(not_masked), np.bitwise_not(masked))
+        elif filter_set == "overkill":
+            not_masked = np.bitwise_or(np.bitwise_or(nan_filter, sample_masked_fraction == 0), planck_masked_only == 0)
+            masked = np.bitwise_and(
+                np.bitwise_or(sample_masked_fraction == 1, sdss_allowed_region == planck_masked_only),
+                np.bitwise_not(not_masked))
+            mixed_bins = np.bitwise_not(np.bitwise_or(masked, not_masked))
+            masked = np.bitwise_or(masked, np.bitwise_and(mixed_bins, 1 - (planck_masked_only / sdss_allowed_region) < 1 / self.map))
+            not_masked = np.bitwise_or(not_masked, np.bitwise_and(mixed_bins, (planck_masked_only / sdss_allowed_region) < 1 / self.map))
         else:
             raise ValueError("filter set not recognised")
 

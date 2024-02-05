@@ -8,17 +8,17 @@ import healpy as hp
 
 toolkit.load_catalogue("sdss")
 
-#mask = astropy.io.fits.open("../binned_results/test.fits", hdu=1)
+mask = astropy.io.fits.open("../../data/dr8_run_redmapper_v5.10_lgt5_catalog.fit", hdu=1)
 #mask = astropy.io.fits.open("../../data/sdss_catalogue.fits")
-mask = astropy.table.Table.read("../binned_results/test.fits")
+#mask = astropy.table.Table.read("../binned_results/test.fits")
 
-#toolkit.get_header_info(mask)
-print(mask.info)
-print(mask.field("GLON"))
+toolkit.get_header_info(mask)
+#print(mask.info)
+#print(mask.field("GLON"))
 
-mask = astropy.io.fits.open("../binned_results/test.fits")
+#mask = astropy.io.fits.open("../binned_results/test.fits")
 
-cat = toolkit.StarCatalogue("../binned_results/test.fits", hdu=1)
-cat.load_lon_lat()
+#cat = toolkit.StarCatalogue("../binned_results/test.fits", hdu=1)
+#cat.load_lon_lat()
 
-print(np.shape(cat.lon_lat))
+#print(np.shape(cat.lon_lat))

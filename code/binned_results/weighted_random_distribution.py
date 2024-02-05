@@ -9,14 +9,14 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--mask", default="sdss_mask")
 parser.add_argument("--sample_catalogue", default="sdss")
 parser.add_argument("--nside", type=int, default=8)
-parser.add_argument("--save_path", default="random_full_sky.fits")
-parser.add_argument("--target", type=int, default=400000)
+parser.add_argument("--save_path", default="random_sdss_10m.fits")
+parser.add_argument("--target", type=int, default=80000)
 parser.add_argument("--raise_path", type=int, default=2)
 
 args = parser.parse_args()
-target = 1000000
+target = 10000000
 mask = toolkit.load_mask(args.mask, raise_dir=args.raise_path)
-mask.map = np.ones(len(mask.map))
+#mask.map = np.ones(len(mask.map))
 sample_cat = toolkit.load_catalogue(args.sample_catalogue, raise_dir=args.raise_path)
 sample_cat.load_lon_lat()
 """
@@ -28,13 +28,13 @@ else:
 
 nside = args.nside
 
-points = toolkit.gen_random_coords(target, mask)[::-1].transpose()
-points = toolkit.gen_random_coords(1000000)
+points = toolkit.gen_random_coords(target, mask).transpose()[::-1]
+#points = toolkit.gen_random_coords(1000000)
 print(points)
 random_cat = toolkit.StarCatalogue()
 random_cat.lon_lat = points
 #data = toolkit.match_distribution(random_cat, sample_cat, nside)
-data = random_cat.lon_lat.transpose()[::-1]
+data = random_cat.lon_lat#.transpose()[::-1]
 
 print(data)
 print(np.shape(data))

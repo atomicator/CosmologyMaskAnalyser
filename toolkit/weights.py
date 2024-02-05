@@ -30,8 +30,9 @@ def density_weighting(f_s, _f_c, n):
 
 def excess_measurement(f_s, f_c, n):
     excess = (f_c - f_s) / f_s
-    variance = (1 - f_s) / (f_s * n)
+    variance = f_c * (1 - f_c) / (f_s ** 2 * n)
     weight = (1 / variance) / np.sum(1 / variance)
+    weight = 1 / len(n)
     mean = np.sum(excess * weight)
     mean_error = np.sqrt(np.sum(variance * weight ** 2))
     return mean, mean_error
@@ -69,10 +70,10 @@ def regression_weighting(f_s, f_c, n):
     print(f"Grad: {grad} +/-  {grad_error}")
     # Original version didn't have the n dependence, caused weird errors later on
     final = np.array([grad, grad_error]) * np.sum((1 - f_s) * n) * 100 / np.sum(n)
-    #plt.errorbar(f_s, f_c, np.sqrt(variance), marker="+", ls="none")
-    #plt.plot([0, 1], [0, 1])
-    #plt.plot([0, 1], [0, grad])
-    #plt.show()
+    plt.errorbar(f_s, f_c, np.sqrt(variance), marker="+", ls="none")
+    plt.plot([0, 1], [0, 1])
+    plt.plot([0, 1], [0, grad])
+    plt.show()
     return final
 
 
@@ -90,3 +91,7 @@ def skewness_match(f_s, f_c, n):
     popt, pcov = scipy.optimize.curve_fit(_skewness_function, f_s, f_c, sigma=np.sqrt(variance))
     final = np.array([popt[0], np.sqrt(pcov[0][0])])
     return final
+
+def scatter(f_s, f_c, n):
+    plt.scatter(f_c, f_s, marker="+")
+    plt.show()

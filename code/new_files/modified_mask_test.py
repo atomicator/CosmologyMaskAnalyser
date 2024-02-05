@@ -9,23 +9,18 @@ ax = fig.add_subplot(111)
 
 resolution = (1000, 2000)
 
-galactic = toolkit.load_mask("planck_galactic")
-point = toolkit.load_mask("planck_point")
-survey = toolkit.load_mask("planck_survey")
+galactic = toolkit.load_mask("planck_modified_galactic")
+#point = toolkit.load_mask("planck_point")
+point = toolkit.load_mask("planck_modified_point")
 
+galactic.set_fig_ax(fig, ax)
+point.set_fig_ax(fig, ax)
 
-temp = point
-temp.set_fig_ax(fig, ax)
+#temp.map = 1 - np.float_(data == 0)
+galactic.plot(show=False, cbar=False, cmap="bwr", resolution=resolution, clear=False)
 
-data = point.map + 2 * galactic.map
-
-print(data)
-
-temp.map = 1 - np.float_(data == 0)
-temp.plot(show=False, cbar=False, cmap="bwr", resolution=resolution, clear=False)
-
-temp.map = 1 - np.float_(data == 2)
-temp.plot(show=False, cbar=False, cmap="bwr_r", resolution=resolution, clear=False)
+#temp.map = 1 - np.float_(data == 2)
+point.plot(show=False, cbar=False, cmap="bwr_r", resolution=resolution, clear=False)
 
 plt.title("A comparison of the two masks")
 plt.xlabel("Longitude")
