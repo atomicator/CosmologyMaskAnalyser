@@ -32,7 +32,7 @@ def excess_measurement(f_s, f_c, n):
     excess = (f_c - f_s) / f_s
     variance = f_c * (1 - f_c) / (f_s ** 2 * n)
     weight = (1 / variance) / np.sum(1 / variance)
-    weight = 1 / len(n)
+    #weight = 1 / len(n)
     mean = np.sum(excess * weight)
     mean_error = np.sqrt(np.sum(variance * weight ** 2))
     return mean, mean_error
