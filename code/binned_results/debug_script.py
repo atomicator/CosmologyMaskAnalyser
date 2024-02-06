@@ -29,8 +29,8 @@ if args.catalogue == "full_sky":
     data_name = "random full sky"
     cat.load_lon_lat()
 elif args.catalogue == "sdss_random":
-    #cat = toolkit.StarCatalogue("./" + raise_dir * "../" + "code/binned_results/test.fits", table=True)
-    cat = toolkit.StarCatalogue("./" + raise_dir * "../" + "code/binned_results/random_sdss_10m.fits", table=True)
+    cat = toolkit.StarCatalogue("./" + raise_dir * "../" + "code/binned_results/test.fits", table=True)
+    #cat = toolkit.StarCatalogue("./" + raise_dir * "../" + "code/binned_results/random_sdss_10m.fits", table=True)
     cat.load_lon_lat()
     data_name = "sdss random"
 elif args.catalogue == "sdss":
@@ -40,6 +40,10 @@ elif args.catalogue == "sdss_filtered":
     cat = toolkit.load_catalogue("sdss", raise_dir)
     cat.load_with_selection(filter, ["ZRED", "LAMBDA"], lon_lat=True)
     data_name = "\n" + rf"Filtered: ${args.min_z} < z < {args.max_z}$, ${args.min_r} < r < {args.max_r}$"
+elif args.catalogue in ("10m", "400k", "80k"):
+    cat = toolkit.StarCatalogue("./" + raise_dir * "../" + f"code/binned_results/{args.catalogue}.fits", table=True)
+    cat.load_lon_lat()
+    data_name = f"sdss random {args.catalogue}"
 else:
     raise ValueError
 
@@ -66,15 +70,15 @@ elif args.weight_function == "scatter":
 else:
     raise ValueError
 
-#mask_names = ["planck_modified_point", "planck_modified_galactic", "planck_modified_total"]
+mask_names = ["planck_modified_point", "planck_modified_galactic", "planck_modified_total"]
 #mask_names = ["planck_modified_point", "planck_modified_galactic", "planck_modified_total", "planck_galactic"]
-mask_names = ["planck_modified_point", "planck_modified_galactic"]
+#mask_names = ["planck_modified_point", "planck_modified_galactic"]
 labels = ["Point", "Galactic", "Total", "Old Galactic"]
 #NSIDES = [1, 2, 4, 8, 16, 32]
 #NSIDES = [2, 8, 32]
 #NSIDES = [32]
-#NSIDES = [1, 2, 4, 8, 16, 32, 64, 128, 256]
-NSIDES = [1, 4, 8, 32, 128]
+NSIDES = [1, 2, 4, 8, 16, 32, 64, 128, 256]
+#NSIDES = [1, 4, 8, 32, 128]
 run_const = True
 save_path = args.save_path
 f = []
@@ -87,11 +91,11 @@ line_colors = ["xkcd:electric blue", "red", "xkcd:grass green", "purple"]
 fig = plt.figure()
 ax = fig.add_subplot(111)
 
-"""NSIDES = [4]
+"""NSIDES = [32]
 run_const = False
 weight_function = weights.scatter
-mask_names = ["planck_modified_galactic"]
-"""
+mask_names = ["planck_modified_point"]"""
+
 for mask_name in mask_names:
     mask = toolkit.load_mask(mask_name, raise_dir)
     if args.catalogue == "full_sky":

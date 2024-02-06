@@ -466,7 +466,7 @@ class _BinMap(object):
         pass
         # Run a switch-case on v, to run the method for the relevant weight set.
 
-    def divide_sample(self, mask, area_masked_fraction, const=False, filter_set="all"):
+    def divide_sample(self, mask, area_masked_fraction, const=False, filter_set="all", a=5):
         if not const:
             sample_masked_fraction = np.zeros(hp.nside2npix(self.NSIDE))
             for pixel in range(hp.nside2npix(self.NSIDE)):
@@ -509,13 +509,18 @@ class _BinMap(object):
             masked = np.bitwise_and(not_masked, np.bitwise_not(not_masked))
             mixed_bins = np.bitwise_and(np.bitwise_not(not_masked), np.bitwise_not(masked))
         elif filter_set == "overkill":
-            not_masked = np.bitwise_or(np.bitwise_or(nan_filter, sample_masked_fraction == 0), planck_masked_only == 0)
-            masked = np.bitwise_and(
-                np.bitwise_or(sample_masked_fraction == 1, sdss_allowed_region == planck_masked_only),
-                np.bitwise_not(not_masked))
-            mixed_bins = np.bitwise_not(np.bitwise_or(masked, not_masked))
-            masked = np.bitwise_or(masked, np.bitwise_and(mixed_bins, 1 - (planck_masked_only / sdss_allowed_region) < 1 / self.map))
-            not_masked = np.bitwise_or(not_masked, np.bitwise_and(mixed_bins, (planck_masked_only / sdss_allowed_region) < 1 / self.map))
+            with np.errstate(divide="ignore"):
+                not_masked = np.bitwise_or(np.bitwise_or(nan_filter, sample_masked_fraction == 0), planck_masked_only == 0)
+                masked = np.bitwise_and(
+                    np.bitwise_or(sample_masked_fraction == 1, sdss_allowed_region == planck_masked_only),
+                    np.bitwise_not(not_masked))
+                mixed_bins = np.bitwise_not(np.bitwise_or(masked, not_masked))
+                masked = np.bitwise_or(masked, np.bitwise_and(mixed_bins, 1 - (planck_masked_only / sdss_allowed_region) < a / self.map))
+                not_masked = np.bitwise_or(not_masked, np.bitwise_and(mixed_bins, (planck_masked_only / sdss_allowed_region) < a / self.map))
+                mixed_bins = np.bitwise_not(np.bitwise_or(masked, not_masked))
+                masked = np.bitwise_or(masked, np.bitwise_and(mixed_bins, 1 - sample_masked_fraction < a / self.map))
+                not_masked = np.bitwise_or(not_masked, np.bitwise_and(mixed_bins, sample_masked_fraction < a / self.map))
+                mixed_bins = np.bitwise_not(np.bitwise_or(masked, not_masked))
         else:
             raise ValueError("filter set not recognised")
 

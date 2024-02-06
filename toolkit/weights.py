@@ -30,7 +30,10 @@ def density_weighting(f_s, _f_c, n):
 
 def excess_measurement(f_s, f_c, n):
     excess = (f_c - f_s) / f_s
+    #f = np.sqrt(f_c * f_s)
+    #f = (f_c + f_s) / 2
     variance = f_c * (1 - f_c) / (f_s ** 2 * n)
+    #variance = (1 - f_s) / (f_s * n)
     weight = (1 / variance) / np.sum(1 / variance)
     #weight = 1 / len(n)
     mean = np.sum(excess * weight)
@@ -93,5 +96,8 @@ def skewness_match(f_s, f_c, n):
     return final
 
 def scatter(f_s, f_c, n):
+    plt.plot((0, 0.6), (0, 0.6))
     plt.scatter(f_c, f_s, marker="+")
+    plt.xlim(0, 0.3)
+    plt.ylim(0, 0.3)
     plt.show()

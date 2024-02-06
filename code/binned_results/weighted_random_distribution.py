@@ -9,12 +9,12 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--mask", default="sdss_mask")
 parser.add_argument("--sample_catalogue", default="sdss")
 parser.add_argument("--nside", type=int, default=8)
-parser.add_argument("--save_path", default="random_sdss_10m.fits")
+parser.add_argument("--save_path", default="test.fits")
 parser.add_argument("--target", type=int, default=80000)
 parser.add_argument("--raise_path", type=int, default=2)
 
 args = parser.parse_args()
-target = 10000000
+target = args.target
 mask = toolkit.load_mask(args.mask, raise_dir=args.raise_path)
 #mask.map = np.ones(len(mask.map))
 sample_cat = toolkit.load_catalogue(args.sample_catalogue, raise_dir=args.raise_path)
