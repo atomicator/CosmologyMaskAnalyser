@@ -38,6 +38,8 @@ def excess_measurement(f_s, f_c, n):
     #weight = 1 / len(n)
     mean = np.sum(excess * weight)
     mean_error = np.sqrt(np.sum(variance * weight ** 2))
+    if len(n) == 0:
+        mean, mean_error = np.nan, np.nan
     return mean, mean_error
 
 

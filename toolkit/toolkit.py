@@ -509,7 +509,7 @@ class _BinMap(object):
             masked = np.bitwise_and(not_masked, np.bitwise_not(not_masked))
             mixed_bins = np.bitwise_and(np.bitwise_not(not_masked), np.bitwise_not(masked))
         elif filter_set == "overkill":
-            with np.errstate(divide="ignore"):
+            with np.errstate(divide="ignore", invalid="ignore"):
                 not_masked = np.bitwise_or(np.bitwise_or(nan_filter, sample_masked_fraction == 0), planck_masked_only == 0)
                 masked = np.bitwise_and(
                     np.bitwise_or(sample_masked_fraction == 1, sdss_allowed_region == planck_masked_only),

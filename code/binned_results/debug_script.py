@@ -7,14 +7,14 @@ import argparse
 parser = argparse.ArgumentParser()
 
 parser.add_argument("--catalogue", default="sdss_random")
-parser.add_argument("--save_path", default="test.pdf")
+parser.add_argument("--save_path", default="400k.pdf")
 parser.add_argument("--raise_path", type=int, default=2)
 parser.add_argument("--weight_function", default="excess_measurement")
 parser.add_argument("--min_z", type=float, default=0.0)
 parser.add_argument("--min_r", type=float, default=10.0)
 parser.add_argument("--max_z", type=float, default=20.0)
 parser.add_argument("--max_r", type=float, default=10000.0)
-
+parser.add_argument("--data_mask", default="sdss")
 args = parser.parse_args()
 
 
@@ -28,26 +28,34 @@ if args.catalogue == "full_sky":
     cat = toolkit.StarCatalogue("./" + raise_dir * "../" + "code/binned_results/random_full_sky.fits", table=True)
     data_name = "random full sky"
     cat.load_lon_lat()
+    data_mask = "full_sky"
 elif args.catalogue == "sdss_random":
     cat = toolkit.StarCatalogue("./" + raise_dir * "../" + "code/binned_results/test.fits", table=True)
-    #cat = toolkit.StarCatalogue("./" + raise_dir * "../" + "code/binned_results/random_sdss_10m.fits", table=True)
+    #cat = toolkit.StarCatalogue("./" + raise_dir * "../" + "code/binned_results/random_sdss_80k.fits", table=True)
     cat.load_lon_lat()
-    data_name = "sdss random"
+    data_name = "sdss random 400k"
+    data_mask = "sdss"
 elif args.catalogue == "sdss":
     cat = toolkit.load_catalogue("sdss", raise_dir)
     data_name = "sdss actual"
+    data_mask = "sdss"
 elif args.catalogue == "sdss_filtered":
     cat = toolkit.load_catalogue("sdss", raise_dir)
     cat.load_with_selection(filter, ["ZRED", "LAMBDA"], lon_lat=True)
+    data_mask = "sdss"
     data_name = "\n" + rf"Filtered: ${args.min_z} < z < {args.max_z}$, ${args.min_r} < r < {args.max_r}$"
 elif args.catalogue in ("10m", "400k", "80k"):
     cat = toolkit.StarCatalogue("./" + raise_dir * "../" + f"code/binned_results/{args.catalogue}.fits", table=True)
     cat.load_lon_lat()
+    data_mask = "sdss"
     data_name = f"sdss random {args.catalogue}"
 else:
     raise ValueError
 
-print(len(cat.lon_lat))
+N = len(cat.lon_lat)
+print(N)
+a = 1e-6 * N + 5
+print(a)
 
 if args.weight_function == "excess_measurement":
     y_axis_label = r"Excess"
@@ -70,14 +78,14 @@ elif args.weight_function == "scatter":
 else:
     raise ValueError
 
-mask_names = ["planck_modified_point", "planck_modified_galactic", "planck_modified_total"]
+#mask_names = ["planck_modified_point", "planck_modified_galactic", "planck_modified_total"]
 #mask_names = ["planck_modified_point", "planck_modified_galactic", "planck_modified_total", "planck_galactic"]
-#mask_names = ["planck_modified_point", "planck_modified_galactic"]
+mask_names = ["planck_modified_point", "planck_modified_galactic"]
 labels = ["Point", "Galactic", "Total", "Old Galactic"]
 #NSIDES = [1, 2, 4, 8, 16, 32]
-#NSIDES = [2, 8, 32]
+NSIDES = [1, 2, 4, 8, 16, 32, 64]
 #NSIDES = [32]
-NSIDES = [1, 2, 4, 8, 16, 32, 64, 128, 256]
+#NSIDES = [1, 2, 4, 8, 16, 32, 64, 128, 256]
 #NSIDES = [1, 4, 8, 32, 128]
 run_const = True
 save_path = args.save_path
@@ -98,14 +106,14 @@ mask_names = ["planck_modified_point"]"""
 
 for mask_name in mask_names:
     mask = toolkit.load_mask(mask_name, raise_dir)
-    if args.catalogue == "full_sky":
+    if data_mask == "full_sky":
         data_set = np.array((
             np.zeros(12 * 2048 ** 2),
             1 - mask.map,
             np.zeros(12 * 2048 ** 2),
             mask.map
         ))
-    else:
+    elif data_mask == "sdss":
         sdss_mask = toolkit.load_mask("sdss_mask", raise_dir)
         temp = mask.map + 1j * sdss_mask.map
         data_set = np.float_(np.array((
@@ -114,6 +122,8 @@ for mask_name in mask_names:
             temp == 1,
             temp == 1+1j
         )))
+    else:
+        raise ValueError
 
     results = []
     if not set_f_zero:
@@ -131,7 +141,7 @@ for mask_name in mask_names:
         binmap = toolkit.ConstantMap()
         binmap.bin_catalogue(cat)
         binmap.load_catalogue(cat)
-        output = binmap.divide_sample(mask, data, True, filter_set)
+        output = binmap.divide_sample(mask, data, True, filter_set, a)
         mixed = weight_function(*output[1:])
         print(f"Mixed C: {mixed[0]} +/- {mixed[1]}")
         if convert_to_mask_frac:
@@ -152,7 +162,7 @@ for mask_name in mask_names:
             binmap = toolkit.HealpixBinMap(n)
             binmap.bin_catalogue(cat)
             binmap.load_catalogue(cat)
-            output = binmap.divide_sample(mask, data, False, filter_set)
+            output = binmap.divide_sample(mask, data, False, filter_set, a)
             mixed = weight_function(*output[1:])
             print(f"Mixed {n}: {mixed[0]} +/- {mixed[1]}")
             print(output[0])
