@@ -7,7 +7,6 @@ import pixell.enplot
 import healpy as hp
 import astropy.cosmology
 import astropy.units
-import pandas as pd
 import matplotlib.projections
 
 plt.rcParams.update({
@@ -28,7 +27,7 @@ ra_max_test = 180
 
 #print(box)
 
-imap = enmap.read_fits("./data/ACT_mask.fits", hdu=1)
+imap = enmap.read_fits("../../data/ACT_mask.fits", hdu=1)
 #imap = enmap.read_map("./data/ACT_mask.fits", hdu=1)
 #data = astropy.io.fits.open("./data/planck_galactic_mask.fits", hdu=2)[2]
 
@@ -40,21 +39,8 @@ x = len(imap)
 y = len(imap[0])
 print(x, y)
 
-#new_data = imap[int(x * ra_min / 360):int(x * ra_max / 360), int(y * dec_min / 360):int(y * dec_max / 360)]
-#new_data = imap[int(x * (dec_min_test + 90) / 180):int(x * (dec_max_test + 90) / 180),
-#                int(y * (ra_min_test + 180) / 360):int(y * (ra_max_test + 180) / 360)]
 new_data = imap[::6, ::6]
 print(new_data)
-
-'''hp.mollview(
-    new_data,
-    xsize=int(1e4),
-    #coord=["G", "E"],
-    #title="Histogram equalized Ecliptic",
-    #unit="mK",
-    #norm="hist"
-)
-hp.graticule()'''
 
 new_data = numpy.array(new_data)
 #fig, ax = plt.subplots(figsize=(1, 1))
@@ -75,7 +61,7 @@ c = ax.pcolormesh(Lon, Lat, new_data)
 #ax.colorbar(orientation="horizontal")
 fig.colorbar(c, orientation="horizontal")
 plt.title("Part of the ACT mask")
-plt.savefig("./graphs/act_mask/mollweide.png")
+#plt.savefig("./graphs/act_mask/mollweide.png")
 fig.show()
 
 

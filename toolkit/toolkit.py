@@ -46,7 +46,9 @@ class __Mask(object):  # overwite this with pixell and healpy specific versions
 class PixellMask(__Mask):
     def __init__(self, path, step=1, mask_using_latlon=True, **kwargs):
         # Load data from fits file
-        self.map = pixell.enmap.read_fits(path, **kwargs)[::step, ::step]
+        self.imap = pixell.enmap.read_fits(path, **kwargs)
+        self.map = np.array(self.imap)
+        print(np.shape(self.map))
         self.x = len(self.map)
         self.y = len(self.map[0])
         self.lat_min = -90
@@ -64,15 +66,45 @@ class PixellMask(__Mask):
         self.lon_max = lon_max
 
     def lookup_point(self, lat, lon):
-        # print(lon, lat)
-        point = self.map[int(((90 + lat) / 180) * self.x)][int(((lon - 180) / 360) * self.y)]
+        if not self.mask_using_latlon:
+            c = astropy.coordinates.SkyCoord(lon, lat, unit="deg", frame="galactic")  # convert to galactic co ords
+            lon = c.icrs.ra.degree
+            lat = c.icrs.dec.degree
+        print(np.min(lon), np.max(lon))
+        print(np.min(lat), np.max(lat))
+        print(np.shape(lat))
+        print(np.shape(lat))
+        print(np.shape(self.map)[0])
+        # point = self.map[np.int_(((90 + lat) / 180) * self.x), np.int_(((lon - 180) / 360) * self.y)]
+        pix = np.int_(pixell.enmap.sky2pix(self.imap.shape, self.imap.wcs, np.array((lat, lon)) * np.pi / 180))
+
+        print(np.shape(pix))
+        point = np.zeros(np.shape(pix)[1:])
+        # points_in_range = pix[
+        #    np.bitwise_and(np.bitwise_and(0 < np.array(pix[0]), np.array(pix[0]) < np.shape(self.map)[0]),
+        #                   np.bitwise_and(0 < np.array(pix[1]), np.array(pix[1]) < np.shape(self.map)[1]))]
+        print(np.shape(np.bool_(np.int_(0 < np.array(pix[0])) * np.int_(np.array(pix[0]) < np.shape(self.map)[0]))))
+        print(np.shape(np.bool_(np.int_(0 < np.array(pix[1])) * np.int_(np.array(pix[1]) < np.shape(self.map)[1]))))
+        points_in_range = np.bitwise_and(np.bool_(np.int_(0 < np.array(pix[0])) * np.int_(np.array(pix[0]) < np.shape(self.map)[0] - 1)),
+                                             np.bool_(np.int_(0 < np.array(pix[1])) * np.int_(np.array(pix[1]) < np.shape(self.map)[1] - 1)))
+        print("Test")
+        print(np.shape(points_in_range))
+        print(np.shape(point))
+        #print(np.min(pix), np.max(pix))
+        #print(np.min(points_in_range), np.max(pix))
+        print(np.shape(point[points_in_range]))
+        point[points_in_range] = self.map[pix[0, points_in_range], pix[1, points_in_range]]
+        #point[points_in_range] = self.map
+        print(np.shape(point))
         return point
 
-    def plot_on_ax(self, ax, alpha, cmap="plasma"):
-        lat = np.linspace(self.lat_min, self.lat_max, self.x + 1)
-        lon = np.linspace(self.lon_min, self.lon_max, self.y + 1)
+    def plot_on_ax(self, ax, alpha, resolution, cmap="plasma"):
+        print(resolution)
+        lat = np.linspace(self.lat_min, self.lat_max, resolution[0] + 1)[1:-2]
+        lon = np.linspace(self.lon_min, self.lon_max, resolution[1] + 1)[1:-2]
         lon, lat = np.meshgrid(lon, lat)
-        c = ax.pcolormesh(lon, lat, self.map, alpha=alpha, cmap=cmap)
+        data = self.lookup_point(lat, lon)
+        c = ax.pcolormesh(lon, lat, data, alpha=alpha, cmap=cmap)
         return c
 
     def old_plot(self, fig, ax, save_path=None, cmap="plasma", title=None, show=True, cbar=True, clear=True, **kwargs):
@@ -108,14 +140,16 @@ class PixellMask(__Mask):
             plt.show()
         return c
 
-    def plot(self, clear=True, cbar=None, title=None, save_path=None, show=False, cmap="plasma", alpha=1):
+    def plot(self, resolution=(1000, 2000), clear=True, cbar=None, title=None, save_path=None, show=False,
+             cmap="plasma", alpha=1):
         if clear:
             self.ax.cla()
-        c = self.plot_on_ax(self.ax, alpha, cmap=cmap)
+        print(resolution)
+        c = self.plot_on_ax(self.ax, alpha, resolution=resolution, cmap=cmap)
         if cbar:
             self.fig.colorbar(c, orientation="horizontal", cmap=cmap)
         if title:
-            self.ax.title(title)
+            self.ax.set_title(title)
         if save_path:
             plt.savefig(save_path)
         if show:
@@ -234,7 +268,7 @@ class NoFigAx(TypeError):
 
 
 class StarCatalogue(object):
-    def __init__(self, path=None, hdu=00, table=False, **kwargs):
+    def __init__(self, path=None, hdu=0, table=False, **kwargs):
         if path:
             if not table:
                 self.fits = astropy.io.fits.open(path, **kwargs)
@@ -265,8 +299,12 @@ class StarCatalogue(object):
         self.ax = ax
 
     def load_ra_dec(self):
-        dec = self.data.field('DEC')
-        ra = self.data.field('RA')
+        try:
+            dec = self.data.field('DEC')
+            ra = self.data.field('RA')
+        except KeyError:
+            dec = self.data.field('decDeg')
+            ra = self.data.field('RADeg')
         self.lon_lat = np.array([ra, dec]).transpose()
 
     def load_lon_lat(self):
@@ -274,8 +312,12 @@ class StarCatalogue(object):
             lon = self.data.field('GLON')
             lat = self.data.field('GLAT')
         except KeyError:
-            dec = self.data.field('DEC')
-            ra = self.data.field('RA')
+            try:
+                dec = self.data.field('DEC')
+                ra = self.data.field('RA')
+            except KeyError:
+                dec = self.data.field('decDeg')
+                ra = self.data.field('RADeg')
             c = astropy.coordinates.SkyCoord(ra, dec, unit="deg")  # convert to galactic co ords
             lon = c.galactic.l.degree
             lat = c.galactic.b.degree
@@ -477,7 +519,8 @@ class _BinMap(object):
                 except TypeError:
                     sample_masked_fraction[pixel] = np.NAN
         else:
-            sample_masked_fraction = np.array(1 - np.sum(mask.lookup_point(*self.binned_sample[0].transpose())) / len(self.binned_sample[0]))
+            sample_masked_fraction = np.array(
+                1 - np.sum(mask.lookup_point(*self.binned_sample[0].transpose())) / len(self.binned_sample[0]))
 
         sdss_allowed_region = area_masked_fraction[1] + area_masked_fraction[3]
         planck_masked_only = area_masked_fraction[1]
@@ -487,8 +530,9 @@ class _BinMap(object):
 
         if filter_set == "all":
             not_masked = np.bitwise_or(np.bitwise_or(nan_filter, sample_masked_fraction == 0), planck_masked_only == 0)
-            masked = np.bitwise_and(np.bitwise_or(sample_masked_fraction == 1, sdss_allowed_region == planck_masked_only),
-                                    np.bitwise_not(not_masked))
+            masked = np.bitwise_and(
+                np.bitwise_or(sample_masked_fraction == 1, sdss_allowed_region == planck_masked_only),
+                np.bitwise_not(not_masked))
             mixed_bins = np.bitwise_not(np.bitwise_or(masked, not_masked))
 
             """nan_filter = np.bitwise_or(np.isnan(sample_masked_fraction), np.isinf(sample_masked_fraction))
@@ -510,16 +554,20 @@ class _BinMap(object):
             mixed_bins = np.bitwise_and(np.bitwise_not(not_masked), np.bitwise_not(masked))
         elif filter_set == "overkill":
             with np.errstate(divide="ignore", invalid="ignore"):
-                not_masked = np.bitwise_or(np.bitwise_or(nan_filter, sample_masked_fraction == 0), planck_masked_only == 0)
+                not_masked = np.bitwise_or(np.bitwise_or(nan_filter, sample_masked_fraction == 0),
+                                           planck_masked_only == 0)
                 masked = np.bitwise_and(
                     np.bitwise_or(sample_masked_fraction == 1, sdss_allowed_region == planck_masked_only),
                     np.bitwise_not(not_masked))
                 mixed_bins = np.bitwise_not(np.bitwise_or(masked, not_masked))
-                masked = np.bitwise_or(masked, np.bitwise_and(mixed_bins, 1 - (planck_masked_only / sdss_allowed_region) < a / self.map))
-                not_masked = np.bitwise_or(not_masked, np.bitwise_and(mixed_bins, (planck_masked_only / sdss_allowed_region) < a / self.map))
+                masked = np.bitwise_or(masked, np.bitwise_and(mixed_bins, 1 - (
+                            planck_masked_only / sdss_allowed_region) < a / self.map))
+                not_masked = np.bitwise_or(not_masked, np.bitwise_and(mixed_bins, (
+                            planck_masked_only / sdss_allowed_region) < a / self.map))
                 mixed_bins = np.bitwise_not(np.bitwise_or(masked, not_masked))
                 masked = np.bitwise_or(masked, np.bitwise_and(mixed_bins, 1 - sample_masked_fraction < a / self.map))
-                not_masked = np.bitwise_or(not_masked, np.bitwise_and(mixed_bins, sample_masked_fraction < a / self.map))
+                not_masked = np.bitwise_or(not_masked,
+                                           np.bitwise_and(mixed_bins, sample_masked_fraction < a / self.map))
                 mixed_bins = np.bitwise_not(np.bitwise_or(masked, not_masked))
         else:
             raise ValueError("filter set not recognised")
@@ -541,7 +589,9 @@ class _BinMap(object):
             cluster_fraction = np.array((sample_masked_fraction))
             n = self.map
 
-        return [[fully_masked_cluster_fraction, not_masked_cluster_fraction, fully_masked_sky_fraction, not_masked_sky_fraction], sky_fraction, cluster_fraction, n]
+        return [[fully_masked_cluster_fraction, not_masked_cluster_fraction, fully_masked_sky_fraction,
+                 not_masked_sky_fraction], sky_fraction, cluster_fraction, n]
+
 
 class BinaryMap(_BinMap):
     def __init__(self):
@@ -564,7 +614,8 @@ class BinaryMap(_BinMap):
                                            np.sum(mask.map[bin == 1]) / len(mask.map[bin == 1])])
         print(f"Mask fraction map: {self.mask_fraction_map}")
         with np.errstate(divide="ignore"):
-            inverted_fraction_map = np.power(self.mask_fraction_map, -1)  # spits out inf/NaN values, ignore RuntimeWarning
+            inverted_fraction_map = np.power(self.mask_fraction_map,
+                                             -1)  # spits out inf/NaN values, ignore RuntimeWarning
         inverted_fraction_map[np.bitwise_or(np.isnan(inverted_fraction_map), np.isinf(inverted_fraction_map))] = 0
         self.weighted_map = self.map * inverted_fraction_map
 
@@ -611,7 +662,7 @@ class HealpixBinMap(_BinMap):
 
     def calc_weighted_map(self, mask, resolution=(1000, 1000)):
         self.mask_fraction_map = hp.pixelfunc.ud_grade(mask.map, self.NSIDE)
-        #with np.seterr(all="ignore"):
+        # with np.seterr(all="ignore"):
         inverted_fraction_map = np.power(self.mask_fraction_map, -1)  # spits out inf/NaN values, ignore RuntimeWarning
         inverted_fraction_map[np.bitwise_or(np.isnan(inverted_fraction_map), np.isinf(inverted_fraction_map))] = 0
         self.weighted_map = self.map * inverted_fraction_map
@@ -821,6 +872,7 @@ def gen_random_coords(n, mask=None):
         data = data[:, np.bool_(mask.lookup_point(phi, theta))]
     return data
 
+
 def match_distribution(random_coords, sample, nside):
     binmap_sample = HealpixBinMap(nside)
     binmap_sample.bin_catalogue(sample)
@@ -840,12 +892,16 @@ def match_distribution(random_coords, sample, nside):
     for bin_num in range(hp.nside2npix(nside)):
         if ratio[bin_num] != 0:
             if first:
-                final_data_set = binmap_random.binned_sample[bin_num][:int(new_ratio * len(binmap_sample.binned_sample[bin_num]))]
+                final_data_set = binmap_random.binned_sample[bin_num][
+                                 :int(new_ratio * len(binmap_sample.binned_sample[bin_num]))]
                 first = False
             else:
-                final_data_set = np.append(final_data_set, binmap_random.binned_sample[bin_num][:int(new_ratio * len(binmap_sample.binned_sample[bin_num]))], axis=0)
+                final_data_set = np.append(final_data_set, binmap_random.binned_sample[bin_num][
+                                                           :int(new_ratio * len(binmap_sample.binned_sample[bin_num]))],
+                                           axis=0)
     print(final_data_set)
     return final_data_set
+
 
 def ra_dec_to_lon_lat(ra, dec, reverse=False):
     if not reverse:

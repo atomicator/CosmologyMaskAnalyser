@@ -6,14 +6,14 @@ fig = plt.figure()
 ax = fig.add_subplot(111)
 
 # load the catalogue
-#cat = toolkit.StarCatalogue("../../data/sdss_catalogue.fits", hdu=1)
-cat = toolkit.StarCatalogue("../binned_results/random_sdss_80k.fits", hdu=1, table=True)
+cat = toolkit.StarCatalogue("../../data/DR5_cluster-catalog_v1.1.fits", hdu=1)
+#cat = toolkit.StarCatalogue("../binned_results/random_sdss_80k.fits", hdu=1, table=True)
 cat.load_lon_lat()
 
 print(cat.lon_lat)
 
 # load the masks
-#mask = toolkit.PixellMask("../../data/ACT_mask.fits", step=10, hdu=1)
+mask = toolkit.PixellMask("../../data/ACT_mask.fits", step=10, hdu=1, mask_using_latlon=False)
 #mask = toolkit.HealpyMask("../../data/planck_galactic_mask.fits")
 #mask = toolkit.HealpyMask("../../data/planck_point_mask.fits")
 #mask = toolkit.load_mask("planck_modified_galactic")
@@ -39,8 +39,8 @@ print(cat.lon_lat)
 
 cat.set_fig_ax(fig, ax)
 #cat.set_cat_mask(m)
-#cat.load_ra_dec()
-cat.load_lon_lat()
+cat.load_ra_dec()
+#cat.load_lon_lat()
 cat.plot_heatmap(32, cmap="rainbow", resolution=(1000, 2000), cbar=True, cbar_label="Clusters per "
                                                                                      "square degree")
 

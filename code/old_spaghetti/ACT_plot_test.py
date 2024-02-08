@@ -7,7 +7,6 @@ import pixell.enplot
 import healpy as hp
 import astropy.cosmology
 import astropy.units
-import pandas as pd
 import matplotlib.projections
 
 plt.rcParams.update({
@@ -28,7 +27,7 @@ ra_max_test = 180
 
 #print(box)
 
-imap = enmap.read_fits("../data/ACT_mask.fits", hdu=1)
+imap = enmap.read_fits("../../data/ACT_mask.fits", hdu=1)
 #imap = enmap.read_map("./data/ACT_mask.fits", hdu=1)
 #data = astropy.io.fits.open("./data/planck_galactic_mask.fits", hdu=2)[2]
 

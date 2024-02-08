@@ -54,7 +54,7 @@ else:
 
 N = len(cat.lon_lat)
 print(N)
-a = 1e-6 * N + 5
+a = 1e-8 * N ** 2 + 5
 print(a)
 
 if args.weight_function == "excess_measurement":
