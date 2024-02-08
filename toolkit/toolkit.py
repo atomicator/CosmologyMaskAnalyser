@@ -785,7 +785,7 @@ def load_mask(mask, raise_dir=2, nside=8):
         planck_only.NPIX = hp.nside2npix(nside)
         return planck_only
     elif mask.lower() == "act":
-        value = PixellMask("../" * raise_dir + "/data/ACT_mask.fits", hdu=1, mask_using_latlon=False)
+        value = PixellMask("../" * raise_dir + "data/ACT_mask.fits", hdu=1, mask_using_latlon=False)
     else:
         raise ValueError(f"{mask} is not a recognised mask")
     return value
