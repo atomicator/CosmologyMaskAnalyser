@@ -65,7 +65,7 @@ class PixellMask(__Mask):
         self.lon_min = lon_min
         self.lon_max = lon_max
 
-    def lookup_point(self, lat, lon):
+    def lookup_point(self, lon, lat):
         if not self.mask_using_latlon:
             c = astropy.coordinates.SkyCoord(lon, lat, unit="deg", frame="galactic")  # convert to galactic co ords
             lon = c.icrs.ra.degree
@@ -669,16 +669,14 @@ class HealpixBinMap(_BinMap):
 
 
 def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="", res=int(1e4)):
-    pix = np.linspace(0, NSIDE_internal - 1, NSIDE_internal)
+    """pix = np.linspace(0, NSIDE_internal - 1, NSIDE_internal)
     print(mask1.NSIDE, mask2.NSIDE)
     sum = mask1.map + 1j * mask2.map
     data1 = hp.ud_grade(sum == 0.0, NSIDE)
     data2 = hp.ud_grade(sum == 1.0, NSIDE)
     data3 = hp.ud_grade(sum == 1j, NSIDE)
     data4 = hp.ud_grade(sum == 1 + 1j, NSIDE)
-
-    results = np.float_(np.array([data1, data2, data3, data4]))
-
+    results = np.float_(np.array([data1, data2, data3, data4]))"""
     """x = np.linspace(-180, 180, 2 * res)
     y = np.linspace(-90, 90, res)
     x, y = np.meshgrid(x, y)
@@ -702,7 +700,16 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="
     print(map)
     results = map[1:] / (map[0] + 1e-100)
     print(np.max(results[0]), np.max(results[1]), np.max(results[2]), np.max(results[3]))"""
-
+    pix = np.int_(np.linspace(0, hp.nside2npix(NSIDE_internal) - 1, hp.nside2npix(NSIDE_internal)))
+    points = hp.pix2ang(NSIDE_internal, pix, lonlat=True)
+    sum = mask1.lookup_point(*points) + 1j * mask2.lookup_point(*points)
+    print(np.shape(sum))
+    print(sum)
+    data1 = hp.ud_grade(sum == 0.0, NSIDE)
+    data2 = hp.ud_grade(sum == 1.0, NSIDE)
+    data3 = hp.ud_grade(sum == 1j, NSIDE)
+    data4 = hp.ud_grade(sum == 1 + 1j, NSIDE)
+    results = np.float_(np.array([data1, data2, data3, data4]))
     hp.fitsfunc.write_map(f"./{name}_{NSIDE}_1.fits", results[0], overwrite=True)
     hp.fitsfunc.write_map(f"./{name}_{NSIDE}_2.fits", results[1], overwrite=True)
     hp.fitsfunc.write_map(f"./{name}_{NSIDE}_3.fits", results[2], overwrite=True)
