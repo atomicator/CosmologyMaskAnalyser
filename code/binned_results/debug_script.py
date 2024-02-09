@@ -44,7 +44,7 @@ elif args.catalogue == "sdss_filtered":
     cat.load_with_selection(filter, ["ZRED", "LAMBDA"], lon_lat=True)
     data_mask = "sdss"
     data_name = "\n" + rf"Filtered: ${args.min_z} < z < {args.max_z}$, ${args.min_r} < r < {args.max_r}$"
-elif args.catalogue in ("10m", "400k", "80k"):
+elif args.catalogue in ("10m", "400k", "80k", "act_10m", "act_400k", "act_80k"):
     cat = toolkit.StarCatalogue("./" + raise_dir * "../" + f"code/binned_results/{args.catalogue}.fits", table=True)
     cat.load_lon_lat()
     data_mask = "sdss"
@@ -54,7 +54,7 @@ else:
 
 N = len(cat.lon_lat)
 print(N)
-a = 1e-8 * N ** 2 + 5
+a = 1e-5 * N + 5
 print(a)
 
 if args.weight_function == "excess_measurement":
@@ -121,6 +121,14 @@ for mask_name in mask_names:
             temp == 1j,
             temp == 1,
             temp == 1+1j
+        )))
+    elif data_mask == "act":
+        sdss_mask = toolkit.load_mask("act", raise_dir)
+        data_set = np.float_(np.array((
+            toolkit.HealpyMask("../" * raise_dir + "code/binned_results/sdss_mask_act_256_1.fits").map,
+            toolkit.HealpyMask("../" * raise_dir + "code/binned_results/sdss_mask_act_256_2.fits").map,
+            toolkit.HealpyMask("../" * raise_dir + "code/binned_results/sdss_mask_act_256_3.fits").map,
+            toolkit.HealpyMask("../" * raise_dir + "code/binned_results/sdss_mask_act_256_4.fits").map
         )))
     else:
         raise ValueError

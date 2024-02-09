@@ -15,66 +15,12 @@ wait
 #nice -20 python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss" --weight_function="excess_measurement" --save_path="./sdss_data_excess.pdf"
 #nice -20 python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss" --weight_function="density_weighting" --save_path="./sdss_data_density.pdf"
 
-nice -20 python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered"  \
---weight_function="density_weighting" --save_path="./min_z_3.pdf" --min_z=0.3 &
-nice -20 python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered"  \
---weight_function="density_weighting" --save_path="./min_z_4.pdf" --min_z=0.4 &
-nice -20 python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered"  \
---weight_function="density_weighting" --save_path="./min_z_5.pdf" --min_z=0.5
-wait
+#nice -20 python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered"  \
+#--weight_function="density_weighting" --save_path="./min_z_3.pdf" --min_z=0.3 &
+#nice -20 python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered"  \
+#--weight_function="density_weighting" --save_path="./min_z_4.pdf" --min_z=0.4 &
+#nice -20 python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered"  \
+#--weight_function="density_weighting" --save_path="./min_z_5.pdf" --min_z=0.5
+#wait
 
-nice -20 python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered"  \
---weight_function="density_weighting" --save_path="./z_bin_1.pdf" --max_z=0.3 &
-nice -20 python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered"  \
---weight_function="density_weighting" --save_path="./z_bin_2.pdf" --min_z=0.3 --max_z=0.4 &
-nice -20 python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered"  \
---weight_function="density_weighting" --save_path="./z_bin_3.pdf" --min_z=0.4 --max_z=0.5
-wait
-
-nice -20 python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered"  \
---weight_function="density_weighting" --save_path="./min_r_6.pdf" --min_r=0.6 &
-nice -20 python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered"  \
---weight_function="density_weighting" --save_path="./min_r_65.pdf" --min_r=0.65 &
-nice -20 python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered"  \
---weight_function="density_weighting" --save_path="./min_r_7.pdf" --min_r=0.7
-wait
-
-nice -20 python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered"  \
---weight_function="density_weighting" --save_path="./r_bin_1.pdf" --max_r=0.6 &
-nice -20 python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered"  \
---weight_function="density_weighting" --save_path="./r_bin_2.pdf" --min_r=0.6 --max_r=0.65 &
-nice -20 python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered"  \
---weight_function="density_weighting" --save_path="./r_bin_3.pdf" --min_r=0.65 --max_r=0.7 &
-wait
-
-nice -20 python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered"  \
---weight_function="excess_measurement" --save_path="./excess_min_z_3.pdf" --min_z=0.3 &
-nice -20 python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered"  \
---weight_function="excess_measurement" --save_path="./excess_min_z_4.pdf" --min_z=0.4 &
-nice -20 python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered"  \
---weight_function="excess_measurement" --save_path="./excess_min_z_5.pdf" --min_z=0.5
-wait
-
-nice -20 python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered"  \
---weight_function="excess_measurement" --save_path="./excess_z_bin_1.pdf" --max_z=0.3 &
-nice -20 python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered"  \
---weight_function="excess_measurement" --save_path="./excess_z_bin_2.pdf" --min_z=0.3 --max_z=0.4 &
-nice -20 python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered"  \
---weight_function="excess_measurement" --save_path="./excess_z_bin_3.pdf" --min_z=0.4 --max_z=0.5
-wait
-
-nice -20 python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered"  \
---weight_function="excess_measurement" --save_path="./excess_min_r_6.pdf" --min_r=0.6 &
-nice -20 python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered"  \
---weight_function="excess_measurement" --save_path="./excess_min_r_65.pdf" --min_r=0.65 &
-nice -20 python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered"  \
---weight_function="excess_measurement" --save_path="./excess_min_r_7.pdf" --min_r=0.7
-wait
-
-nice -20 python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered"  \
---weight_function="excess_measurement" --save_path="./excess_r_bin_1.pdf" --max_r=0.6 &
-nice -20 python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered"  \
---weight_function="excess_measurement" --save_path="./excess_r_bin_2.pdf" --min_r=0.6 --max_r=0.65 &
-nice -20 python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered"  \
---weight_function="excess_measurement" --save_path="./excess_r_bin_3.pdf" --min_r=0.65 --max_r=0.7 &
-wait
+python3
