@@ -70,32 +70,16 @@ class PixellMask(__Mask):
             c = astropy.coordinates.SkyCoord(lon, lat, unit="deg", frame="galactic")  # convert to galactic co ords
             lon = c.icrs.ra.degree
             lat = c.icrs.dec.degree
-        print(np.min(lon), np.max(lon))
-        print(np.min(lat), np.max(lat))
-        print(np.shape(lat))
-        print(np.shape(lat))
-        print(np.shape(self.map)[0])
         # point = self.map[np.int_(((90 + lat) / 180) * self.x), np.int_(((lon - 180) / 360) * self.y)]
         pix = np.int_(pixell.enmap.sky2pix(self.imap.shape, self.imap.wcs, np.array((lat, lon)) * np.pi / 180))
-
-        print(np.shape(pix))
         point = np.zeros(np.shape(pix)[1:])
         # points_in_range = pix[
         #    np.bitwise_and(np.bitwise_and(0 < np.array(pix[0]), np.array(pix[0]) < np.shape(self.map)[0]),
         #                   np.bitwise_and(0 < np.array(pix[1]), np.array(pix[1]) < np.shape(self.map)[1]))]
-        print(np.shape(np.bool_(np.int_(0 < np.array(pix[0])) * np.int_(np.array(pix[0]) < np.shape(self.map)[0]))))
-        print(np.shape(np.bool_(np.int_(0 < np.array(pix[1])) * np.int_(np.array(pix[1]) < np.shape(self.map)[1]))))
         points_in_range = np.bitwise_and(np.bool_(np.int_(0 < np.array(pix[0])) * np.int_(np.array(pix[0]) < np.shape(self.map)[0] - 1)),
                                              np.bool_(np.int_(0 < np.array(pix[1])) * np.int_(np.array(pix[1]) < np.shape(self.map)[1] - 1)))
-        print("Test")
-        print(np.shape(points_in_range))
-        print(np.shape(point))
-        #print(np.min(pix), np.max(pix))
-        #print(np.min(points_in_range), np.max(pix))
-        print(np.shape(point[points_in_range]))
         point[points_in_range] = self.map[pix[0, points_in_range], pix[1, points_in_range]]
         #point[points_in_range] = self.map
-        print(np.shape(point))
         return point
 
     def plot_on_ax(self, ax, alpha, resolution, cmap="plasma"):
