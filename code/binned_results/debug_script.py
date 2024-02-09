@@ -7,14 +7,14 @@ import argparse
 parser = argparse.ArgumentParser()
 
 parser.add_argument("--catalogue", default="sdss_random")
-parser.add_argument("--save_path", default="400k.pdf")
+parser.add_argument("--save_path", default="test.pdf")
 parser.add_argument("--raise_path", type=int, default=2)
 parser.add_argument("--weight_function", default="excess_measurement")
 parser.add_argument("--min_z", type=float, default=0.0)
 parser.add_argument("--min_r", type=float, default=10.0)
 parser.add_argument("--max_z", type=float, default=20.0)
 parser.add_argument("--max_r", type=float, default=10000.0)
-parser.add_argument("--data_mask", default="sdss")
+parser.add_argument("--data_mask", default="sdss_planck")
 args = parser.parse_args()
 
 
@@ -28,13 +28,11 @@ if args.catalogue == "full_sky":
     cat = toolkit.StarCatalogue("./" + raise_dir * "../" + "code/binned_results/random_full_sky.fits", table=True)
     data_name = "random full sky"
     cat.load_lon_lat()
-    data_mask = "full_sky"
 elif args.catalogue == "sdss_random":
     cat = toolkit.StarCatalogue("./" + raise_dir * "../" + "code/binned_results/test.fits", table=True)
     #cat = toolkit.StarCatalogue("./" + raise_dir * "../" + "code/binned_results/random_sdss_80k.fits", table=True)
     cat.load_lon_lat()
     data_name = "sdss random 400k"
-    data_mask = "sdss"
 elif args.catalogue == "sdss":
     cat = toolkit.load_catalogue("sdss", raise_dir)
     data_name = "sdss actual"
@@ -42,15 +40,15 @@ elif args.catalogue == "sdss":
 elif args.catalogue == "sdss_filtered":
     cat = toolkit.load_catalogue("sdss", raise_dir)
     cat.load_with_selection(filter, ["ZRED", "LAMBDA"], lon_lat=True)
-    data_mask = "sdss"
     data_name = "\n" + rf"Filtered: ${args.min_z} < z < {args.max_z}$, ${args.min_r} < r < {args.max_r}$"
-elif args.catalogue in ("10m", "400k", "80k", "act_10m", "act_400k", "act_80k"):
+elif args.catalogue in ("10m", "400k", "80k"):
     cat = toolkit.StarCatalogue("./" + raise_dir * "../" + f"code/binned_results/{args.catalogue}.fits", table=True)
     cat.load_lon_lat()
-    data_mask = "sdss"
     data_name = f"sdss random {args.catalogue}"
 else:
     raise ValueError
+
+data_mask = args.data_mask
 
 N = len(cat.lon_lat)
 print(N)
@@ -78,10 +76,15 @@ elif args.weight_function == "scatter":
 else:
     raise ValueError
 
-#mask_names = ["planck_modified_point", "planck_modified_galactic", "planck_modified_total"]
-#mask_names = ["planck_modified_point", "planck_modified_galactic", "planck_modified_total", "planck_galactic"]
-mask_names = ["planck_modified_point", "planck_modified_galactic"]
-labels = ["Point", "Galactic", "Total", "Old Galactic"]
+if data_mask == "sdss_planck":
+    #mask_names = ["planck_modified_point", "planck_modified_galactic", "planck_modified_total"]
+    #mask_names = ["planck_modified_point", "planck_modified_galactic", "planck_modified_total", "planck_galactic"]
+    mask_names = ["planck_modified_point", "planck_modified_galactic"]
+    labels = ["Point", "Galactic", "Total", "Old Galactic"]
+elif data_mask == "sdss_act":
+    mask_names = ["act"]
+    labels = ["ACT"]
+
 #NSIDES = [1, 2, 4, 8, 16, 32]
 NSIDES = [1, 2, 4, 8, 16, 32, 64]
 #NSIDES = [32]
@@ -113,7 +116,7 @@ for mask_name in mask_names:
             np.zeros(12 * 2048 ** 2),
             mask.map
         ))
-    elif data_mask == "sdss":
+    elif data_mask == "sdss_planck":
         sdss_mask = toolkit.load_mask("sdss_mask", raise_dir)
         temp = mask.map + 1j * sdss_mask.map
         data_set = np.float_(np.array((
@@ -122,7 +125,7 @@ for mask_name in mask_names:
             temp == 1,
             temp == 1+1j
         )))
-    elif data_mask == "act":
+    elif data_mask == "sdss_act":
         sdss_mask = toolkit.load_mask("act", raise_dir)
         data_set = np.float_(np.array((
             toolkit.HealpyMask("../" * raise_dir + "code/binned_results/sdss_mask_act_256_1.fits").map,
