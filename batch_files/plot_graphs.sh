@@ -6,21 +6,15 @@
 wait
 # Write new graphs
 
-#python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="full_sky" --weight_function="excess_measurement" --save_path="./full_sky_excess.pdf" &
-#python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="full_sky" --weight_function="density_weighting" --save_path="./full_sky_density.pdf" &
+python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss" --weight_function="excess_measurement" --save_path="./sdss_excess.pdf" --data_mask="sdss_planck" &
+python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="80k" --weight_function="excess_measurement" --save_path="./sdss_excess_random_80k.pdf" --data_mask="sdss_planck" &
+python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="400k" --weight_function="excess_measurement" --save_path="./sdss_excess_random_400k.pdf" --data_mask="sdss_planck" &
+python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="10m" --weight_function="excess_measurement" --save_path="./sdss_excess_random_10m.pdf" --data_mask="sdss_planck" &
+python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="planck_point_biased" --weight_function="excess_measurement" --save_path="./sdss_planck_point_biased.pdf" --data_mask="sdss_planck" &
 
-#python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_random" --weight_function="excess_measurement" --save_path="./sdss_random_excess.pdf" &
-#python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_random" --weight_function="density_weighting" --save_path="./sdss_random_density.pdf" &
+python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss" --weight_function="excess_measurement" --save_path="./act_excess.pdf" --data_mask="act_planck" &
+python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="80k" --weight_function="excess_measurement" --save_path="./act_excess_random_80k.pdf" --data_mask="act_planck" &
+python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="400k" --weight_function="excess_measurement" --save_path="./act_excess_random_400k.pdf" --data_mask="act_planck" &
+python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="10m" --weight_function="excess_measurement" --save_path="./act_excess_random_10m.pdf" --data_mask="act_planck" &
 
-#nice -20 python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss" --weight_function="excess_measurement" --save_path="./sdss_data_excess.pdf"
-#nice -20 python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss" --weight_function="density_weighting" --save_path="./sdss_data_density.pdf"
-
-#nice -20 python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered"  \
-#--weight_function="density_weighting" --save_path="./min_z_3.pdf" --min_z=0.3 &
-#nice -20 python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered"  \
-#--weight_function="density_weighting" --save_path="./min_z_4.pdf" --min_z=0.4 &
-#nice -20 python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered"  \
-#--weight_function="density_weighting" --save_path="./min_z_5.pdf" --min_z=0.5
-#wait
-
-python3
+wait

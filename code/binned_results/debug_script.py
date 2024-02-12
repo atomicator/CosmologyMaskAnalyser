@@ -6,7 +6,7 @@ import argparse
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument("--catalogue", default="sdss_random")
+parser.add_argument("--catalogue", default="planck_point_biased")
 parser.add_argument("--save_path", default="test.pdf")
 parser.add_argument("--raise_path", type=int, default=2)
 parser.add_argument("--weight_function", default="excess_measurement")
@@ -45,6 +45,13 @@ elif args.catalogue in ("10m", "400k", "80k"):
     cat = toolkit.StarCatalogue("./" + raise_dir * "../" + f"code/binned_results/{args.catalogue}.fits", table=True)
     cat.load_lon_lat()
     data_name = f"sdss random {args.catalogue}"
+elif args.catalogue == "planck_point_biased":
+    cat = toolkit.StarCatalogue("./" + raise_dir * "../" + "code/binned_results/bias.fits", table=True)
+    cat.load_lon_lat()
+    cat1 = toolkit.StarCatalogue("./" + raise_dir * "../" + "code/binned_results/test.fits", table=True)
+    cat1.load_lon_lat()
+    cat.lon_lat = np.append(cat1.lon_lat, cat.lon_lat, axis=0)
+    data_name = "sdss biased"
 else:
     raise ValueError
 
@@ -52,7 +59,7 @@ data_mask = args.data_mask
 
 N = len(cat.lon_lat)
 print(N)
-a = 1e-5 * N + 5
+a = 0
 print(a)
 
 if args.weight_function == "excess_measurement":
@@ -77,18 +84,22 @@ else:
     raise ValueError
 
 if data_mask == "sdss_planck":
-    #mask_names = ["planck_modified_point", "planck_modified_galactic", "planck_modified_total"]
+    mask_names = ["planck_modified_point", "planck_modified_galactic", "planck_modified_total"]
     #mask_names = ["planck_modified_point", "planck_modified_galactic", "planck_modified_total", "planck_galactic"]
-    mask_names = ["planck_modified_point", "planck_modified_galactic"]
+    #mask_names = ["planck_modified_point", "planck_modified_galactic"]
+    #mask_names = ["planck_modified_point"]
     labels = ["Point", "Galactic", "Total", "Old Galactic"]
 elif data_mask == "sdss_act":
     mask_names = ["act"]
     labels = ["ACT"]
+else:
+    raise ValueError
 
 #NSIDES = [1, 2, 4, 8, 16, 32]
-NSIDES = [1, 2, 4, 8, 16, 32, 64]
+#NSIDES = [1, 2, 4, 8, 16, 32, 64]
+#NSIDES = [1, 2, 4, 8, 16, 32, 64, 128]
 #NSIDES = [32]
-#NSIDES = [1, 2, 4, 8, 16, 32, 64, 128, 256]
+NSIDES = [1, 2, 4, 8, 16, 32, 64, 128, 256]
 #NSIDES = [1, 4, 8, 32, 128]
 run_const = True
 save_path = args.save_path
@@ -109,6 +120,7 @@ mask_names = ["planck_modified_point"]"""
 
 for mask_name in mask_names:
     mask = toolkit.load_mask(mask_name, raise_dir)
+    mask.set_fig_ax(fig, ax)
     if data_mask == "full_sky":
         data_set = np.array((
             np.zeros(12 * 2048 ** 2),
@@ -153,7 +165,7 @@ for mask_name in mask_names:
         binmap.bin_catalogue(cat)
         binmap.load_catalogue(cat)
         output = binmap.divide_sample(mask, data, True, filter_set, a)
-        mixed = weight_function(*output[1:])
+        mixed = weight_function(*output[1:], skip_n_filter=True)
         print(f"Mixed C: {mixed[0]} +/- {mixed[1]}")
         if convert_to_mask_frac:
             final = np.array([output[0][0] + (1 - output[0][0] - output[0][1]) * mixed[0], (1 - output[0][0] - output[0][1]) * mixed[1]])
@@ -189,7 +201,9 @@ for mask_name in mask_names:
     result_set.append(results)
 
 print(result_set)
-
+plt.clf()
+fig = plt.figure()
+ax = fig.add_subplot()
 for i in range(len(result_set)):
     x = NSIDES.copy()
     if run_const:

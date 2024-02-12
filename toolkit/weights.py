@@ -3,7 +3,7 @@ import scipy.optimize
 import matplotlib.pyplot as plt
 
 
-def linear_weighting(f_s, _f_c, n):
+def linear_weighting(f_s, _f_c, n, **_kwargs):
     variance = f_s * (1 - f_s) / n
     weights = np.ones(len(n)) / len(n)
     mean = np.sum(f_s * weights) * 100
@@ -11,7 +11,7 @@ def linear_weighting(f_s, _f_c, n):
     return mean, mean_error
 
 
-def inverse_variance_weighting(f_s, _f_c, n):
+def inverse_variance_weighting(f_s, _f_c, n, **_kwargs):
     variance = f_s * (1 - f_s) / n
     weights = (1 / variance) / (np.sum(1 / variance))
     mean = np.sum(f_s * weights) * 100
@@ -19,7 +19,7 @@ def inverse_variance_weighting(f_s, _f_c, n):
     return mean, mean_error
 
 
-def density_weighting(f_s, _f_c, n):
+def density_weighting(f_s, _f_c, n, **_kwargs):
     variance = f_s * (1 - f_s) / n
     weights = n / (np.sum(n))
     print(np.sum(weights))
@@ -28,13 +28,25 @@ def density_weighting(f_s, _f_c, n):
     return mean, mean_error
 
 
-def excess_measurement(f_s, f_c, n):
-    excess = (f_c - f_s) / f_s
+def excess_measurement(f_s, f_c, n, skip_n_filter=False, **_kwargs):
+    if not skip_n_filter:
+        f_s = f_s[n > 100]
+        f_c = f_c[n > 100]
+        n = n[n > 100]
+    plt.scatter(f_s, f_c, marker="+")
+    plt.show()
+    excess = (f_c - f_s) / (f_s)
+    #excess = f_c - f_s
+    print(f"Mean N: {np.mean(n)}")
     #f = np.sqrt(f_c * f_s)
     #f = (f_c + f_s) / 2
     #variance = f_c * (1 - f_c) / (f_s ** 2 * n)
     variance = (1 - f_s) / (f_s * n)
-    weight = (1 / variance) / np.sum(1 / variance)
+    #variance = 1 / n
+    #variance = f_c * (1 - f_c) / n
+    #weight = (1 / (variance + 1e-4/(n * f_s))) / np.sum(1 / (variance + 1e-4/(n * f_s)))
+    #weight = ((1 - f_s) * f_s / variance) / np.sum(f_s * (1 - f_s) / variance)
+    weight = (np.sin(np.pi * f_s) / variance) / np.sum(np.sin(np.pi * f_s) / variance)
     #weight = 1 / len(n)
     mean = np.sum(excess * weight)
     mean_error = np.sqrt(np.sum(variance * weight ** 2))
@@ -43,7 +55,7 @@ def excess_measurement(f_s, f_c, n):
     return mean, mean_error
 
 
-def excess_measurement_frac(f_s, f_c, n):
+def excess_measurement_frac(f_s, f_c, n, **_kwargs):
     excess = (f_c - f_s) / f_s
     variance = (1 - f_s) / (f_s * n)
     weight = (1 / variance) / np.sum(1 / variance)
@@ -54,11 +66,11 @@ def excess_measurement_frac(f_s, f_c, n):
     return cluster_masked_frac, cluster_masked_frac_error
 
 
-def _line(x, a):
+def _line(x, a, **_kwargs):
     return x * a
 
 
-def regression_weighting(f_s, f_c, n):
+def regression_weighting(f_s, f_c, n, **_kwargs):
     variance = f_c * (1 - f_c) / n
     """plt.errorbar(f_s, f_c, np.sqrt(variance), marker="+", ls="none")
     plt.plot([0, 1], [0, 1])
@@ -82,11 +94,11 @@ def regression_weighting(f_s, f_c, n):
     return final
 
 
-def _skewness_function(x, a):
+def _skewness_function(x, a, **_kwargs):
     return (a + 1) * x / (a * x + 1)
 
 
-def skewness_match(f_s, f_c, n):
+def skewness_match(f_s, f_c, n, **_kwargs):
     minimum_n = 0
     f_s = f_s[n > minimum_n]
     f_c = f_c[n > minimum_n]
@@ -97,7 +109,7 @@ def skewness_match(f_s, f_c, n):
     final = np.array([popt[0], np.sqrt(pcov[0][0])])
     return final
 
-def scatter(f_s, f_c, n):
+def scatter(f_s, f_c, n, **_kwargs):
     plt.plot((0, 0.6), (0, 0.6))
     plt.scatter(f_c, f_s, marker="+")
     plt.xlim(0, 0.3)

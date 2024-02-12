@@ -13,7 +13,9 @@ import sklearn.linear_model
 def plt_use_tex():
     plt.rcParams.update({
         "text.usetex": True,
-        "font.family": "serif"})
+        "font.family": "serif",
+        'text.latex.preamble': r'\usepackage{csquotes}'
+    })
     return None
 
 
@@ -44,7 +46,7 @@ class __Mask(object):  # overwite this with pixell and healpy specific versions
 
 
 class PixellMask(__Mask):
-    def __init__(self, path, step=1, mask_using_latlon=True, **kwargs):
+    def __init__(self, path, step=1, mask_using_latlon=True, invert=True, **kwargs):
         # Load data from fits file
         self.imap = pixell.enmap.read_fits(path, **kwargs)
         self.map = np.array(self.imap)
@@ -58,6 +60,7 @@ class PixellMask(__Mask):
         self.fig = None
         self.ax = None
         self.mask_using_latlon = mask_using_latlon
+        self.invert = invert
 
     def update_angle_range(self, lat_min=-90, lat_max=90, lon_min=0, lon_max=360):
         self.lat_min = lat_min
@@ -80,15 +83,18 @@ class PixellMask(__Mask):
                                              np.bool_(np.int_(0 < np.array(pix[1])) * np.int_(np.array(pix[1]) < np.shape(self.map)[1] - 1)))
         point[points_in_range] = self.map[pix[0, points_in_range], pix[1, points_in_range]]
         #point[points_in_range] = self.map
+        if self.invert:
+            point = 1 - point
         return point
 
-    def plot_on_ax(self, ax, alpha, resolution, cmap="plasma"):
+    def plot_on_ax(self, ax, alpha, resolution, cmap="plasma", **kwargs):
         print(resolution)
         lat = np.linspace(self.lat_min, self.lat_max, resolution[0] + 1)[1:-2]
         lon = np.linspace(self.lon_min, self.lon_max, resolution[1] + 1)[1:-2]
         lon, lat = np.meshgrid(lon, lat)
-        data = self.lookup_point(lat, lon)
-        c = ax.pcolormesh(lon, lat, data, alpha=alpha, cmap=cmap)
+        data = self.lookup_point(lon, lat)
+        data[data == 1] = np.nan
+        c = ax.pcolormesh(lon, lat, data, alpha=alpha, cmap=cmap, **kwargs)
         return c
 
     def old_plot(self, fig, ax, save_path=None, cmap="plasma", title=None, show=True, cbar=True, clear=True, **kwargs):
@@ -107,7 +113,7 @@ class PixellMask(__Mask):
         if show:
             fig.show()
 
-    def plot_old(self, ax, save_path=None, cmap="plasma", title=None, show=True, cbar=True, clear=True, **kwargs):
+    def plot_old(self, ax, save_path=None, cmap="plasma", title=None, show=True, alpha=0, cbar=True, clear=True, **kwargs):
         if clear:
             plt.clf()
         lat = np.linspace(self.lat_min, self.lat_max, self.x + 1)
@@ -125,11 +131,11 @@ class PixellMask(__Mask):
         return c
 
     def plot(self, resolution=(1000, 2000), clear=True, cbar=None, title=None, save_path=None, show=False,
-             cmap="plasma", alpha=1):
+             cmap="plasma", alpha=1, **kwargs):
         if clear:
             self.ax.cla()
         print(resolution)
-        c = self.plot_on_ax(self.ax, alpha, resolution=resolution, cmap=cmap)
+        c = self.plot_on_ax(self.ax, alpha, resolution=resolution, cmap=cmap, **kwargs)
         if cbar:
             self.fig.colorbar(c, orientation="horizontal", cmap=cmap)
         if title:
@@ -241,6 +247,34 @@ class HealpyMask(__Mask):
         new = copy.deepcopy(self)
         new.fig, new.ax = fig, ax
         return new
+
+
+class CombinationMask(PixellMask):
+    def __init__(self, mask1, mask2, invert=False):
+        self.mask1 = mask1
+        self.mask2 = mask2
+        self.lat_min = -90
+        self.lat_max = 90
+        self.lon_min = 00
+        self.lon_max = 360
+        self.fig = None
+        self.ax = None
+        self.mask_using_latlon = True
+        self.invert = invert
+
+    def lookup_point(self, lon, lat):
+        data = np.float_(np.bitwise_and(np.bool_(self.mask1.lookup_point(lon, lat)),
+                                                       np.bool_(self.mask2.lookup_point(lon, lat))))
+        #data = 1 - self.mask1.lookup_point(lon, lat) * self.mask2.lookup_point(lon, lat)
+        if self.invert:
+            data = 1 - data
+        return data
+
+    def calc_exact_unmasked_fraction(self):
+        pixels = np.int_(np.linspace(0, hp.nside2npix(32) - 1, hp.nside2npix(32)))
+        num_masked = np.sum(self.lookup_point(*hp.pix2ang(32, pixels, lonlat=True)))
+        unmasked_fraction = num_masked / len(pixels)
+        return unmasked_fraction
 
 
 class NotMaskError(TypeError):
@@ -687,18 +721,25 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="
     pix = np.int_(np.linspace(0, hp.nside2npix(NSIDE_internal) - 1, hp.nside2npix(NSIDE_internal)))
     points = hp.pix2ang(NSIDE_internal, pix, lonlat=True)
     sum = mask1.lookup_point(*points) + 1j * mask2.lookup_point(*points)
+    mask1_masked = mask1.lookup_point(*points) == 0.0
+    mask2_masked = mask2.lookup_point(*points) == 0.0
     print(np.shape(sum))
     print(sum)
-    data1 = hp.ud_grade(sum == 0.0, NSIDE)
+    """data1 = hp.ud_grade(sum == 0.0, NSIDE)
     data2 = hp.ud_grade(sum == 1.0, NSIDE)
     data3 = hp.ud_grade(sum == 1j, NSIDE)
-    data4 = hp.ud_grade(sum == 1 + 1j, NSIDE)
+    data4 = hp.ud_grade(sum == 1 + 1j, NSIDE)"""
+    data1 = hp.ud_grade(np.float_(np.bitwise_and(mask1_masked, mask2_masked)), NSIDE)
+    data2 = hp.ud_grade(np.float_(np.bitwise_and(np.bitwise_not(mask1_masked), mask2_masked)), NSIDE)
+    data3 = hp.ud_grade(np.float_(np.bitwise_and(mask1_masked, np.bitwise_not(mask2_masked))), NSIDE)
+    data4 = hp.ud_grade(np.float_(np.bitwise_and(np.bitwise_not(mask1_masked), np.bitwise_not(mask2_masked))), NSIDE)
     results = np.float_(np.array([data1, data2, data3, data4]))
     hp.fitsfunc.write_map(f"./{name}_{NSIDE}_1.fits", results[0], overwrite=True)
     hp.fitsfunc.write_map(f"./{name}_{NSIDE}_2.fits", results[1], overwrite=True)
     hp.fitsfunc.write_map(f"./{name}_{NSIDE}_3.fits", results[2], overwrite=True)
     hp.fitsfunc.write_map(f"./{name}_{NSIDE}_4.fits", results[3], overwrite=True)
     print(results)
+    print(np.min(data1 + data2 + data3 + data4), np.max(data1 + data2 + data3 + data4))
 
 
 def gen_random_coord():
@@ -725,7 +766,7 @@ def get_header_info(hdu_list):
         print(hdu.header)
 
 
-def load_mask(mask, raise_dir=2, nside=8):
+def load_mask(mask, raise_dir=2, nside=8, invert=False):
     value = None
     if mask == "planck_galactic":
         # value = HealpyMask("../" * raise_dir + "data/HFI_PCCS_SZ-selfunc-union-survey_R2.08.fits", mask_using_latlon=True, hdu=1, partial=False)
@@ -769,7 +810,12 @@ def load_mask(mask, raise_dir=2, nside=8):
         planck_only.NPIX = hp.nside2npix(nside)
         return planck_only
     elif mask.lower() == "act":
-        value = PixellMask("../" * raise_dir + "data/ACT_mask.fits", hdu=1, mask_using_latlon=False)
+        value = PixellMask("../" * raise_dir + "data/ACT_mask.fits", hdu=1, mask_using_latlon=False, invert=invert)
+    elif mask == "sdss_planck_point_only":
+        mask1 = load_mask("sdss_mask", raise_dir)
+        mask2 = load_mask("planck_modified_point", raise_dir)
+        mask2.map = 1 - mask2.map
+        value = CombinationMask(mask1, mask2)
     else:
         raise ValueError(f"{mask} is not a recognised mask")
     return value
