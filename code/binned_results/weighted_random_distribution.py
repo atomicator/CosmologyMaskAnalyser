@@ -9,8 +9,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--mask", default="sdss_mask")
 parser.add_argument("--sample_catalogue", default="act")
 parser.add_argument("--nside", type=int, default=8)
-parser.add_argument("--save_path", default="bias.fits")
-parser.add_argument("--target", type=int, default=500)
+parser.add_argument("--save_path", default="test.fits")
+parser.add_argument("--target", type=int, default=400000)
 parser.add_argument("--raise_path", type=int, default=2)
 
 args = parser.parse_args()
@@ -22,9 +22,10 @@ target = args.target
 #sample_cat.load_lon_lat()
 
 sdss_mask = toolkit.load_mask("sdss_mask")
-sdss_mask.map = 1 - sdss_mask.map
+#sdss_mask.map = 1 - sdss_mask.map
 planck = toolkit.load_mask("planck_modified_point")
-mask = toolkit.CombinationMask(sdss_mask, planck)
+#mask = toolkit.CombinationMask(sdss_mask, planck)
+mask = sdss_mask
 
 """
 if args.target:

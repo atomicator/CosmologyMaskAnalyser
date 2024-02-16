@@ -6,10 +6,10 @@ import argparse
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument("--catalogue", default="planck_point_biased")
-parser.add_argument("--save_path", default="test.pdf")
+parser.add_argument("--catalogue", default="sdss")
+parser.add_argument("--save_path", default="sdss_data.pdf")
 parser.add_argument("--raise_path", type=int, default=2)
-parser.add_argument("--weight_function", default="excess_measurement")
+parser.add_argument("--weight_function", default="excess")
 parser.add_argument("--min_z", type=float, default=0.0)
 parser.add_argument("--min_r", type=float, default=10.0)
 parser.add_argument("--max_z", type=float, default=20.0)
@@ -52,6 +52,12 @@ elif args.catalogue == "planck_point_biased":
     cat1.load_lon_lat()
     cat.lon_lat = np.append(cat1.lon_lat, cat.lon_lat, axis=0)
     data_name = "sdss biased"
+elif args.catalogue == "full_sky_inigo":
+    cat = toolkit.StarCatalogue("../binned_results/test.fits", hdu=1, table=True)
+    cat.load_lon_lat()
+    data = np.load("../../data/random_catalogue_400k_inigo.npy")
+    cat.lon_lat = np.array([data[0] * 180 / np.pi, 90 - data[1] * 180 / np.pi]).transpose()
+    data_name = "full sky 400k from Inigo"
 else:
     raise ValueError
 
@@ -62,13 +68,13 @@ print(N)
 a = 0
 print(a)
 
-if args.weight_function == "excess_measurement":
+if args.weight_function == "excess":
     y_axis_label = r"Excess"
     weight_function = weights.excess_measurement
     set_f_zero = True
     convert_to_mask_frac = False
-    filter_set = "overkill"
-elif args.weight_function == "density_weighting":
+    filter_set = "n_only"
+elif args.weight_function == "density":
     y_axis_label = r"Error ($\%$)"
     weight_function = weights.density_weighting
     set_f_zero = False
@@ -80,27 +86,39 @@ elif args.weight_function == "scatter":
     set_f_zero = True
     convert_to_mask_frac = False
     filter_set = "all"
+elif args.weight_function == "ratio":
+    y_axis_label = ""
+    weight_function = weights.ratio
+    set_f_zero = True
+    convert_to_mask_frac = False
+    filter_set = "n_only"
 else:
     raise ValueError
 
 if data_mask == "sdss_planck":
-    mask_names = ["planck_modified_point", "planck_modified_galactic", "planck_modified_total"]
+    #mask_names = ["planck_modified_point", "planck_modified_galactic", "planck_modified_total"]
     #mask_names = ["planck_modified_point", "planck_modified_galactic", "planck_modified_total", "planck_galactic"]
-    #mask_names = ["planck_modified_point", "planck_modified_galactic"]
+    mask_names = ["planck_modified_point", "planck_modified_galactic"]
     #mask_names = ["planck_modified_point"]
     labels = ["Point", "Galactic", "Total", "Old Galactic"]
 elif data_mask == "sdss_act":
     mask_names = ["act"]
     labels = ["ACT"]
+elif data_mask == "full_sky":
+    mask_names = ["planck_point_test", "planck_galactic_test"]
+    labels = ["Planck Total", "Planck Galactic"]
 else:
     raise ValueError
 
+
+
+
 #NSIDES = [1, 2, 4, 8, 16, 32]
 #NSIDES = [1, 2, 4, 8, 16, 32, 64]
-#NSIDES = [1, 2, 4, 8, 16, 32, 64, 128]
+NSIDES = [1, 2, 4, 8, 16, 32, 64, 128]
 #NSIDES = [32]
-NSIDES = [1, 2, 4, 8, 16, 32, 64, 128, 256]
-#NSIDES = [1, 4, 8, 32, 128]
+#NSIDES = [1, 2, 4, 8, 16, 32, 64, 128, 256]
+#NSIDES = [2, 8, 32]
 run_const = True
 save_path = args.save_path
 f = []
@@ -219,6 +237,8 @@ ax.set_xlim(1/2 * np.sqrt(1/2), NSIDES[-1] * np.sqrt(2))
 
 ax.plot([1/2, NSIDES[-1]], np.zeros(2), color="k")
 ax.set_xticks([0.5] + NSIDES, ["C"] + NSIDES)
+
+#plt.ylim(-0.005, 0.005)
 
 ax.legend()
 ax.set_xlabel("NSIDE")

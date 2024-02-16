@@ -8,14 +8,16 @@ import healpy as hp
 
 #toolkit.load_catalogue("sdss")
 
-mask = toolkit.PixellMask("../../data/ACT_mask.fits", hdu=1)
+#mask = toolkit.PixellMask("../../data/ACT_mask.fits", hdu=1)
 
-#mask = astropy.io.fits.open("../../data/DR5_cluster-catalog_v1.1.fits", hdu=1)
+mask = astropy.io.fits.open("../../data/sdss_catalogue.fits", hdu=1)
 #mask = astropy.io.fits.open("../../data/ACT_mask.fits", hdu=1)
 #mask = astropy.table.Table.read("../../data/ACT_mask.fits")
 #mask = astropy.table.Table.read("../binned_results/test.fits")
-#mask = astropy.table.Table.read("../../data/DR5_cluster-catalog_v1.1.fits", hdu=1)
-#toolkit.get_header_info(mask)
+#mask = astropy.table.Table.read("../../data/DR5_cluster-catalog_v1.1.fits")
+
+toolkit.get_header_info(mask)
+#toolkit.get_file_info("../../data/DR5_cluster-catalog_v1.1.fits", hdu=1)
 #print(mask.info)
 #data = mask.field("RA---CAR")
 

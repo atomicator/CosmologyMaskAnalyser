@@ -29,8 +29,8 @@ point.map = np.float_((mmf3.map * 2 + total.map) != 2)
 error.map = np.float_((mmf3.map * 2 + total.map) != 1)
 galactic.map = np.float_((mmf3.map * 2 + total.map) != 0)
 
-galactic.plot(cmap="bwr", clear=False)
-#point.plot(cmap="rainbow_r", clear=False)
+#galactic.plot(cmap="bwr", clear=False)
+point.plot(cmap="rainbow_r", clear=False)
 error.plot(cmap="bwr_r", clear=False)
 
 plt.show()

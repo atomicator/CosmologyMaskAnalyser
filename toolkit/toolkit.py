@@ -587,6 +587,12 @@ class _BinMap(object):
                 not_masked = np.bitwise_or(not_masked,
                                            np.bitwise_and(mixed_bins, sample_masked_fraction < a / self.map))
                 mixed_bins = np.bitwise_not(np.bitwise_or(masked, not_masked))
+        elif filter_set == "excess":
+            print("test")
+            not_masked = np.bitwise_or(np.bitwise_or(nan_filter, self.map == 0), sdss_allowed_region == 0)
+            filtered = np.bitwise_or(np.bitwise_or(sdss_allowed_region == 0, planck_masked_only == 0), sdss_allowed_region <= planck_masked_only)
+            masked = np.bitwise_and(not_masked, filtered)
+            mixed_bins = np.bitwise_and(np.bitwise_not(not_masked), np.bitwise_not(masked))
         else:
             raise ValueError("filter set not recognised")
 
@@ -810,12 +816,16 @@ def load_mask(mask, raise_dir=2, nside=8, invert=False):
         planck_only.NPIX = hp.nside2npix(nside)
         return planck_only
     elif mask.lower() == "act":
-        value = PixellMask("../" * raise_dir + "data/ACT_mask.fits", hdu=1, mask_using_latlon=False, invert=invert)
+        value = PixellMask("../" * raise_dir + "data/ACT_mask.fits", hdu=1, mask_using_latlon=True, invert=invert)
     elif mask == "sdss_planck_point_only":
         mask1 = load_mask("sdss_mask", raise_dir)
         mask2 = load_mask("planck_modified_point", raise_dir)
         mask2.map = 1 - mask2.map
         value = CombinationMask(mask1, mask2)
+    elif mask == "planck_galactic_test":
+        value = HealpyMask("../" * raise_dir + "data/planck_galactic_mask.fits", partial=True, mask_using_latlon=True)
+    elif mask == "planck_point_test":
+        value = HealpyMask("../" * raise_dir + "data/planck_point_mask.fits", partial=True, mask_using_latlon=True)
     else:
         raise ValueError(f"{mask} is not a recognised mask")
     return value
