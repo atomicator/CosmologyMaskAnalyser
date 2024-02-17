@@ -816,7 +816,7 @@ def load_mask(mask, raise_dir=2, nside=8, invert=False):
         planck_only.NPIX = hp.nside2npix(nside)
         return planck_only
     elif mask.lower() == "act":
-        value = PixellMask("../" * raise_dir + "data/ACT_mask.fits", hdu=1, mask_using_latlon=True, invert=invert)
+        value = PixellMask("../" * raise_dir + "data/ACT_mask.fits", hdu=1, mask_using_latlon=False, invert=invert)
     elif mask == "sdss_planck_point_only":
         mask1 = load_mask("sdss_mask", raise_dir)
         mask2 = load_mask("planck_modified_point", raise_dir)

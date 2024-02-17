@@ -6,8 +6,8 @@ import argparse
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument("--catalogue", default="sdss")
-parser.add_argument("--save_path", default="sdss_data.pdf")
+parser.add_argument("--catalogue", default="planck_point_biased")
+parser.add_argument("--save_path", default="planck_point_biased.pdf")
 parser.add_argument("--raise_path", type=int, default=2)
 parser.add_argument("--weight_function", default="excess")
 parser.add_argument("--min_z", type=float, default=0.0)
@@ -98,8 +98,8 @@ else:
 if data_mask == "sdss_planck":
     #mask_names = ["planck_modified_point", "planck_modified_galactic", "planck_modified_total"]
     #mask_names = ["planck_modified_point", "planck_modified_galactic", "planck_modified_total", "planck_galactic"]
-    mask_names = ["planck_modified_point", "planck_modified_galactic"]
-    #mask_names = ["planck_modified_point"]
+    #mask_names = ["planck_modified_point", "planck_modified_galactic"]
+    mask_names = ["planck_modified_point"]
     labels = ["Point", "Galactic", "Total", "Old Galactic"]
 elif data_mask == "sdss_act":
     mask_names = ["act"]
