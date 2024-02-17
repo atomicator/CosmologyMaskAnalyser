@@ -6,12 +6,12 @@ import argparse
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument("--catalogue", default="planck_point_biased")
+parser.add_argument("--catalogue", default="sdss_filtered")
 parser.add_argument("--save_path", default="planck_point_biased.pdf")
 parser.add_argument("--raise_path", type=int, default=2)
 parser.add_argument("--weight_function", default="excess")
 parser.add_argument("--min_z", type=float, default=0.0)
-parser.add_argument("--min_r", type=float, default=10.0)
+parser.add_argument("--min_r", type=float, default=0.0)
 parser.add_argument("--max_z", type=float, default=20.0)
 parser.add_argument("--max_r", type=float, default=10000.0)
 parser.add_argument("--data_mask", default="sdss_planck")
