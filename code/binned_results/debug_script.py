@@ -6,8 +6,8 @@ import argparse
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument("--catalogue", default="sdss_filtered")
-parser.add_argument("--save_path", default="planck_point_biased.pdf")
+parser.add_argument("--catalogue", default="10m")
+parser.add_argument("--save_path", default="planck_10m.png")
 parser.add_argument("--raise_path", type=int, default=2)
 parser.add_argument("--weight_function", default="excess")
 parser.add_argument("--min_z", type=float, default=0.0)
@@ -15,6 +15,7 @@ parser.add_argument("--min_r", type=float, default=0.0)
 parser.add_argument("--max_z", type=float, default=20.0)
 parser.add_argument("--max_r", type=float, default=10000.0)
 parser.add_argument("--data_mask", default="sdss_planck")
+parser.add_argument("--mask_set", default="both")
 args = parser.parse_args()
 
 
@@ -42,7 +43,7 @@ elif args.catalogue == "sdss_filtered":
     cat.load_with_selection(filter, ["ZRED", "R_LAMBDA"], lon_lat=True)
     data_name = "\n" + rf"Filtered: ${args.min_z} < z < {args.max_z}$, ${args.min_r} < r < {args.max_r}$"
 elif args.catalogue in ("10m", "400k", "80k"):
-    cat = toolkit.StarCatalogue("./" + raise_dir * "../" + f"code/binned_results/{args.catalogue}.fits", table=True)
+    cat = toolkit.StarCatalogue("./" + raise_dir * "../" + f"code/binned_results/random_sdss_{args.catalogue}.fits", table=True)
     cat.load_lon_lat()
     data_name = f"sdss random {args.catalogue}"
 elif args.catalogue == "planck_point_biased":
@@ -98,12 +99,21 @@ else:
 if data_mask == "sdss_planck":
     #mask_names = ["planck_modified_point", "planck_modified_galactic", "planck_modified_total"]
     #mask_names = ["planck_modified_point", "planck_modified_galactic", "planck_modified_total", "planck_galactic"]
-    #mask_names = ["planck_modified_point", "planck_modified_galactic"]
-    mask_names = ["planck_modified_point"]
+    if args.mask_set == "both":
+        mask_names = ["planck_modified_point", "planck_modified_galactic"]
+    elif args.mask_set == "point":
+        mask_names = ["planck_modified_point"]
+    else:
+        raise ValueError
     labels = ["Point", "Galactic", "Total", "Old Galactic"]
 elif data_mask == "sdss_act":
-    mask_names = ["act"]
-    labels = ["ACT"]
+    if args.mask_set == "both":
+        mask_names = ["act_point", "act_galactic"]
+    elif args.mask_set == "point":
+        mask_names = ["act_point"]
+    else:
+        raise ValueError
+    labels = ["Point", "Galactic", "Total", "Old Galactic"]
 elif data_mask == "full_sky":
     mask_names = ["planck_point_test", "planck_galactic_test"]
     labels = ["Planck Total", "Planck Galactic"]

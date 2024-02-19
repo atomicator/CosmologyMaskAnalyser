@@ -7,7 +7,7 @@ import astropy.cosmology
 import astropy
 import matplotlib
 import copy
-import sklearn.linear_model
+import toolkit.filters as filters
 
 
 def plt_use_tex():
@@ -250,7 +250,7 @@ class HealpyMask(__Mask):
 
 
 class CombinationMask(PixellMask):
-    def __init__(self, mask1, mask2, invert=False):
+    def __init__(self, mask1, mask2, invert=False, use_and=True):
         self.mask1 = mask1
         self.mask2 = mask2
         self.lat_min = -90
@@ -261,10 +261,15 @@ class CombinationMask(PixellMask):
         self.ax = None
         self.mask_using_latlon = True
         self.invert = invert
+        self.use_and = use_and
 
     def lookup_point(self, lon, lat):
-        data = np.float_(np.bitwise_and(np.bool_(self.mask1.lookup_point(lon, lat)),
-                                                       np.bool_(self.mask2.lookup_point(lon, lat))))
+        if self.use_and:
+            data = np.float_(np.bitwise_and(np.bool_(self.mask1.lookup_point(lon, lat)),
+                                                           np.bool_(self.mask2.lookup_point(lon, lat))))
+        else:
+            data = np.float_(np.bitwise_or(np.bool_(self.mask1.lookup_point(lon, lat)),
+                                            np.bool_(self.mask2.lookup_point(lon, lat))))
         #data = 1 - self.mask1.lookup_point(lon, lat) * self.mask2.lookup_point(lon, lat)
         if self.invert:
             data = 1 - data
@@ -826,6 +831,18 @@ def load_mask(mask, raise_dir=2, nside=8, invert=False):
         value = HealpyMask("../" * raise_dir + "data/planck_galactic_mask.fits", partial=True, mask_using_latlon=True)
     elif mask == "planck_point_test":
         value = HealpyMask("../" * raise_dir + "data/planck_point_mask.fits", partial=True, mask_using_latlon=True)
+    elif mask == "act_galactic":
+        act_mask = PixellMask("../" * raise_dir + "data/ACT_mask.fits", hdu=1, invert=False, mask_using_latlon=False)
+        act_graph_filter = PixellMask("../" * raise_dir + "data/ACT_mask.fits", hdu=1, invert=False, mask_using_latlon=False)
+        act_graph_filter.map = np.load("../" * raise_dir + "data/act_galactic_mask_array.npy")
+        test = filters.SquareMaskFilter((-10, 20), (40, 100), lonlat=False)
+        final_filter = CombinationMask(act_mask, test, use_and=False, invert=False)
+        value = CombinationMask(act_graph_filter, final_filter, use_and=True, invert=False)
+    elif mask == "act_point":
+        act_mask = PixellMask("../" * raise_dir + "data/ACT_mask.fits", hdu=1, invert=False, mask_using_latlon=False)
+        galactic_mask = load_mask("act_galactic", raise_dir, nside, invert)
+        galactic_mask.invert = True
+        value = CombinationMask(act_mask, galactic_mask, use_and=False)
     else:
         raise ValueError(f"{mask} is not a recognised mask")
     return value
