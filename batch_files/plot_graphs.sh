@@ -12,10 +12,13 @@ wait
 #python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="10m" --weight_function="excess_measurement" --save_path="./sdss_excess_random_10m.pdf" --data_mask="sdss_planck" &
 #python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="planck_point_biased" --weight_function="excess_measurement" --save_path="./sdss_planck_point_biased.pdf" --data_mask="sdss_planck" &
 
-python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss" --weight_function="excess_measurement" --save_path="./act_excess.pdf" --data_mask="sdss_act" &
-python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="80k" --weight_function="excess_measurement" --save_path="./act_excess_random_80k.pdf" --data_mask="sdss_act" &
-python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="400k" --weight_function="excess_measurement" --save_path="./act_excess_random_400k.pdf" --data_mask="sdss_act" &
-python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="10m" --weight_function="excess_measurement" --save_path="./act_excess_random_10m.pdf" --data_mask="sdss_act" &
+python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss" --weight_function="density" --save_path="./act_density.pdf" --data_mask="sdss_act" &
+python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="400k" --weight_function="density" --save_path="./act_density_random_400k.pdf" --data_mask="sdss_act" &
+
+python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss" --weight_function="excess" --save_path="./act_excess.pdf" --data_mask="sdss_act" &
+python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="80k" --weight_function="excess" --save_path="./act_excess_random_80k.pdf" --data_mask="sdss_act" &
+python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="400k" --weight_function="excess" --save_path="./act_excess_random_400k.pdf" --data_mask="sdss_act" &
+python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="10m" --weight_function="excess" --save_path="./act_excess_random_10m.pdf" --data_mask="sdss_act" &
 
 python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered" --weight_function="excess" --save_path="./z_bin_1.png" --min_z=0.000 --max_z=0.319 --mask_set="point" &
 python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered" --weight_function="excess" --save_path="./z_bin_2.png" --min_z=0.319 --max_z=0.420 --mask_set="point" &

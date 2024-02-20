@@ -166,12 +166,11 @@ for mask_name in mask_names:
             temp == 1+1j
         )))
     elif data_mask == "sdss_act":
-        sdss_mask = toolkit.load_mask("act", raise_dir)
         data_set = np.float_(np.array((
-            toolkit.HealpyMask("../" * raise_dir + "code/binned_results/sdss_mask_act_256_1.fits").map,
-            toolkit.HealpyMask("../" * raise_dir + "code/binned_results/sdss_mask_act_256_2.fits").map,
-            toolkit.HealpyMask("../" * raise_dir + "code/binned_results/sdss_mask_act_256_3.fits").map,
-            toolkit.HealpyMask("../" * raise_dir + "code/binned_results/sdss_mask_act_256_4.fits").map
+            toolkit.HealpyMask("../" * raise_dir + f"code/binned_results/sdss_mask_{mask_name}_256_1.fits").map,
+            toolkit.HealpyMask("../" * raise_dir + f"code/binned_results/sdss_mask_{mask_name}_256_2.fits").map,
+            toolkit.HealpyMask("../" * raise_dir + f"code/binned_results/sdss_mask_{mask_name}_256_3.fits").map,
+            toolkit.HealpyMask("../" * raise_dir + f"code/binned_results/sdss_mask_{mask_name}_256_4.fits").map
         )))
     else:
         raise ValueError
