@@ -40,7 +40,7 @@ elif args.catalogue == "sdss":
     data_mask = "sdss"
 elif args.catalogue == "sdss_filtered":
     cat = toolkit.load_catalogue("sdss", raise_dir)
-    cat.load_with_selection(filter, ["ZRED", "R_LAMBDA"], lon_lat=True)
+    cat.load_with_selection(filter, ["ZRED", "LAMBDA_CHISQ"], lon_lat=True)
     data_name = "\n" + rf"Filtered: ${args.min_z} < z < {args.max_z}$, ${args.min_r} < r < {args.max_r}$"
 elif args.catalogue in ("10m", "400k", "80k"):
     cat = toolkit.StarCatalogue("./" + raise_dir * "../" + f"code/binned_results/random_sdss_{args.catalogue}.fits", table=True)
