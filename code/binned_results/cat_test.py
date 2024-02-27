@@ -3,7 +3,7 @@ import numpy as np
 import astropy
 
 
-def filter(redshift):
+"""def filter(redshift):
     global results
     results.append(redshift)
     return redshift > 0.0
@@ -19,8 +19,8 @@ min_z = 0.1
 
 cat = astropy.io.fits.open("../../data/dr8_run_redmapper_v5.10_lgt5_catalog.fit", hdu=1)
 
-print(cat[1].columns)
-
+print(cat[1].columns)"""
+"""
 cat = toolkit.StarCatalogue("../../data/dr8_run_redmapper_v5.10_lgt5_catalog.fit", hdu=1)
 #cat.load_with_selection(filter, ["Z_LAMBDA"], lon_lat=True)
 #cat.load_with_selection(filter, ["ZRED"], lon_lat=True)
@@ -32,3 +32,31 @@ upper = np.median(results[results > median])
 lower = np.median(results[results < median])
 
 print(upper, median, lower)
+"""
+"""
+data = (
+    np.mean(toolkit.HealpyMask("./sdss_mask_planck_modified_galactic_256_1.fits").map),
+    np.mean(toolkit.HealpyMask("./sdss_mask_planck_modified_galactic_256_2.fits").map),
+    np.mean(toolkit.HealpyMask("./sdss_mask_planck_modified_galactic_256_3.fits").map),
+    np.mean(toolkit.HealpyMask("./sdss_mask_planck_modified_galactic_256_4.fits").map)
+)
+galactic_masked_fraction = data[0] + data[1]
+
+data = (
+    np.mean(toolkit.HealpyMask("./sdss_mask_act_point_256_1.fits").map),
+    np.mean(toolkit.HealpyMask("./sdss_mask_act_point_256_2.fits").map),
+    np.mean(toolkit.HealpyMask("./sdss_mask_act_point_256_3.fits").map),
+    np.mean(toolkit.HealpyMask("./sdss_mask_act_point_256_4.fits").map)
+)
+point_masked_fraction = data[0] + data[1]
+final = point_masked_fraction / (1 - galactic_masked_fraction)
+"""
+# ACT: 0.02024328631080069
+data = (
+    np.mean(toolkit.load_mask("planck_modified_point").map),
+    np.mean(toolkit.load_mask("planck_modified_galactic").map)
+)
+final = (1 - data[0]) / data[1]
+
+# ACT: 0.02024328631080069
+print(final)

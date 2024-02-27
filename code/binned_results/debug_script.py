@@ -6,8 +6,8 @@ import argparse
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument("--catalogue", default="10m")
-parser.add_argument("--save_path", default="planck_10m.png")
+parser.add_argument("--catalogue", default="sdss")
+parser.add_argument("--save_path", default="test.png")
 parser.add_argument("--raise_path", type=int, default=2)
 parser.add_argument("--weight_function", default="excess")
 parser.add_argument("--min_z", type=float, default=0.0)
@@ -17,7 +17,6 @@ parser.add_argument("--max_r", type=float, default=10000.0)
 parser.add_argument("--data_mask", default="sdss_planck")
 parser.add_argument("--mask_set", default="both")
 args = parser.parse_args()
-
 
 def filter(redshift, richness):
     global args
@@ -254,4 +253,12 @@ ax.set_xlabel("NSIDE")
 ax.set_ylabel(y_axis_label)
 ax.set_title(f"Binning algorithm using weight: {weight_function.__name__} and data: {data_name}")
 plt.savefig(save_path)
+np.save(save_path[:-4] + ".npy", np.array(result_set))
 plt.show()
+
+"""
+To Do: excess compares to total clusters - Done, add values to overleaf
+logarithmic richness bins, put lines on one graph
+bias catalogue for ACT
+SPT mask
+"""
