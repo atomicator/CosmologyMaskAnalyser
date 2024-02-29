@@ -6,8 +6,8 @@ import argparse
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument("--catalogue", default="sdss")
-parser.add_argument("--save_path", default="test.png")
+parser.add_argument("--catalogue", default="act_bias")
+parser.add_argument("--save_path", default="act_bias.png")
 parser.add_argument("--raise_path", type=int, default=2)
 parser.add_argument("--weight_function", default="excess")
 parser.add_argument("--min_z", type=float, default=0.0)
@@ -15,7 +15,7 @@ parser.add_argument("--min_r", type=float, default=0.0)
 parser.add_argument("--max_z", type=float, default=20.0)
 parser.add_argument("--max_r", type=float, default=10000.0)
 parser.add_argument("--data_mask", default="sdss_planck")
-parser.add_argument("--mask_set", default="both")
+parser.add_argument("--mask_set", default="point")
 args = parser.parse_args()
 
 def filter(redshift, richness):
@@ -58,6 +58,13 @@ elif args.catalogue == "full_sky_inigo":
     data = np.load("../../data/random_catalogue_400k_inigo.npy")
     cat.lon_lat = np.array([data[0] * 180 / np.pi, 90 - data[1] * 180 / np.pi]).transpose()
     data_name = "full sky 400k from Inigo"
+elif args.catalogue == "act_bias":
+    cat = toolkit.StarCatalogue("./" + raise_dir * "../" + "code/binned_results/random_sdss_400k.fits", table=True)
+    cat.load_lon_lat()
+    cat1 = toolkit.StarCatalogue("./" + raise_dir * "../" + "code/binned_results/act_bias.fits", table=True)
+    cat1.load_lon_lat()
+    cat.lon_lat = np.append(cat1.lon_lat, cat.lon_lat, axis=0)
+    data_name = "sdss biased"
 else:
     raise ValueError
 
@@ -120,12 +127,10 @@ else:
     raise ValueError
 
 
-
-
 #NSIDES = [1, 2, 4, 8, 16, 32]
 #NSIDES = [1, 2, 4, 8, 16, 32, 64]
 NSIDES = [1, 2, 4, 8, 16, 32, 64, 128]
-#NSIDES = [32]
+#NSIDES = [1]
 #NSIDES = [1, 2, 4, 8, 16, 32, 64, 128, 256]
 #NSIDES = [2, 8, 32]
 run_const = True

@@ -10,7 +10,8 @@ import healpy as hp
 
 #mask = toolkit.PixellMask("../../data/ACT_mask.fits", hdu=1)
 
-mask = astropy.io.fits.open("../../data/sdss_catalogue.fits", hdu=1)
+#mask = astropy.io.fits.open("../../data/sdss_catalogue.fits", hdu=1)
+mask = astropy.io.fits.open("../../data/pixel_masks/pixel_masks/ra0h50dec-50_pixel_mask.fits.gz", hdu=1)
 #mask = astropy.io.fits.open("../../data/ACT_mask.fits", hdu=1)
 #mask = astropy.table.Table.read("../../data/ACT_mask.fits")
 #mask = astropy.table.Table.read("../binned_results/test.fits")
