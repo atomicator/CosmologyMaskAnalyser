@@ -1,5 +1,4 @@
 import copy
-
 from toolkit import toolkit
 import matplotlib.pyplot as plt
 import numpy as np
@@ -39,9 +38,10 @@ class SPTMask(toolkit.PixellMask):
         lon[lon > 180] -= 360
         valid_points = np.bitwise_and(np.bitwise_and(lon > min_lon, lon < max_lon),
                                       np.bitwise_and(lat > min_lat, lat < max_lat))
-        pix = np.array((np.int_(((-lat[valid_points] + max_lat) * len(self.map) / (max_lat - min_lat))),
-                        np.int_(((-lon[valid_points] + max_lon) * len(self.map[0]) / (max_lon - min_lon)))
-                        ))
+        #pix = np.array((np.int_(((-lat[valid_points] + max_lat) * len(self.map) / (max_lat - min_lat))),
+        #                np.int_(((-lon[valid_points] + max_lon) * len(self.map[0]) / (max_lon - min_lon)))
+        #                ))
+        pix = np.int_(pixell.enmap.sky2pix(self.imap.shape, self.imap.wcs, np.array((lat[valid_points], lon[valid_points])) * np.pi / 180))
         # pix = np.array((np.int_(((lat[valid_points] - min_lat) * len(self.map) / (max_lat - min_lat))),
         #                np.int_(((lon[valid_points] - min_lon) * len(self.map[0]) / (max_lon - min_lon)))
         #                ))
@@ -51,6 +51,7 @@ class SPTMask(toolkit.PixellMask):
             print(np.min(pix[0]), np.max(pix[0]), np.min(pix[1]), np.max(pix[1]))
         except ValueError:
             print("Zero length array")
+        print(np.shape(valid_points), np.shape(pix), np.shape(lat))
         points[valid_points] = self.map[pix[0], pix[1]]
         return points
 

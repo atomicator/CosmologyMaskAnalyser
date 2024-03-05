@@ -3,19 +3,20 @@ import matplotlib.pyplot as plt
 import numpy as np
 import healpy as hp
 import argparse
+import multiprocessing.pool
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument("--catalogue", default="act_bias")
-parser.add_argument("--save_path", default="act_bias.png")
+parser.add_argument("--catalogue", default="sdss")
+parser.add_argument("--save_path", default="test.png")
 parser.add_argument("--raise_path", type=int, default=2)
 parser.add_argument("--weight_function", default="excess")
 parser.add_argument("--min_z", type=float, default=0.0)
 parser.add_argument("--min_r", type=float, default=0.0)
 parser.add_argument("--max_z", type=float, default=20.0)
 parser.add_argument("--max_r", type=float, default=10000.0)
-parser.add_argument("--data_mask", default="sdss_planck")
-parser.add_argument("--mask_set", default="point")
+parser.add_argument("--data_mask", default="sdss_act")
+parser.add_argument("--mask_set", default="both")
 args = parser.parse_args()
 
 def filter(redshift, richness):
@@ -61,19 +62,27 @@ elif args.catalogue == "full_sky_inigo":
 elif args.catalogue == "act_bias":
     cat = toolkit.StarCatalogue("./" + raise_dir * "../" + "code/binned_results/random_sdss_400k.fits", table=True)
     cat.load_lon_lat()
-    cat1 = toolkit.StarCatalogue("./" + raise_dir * "../" + "code/binned_results/act_bias.fits", table=True)
+    cat1 = toolkit.StarCatalogue("./" + raise_dir * "../" + "code/binned_results/act_bias2.fits", table=True)
     cat1.load_lon_lat()
-    cat.lon_lat = np.append(cat1.lon_lat, cat.lon_lat, axis=0)
+    print(len(cat1.lon_lat))
+    cat.lon_lat = np.append(cat1.lon_lat[0:259 - 61], cat.lon_lat, axis=0)
     data_name = "sdss biased"
 else:
     raise ValueError
 
 data_mask = args.data_mask
 
+# Regenerate clusters, calc distribution
+# Redo all results for min redshift 8
+# plot cross section of an nside
+# Reverse ordering of multi line plots
+
 N = len(cat.lon_lat)
 print(N)
 a = 0
 print(a)
+
+#exit()
 
 if args.weight_function == "excess":
     y_axis_label = r"Excess"
@@ -134,6 +143,9 @@ NSIDES = [1, 2, 4, 8, 16, 32, 64, 128]
 #NSIDES = [1, 2, 4, 8, 16, 32, 64, 128, 256]
 #NSIDES = [2, 8, 32]
 run_const = True
+x_len = len(NSIDES)
+if run_const:
+    x_len += 1
 save_path = args.save_path
 f = []
 result_set = []
@@ -150,7 +162,58 @@ run_const = False
 weight_function = weights.scatter
 mask_names = ["planck_modified_point"]"""
 
-for mask_name in mask_names:
+
+def const(*args):
+    global data_set, cat, mask, filter_set, a, convert_to_mask_frac
+    data = np.array((
+        np.mean(data_set[0]),
+        np.mean(data_set[1]),
+        np.mean(data_set[2]),
+        np.mean(data_set[3])
+    ))
+    binmap = toolkit.ConstantMap()
+    binmap.bin_catalogue(cat)
+    binmap.load_catalogue(cat)
+    output = binmap.divide_sample(mask, data, True, filter_set, a)
+    mixed = weight_function(*output[1:], skip_n_filter=True)
+    print(f"Mixed C: {mixed[0]} +/- {mixed[1]}")
+    if convert_to_mask_frac:
+        final = np.array(
+            [output[0][0] + (1 - output[0][0] - output[0][1]) * mixed[0], (1 - output[0][0] - output[0][1]) * mixed[1]])
+    else:
+        final = np.array(mixed)
+    print(f"Final C: {final[0]} +/- {final[1]}")
+    #results.append(final)
+    return final
+
+def nside(n):
+    try:
+        data = np.array((
+            hp.ud_grade(data_set[0], n),
+            hp.ud_grade(data_set[1], n),
+            hp.ud_grade(data_set[2], n),
+            hp.ud_grade(data_set[3], n)
+        ))
+        binmap = toolkit.HealpixBinMap(n)
+        binmap.bin_catalogue(cat)
+        binmap.load_catalogue(cat)
+        output = binmap.divide_sample(mask, data, False, filter_set, a)
+        mixed = weight_function(*output[1:])
+        print(f"Mixed {n}: {mixed[0]} +/- {mixed[1]}")
+        print(output[0])
+        if convert_to_mask_frac:
+            final = np.array([output[0][0] * 100 + (1 - output[0][0] - output[0][1]) * mixed[0],
+                              (1 - output[0][0] - output[0][1]) * mixed[1]])
+        else:
+            final = np.array(mixed)
+        print(f"Final {n}: {final[0]} +/- {final[1]}")
+    except ValueError:
+        final = np.array([np.NaN, np.NaN])
+    #results.append(final)
+    return final
+
+# Old version of code (single threaded)
+"""for mask_name in mask_names:
     mask = toolkit.load_mask(mask_name, raise_dir)
     mask.set_fig_ax(fig, ax)
     if data_mask == "full_sky":
@@ -228,6 +291,66 @@ for mask_name in mask_names:
         except ValueError:
             final = np.array([np.NaN, np.NaN])
         results.append(final)
+    results = np.array(results).transpose()
+    result_set.append(results)"""
+# new version (multithreaded)
+
+for mask_name in mask_names:
+    mask = toolkit.load_mask(mask_name, raise_dir)
+    mask.set_fig_ax(fig, ax)
+    if data_mask == "full_sky":
+        data_set = np.array((
+            np.zeros(12 * 2048 ** 2),
+            1 - mask.map,
+            np.zeros(12 * 2048 ** 2),
+            mask.map
+        ))
+    elif data_mask == "sdss_planck":
+        sdss_mask = toolkit.load_mask("sdss_mask", raise_dir)
+        temp = mask.map + 1j * sdss_mask.map
+        data_set = np.float_(np.array((
+            temp == 0,
+            temp == 1j,
+            temp == 1,
+            temp == 1 + 1j
+        )))
+    elif data_mask == "sdss_act":
+        data_set = np.float_(np.array((
+            toolkit.HealpyMask("../" * raise_dir + f"code/binned_results/sdss_mask_{mask_name}_256_1.fits").map,
+            toolkit.HealpyMask("../" * raise_dir + f"code/binned_results/sdss_mask_{mask_name}_256_2.fits").map,
+            toolkit.HealpyMask("../" * raise_dir + f"code/binned_results/sdss_mask_{mask_name}_256_3.fits").map,
+            toolkit.HealpyMask("../" * raise_dir + f"code/binned_results/sdss_mask_{mask_name}_256_4.fits").map
+        )))
+    else:
+        raise ValueError
+
+    results = np.zeros((x_len, 2))
+    pool = multiprocessing.pool.ThreadPool(processes=x_len)
+    thread_objects = [None] * x_len
+    index = 0
+    print("test")
+    if not set_f_zero:
+        f.append((1 - np.sum(mask.lookup_point(*cat.lon_lat.transpose())) / len(cat.lon_lat)) * 100)
+    else:
+        f.append(0)
+    print(f"{mask_name}: f = {f[-1]}")
+    if run_const:
+        thread_objects[index] = pool.apply_async(const)
+        index += 1
+
+    print(thread_objects)
+    #print(thread_objects[0].get())
+
+    for n in NSIDES:
+        thread_objects[index] = pool.apply_async(nside, (n,))
+        index += 1
+
+    print(thread_objects)
+
+    for i in range(x_len):
+        results[i] = thread_objects[i].get()
+        print(results[i])
+
     results = np.array(results).transpose()
     result_set.append(results)
 

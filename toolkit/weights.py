@@ -20,6 +20,7 @@ def inverse_variance_weighting(f_s, _f_c, n, **_kwargs):
 
 
 def density_weighting(f_s, _f_c, n, **_kwargs):
+    print(f_s, _f_c, n)
     variance = f_s * (1 - f_s) / n
     weights = n / (np.sum(n))
     print(np.sum(weights))

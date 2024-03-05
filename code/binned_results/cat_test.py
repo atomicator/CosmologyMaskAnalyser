@@ -41,22 +41,25 @@ data = (
     np.mean(toolkit.HealpyMask("./sdss_mask_planck_modified_galactic_256_4.fits").map)
 )
 galactic_masked_fraction = data[0] + data[1]
-
+"""
 data = (
     np.mean(toolkit.HealpyMask("./sdss_mask_act_point_256_1.fits").map),
     np.mean(toolkit.HealpyMask("./sdss_mask_act_point_256_2.fits").map),
     np.mean(toolkit.HealpyMask("./sdss_mask_act_point_256_3.fits").map),
     np.mean(toolkit.HealpyMask("./sdss_mask_act_point_256_4.fits").map)
 )
-point_masked_fraction = data[0] + data[1]
-final = point_masked_fraction / (1 - galactic_masked_fraction)
-"""
+#point_masked_fraction = data[0] + data[1]
+#final = point_masked_fraction / (1 - galactic_masked_fraction)
+final = data
+print((0.015567657065637092 + 0.05) * 401074 * data[1] / (data[1] + data[3]))
+#print(0.05 * 401074)
 # ACT: 0.02024328631080069
-data = (
-    np.mean(toolkit.load_mask("planck_modified_point").map),
-    np.mean(toolkit.load_mask("planck_modified_galactic").map)
-)
-final = (1 - data[0]) / data[1]
+#data = (
+#    np.mean(toolkit.load_mask("planck_modified_point").map),
+#    np.mean(toolkit.load_mask("planck_modified_galactic").map)
+#)
+#final = (1 - data[0]) / data[1]
 
 # ACT: 0.02024328631080069
+#401074
 print(final)

@@ -795,6 +795,8 @@ def load_mask(mask, raise_dir=2, nside=8, invert=False):
         rotator = hp.Rotator(coord=["C", "G"])
         value.map = rotator.rotate_map_pixel(value.map)
         value.mask_using_latlon = True
+        value.map[value.map > 0.5] = 1.0
+        value.map[value.map < 0.5] = 0
         # value.map = (value.map - 1) * -1
     elif mask == "planck_modified_galactic":
         point_mask = load_mask("planck_point", raise_dir=raise_dir)

@@ -3,19 +3,42 @@ import numpy as np
 import toolkit.toolkit as toolkit
 
 toolkit.plt_use_tex()
-error_bar_colors = ["xkcd:aqua blue", "orange", "xkcd:mint green", "pink"]
-line_colors = ["xkcd:electric blue", "red", "xkcd:grass green", "purple"]
+error_bar_colors = ["xkcd:aqua blue", "orange", "xkcd:mint green", "pink", "xkcd:burnt sienna"]
+line_colors = ["xkcd:electric blue", "red", "xkcd:grass green", "purple", "xkcd:reddish brown"]
 run_const = True
 
 fig = plt.figure()
 ax = fig.add_subplot(111)
 
 NSIDES = [1, 2, 4, 8, 16, 32, 64, 128]
-labels = ["1", "2", "3"]
-title = "Title"
+
+#title = "The excess of the ACT point mask, as a function of richness (bin)"
+#save_path = "./act_bin_richness.png"
+#files = ["./act_r/bin/act_r_bin_1.npy", "./act_r/bin/act_r_bin_2.npy", "./act_r/bin/act_r_bin_3.npy",
+#         "./act_r/bin/act_r_bin_4.npy", "./act_r/min/act_r_min_4.npy"]
+
+#title = "The excess of the Planck point mask, as a function of richness (bin)"
+#save_path = "./planck_bin_richness.png"
+#files = ["./planck_r/bin/planck_r_bin_1.npy", "./planck_r/bin/planck_r_bin_2.npy", "./planck_r/bin/planck_r_bin_3.npy",
+#         "./planck_r/bin/planck_r_bin_4.npy", "./planck_r/min/planck_r_min_4.npy"]
+
+title = "The excess of the ACT point mask, as a function of richness (min)"
+#save_path = "./act_min_richness.png"
 save_path = "test.png"
+#files = ["./act_r/min/act_excess.npy", "./act_r/min/act_r_min_1.npy", "./act_r/min/act_r_min_2.npy",
+#         "./act_r/min/act_r_min_3.npy", "./act_r/min/act_r_min_4.npy"]
+files = ["./act_r/min/act_r_min_2.npy"]
+
+#title = "The excess of the Planck point mask, as a function of richness (min)"
+#save_path = "./planck_min_richness.png"
+#files = ["./planck_r/bin/planck_excess.npy", "./planck_r/min/planck_r_min_1.npy", "./planck_r/min/planck_r_min_2.npy",
+#         "./planck_r/min/planck_r_min_3.npy", "./planck_r/min/planck_r_min_4.npy"]
+
+#labels = [r"$\lambda < 10$", r"$10 < \lambda < 20$", r"$20 < \lambda < 50$", r"$50 < \lambda < 100$", r"$100 < \lambda$"]
+#labels = [r"All results", r"$10 < \lambda$", r"$20 < \lambda$", r"$50 < \lambda$", r"$100 < \lambda$"]
+labels = ["test"]
+
 y_axis_label = "Excess"
-files = ["./act_r/bin/act_r_bin_1.npy", "./act_r/bin/act_r_bin_2.npy", "./act_r/bin/act_r_bin_3.npy"]
 
 for file in files:
     result_set = np.load(file)
