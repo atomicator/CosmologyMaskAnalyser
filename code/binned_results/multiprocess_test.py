@@ -1,13 +1,15 @@
+import numpy as np
 import multiprocessing.pool
 import os
 
 os.system("taskset -p 0xff %d" % os.getpid())
 
-def test(x):
-    while True:
-        #print(x)
-        x += 1
-        #time.sleep(10)
+def test(_data):
+    data = np.random.randn(2, 1000)
+    for nn in range(1000):
+        for ii in data[0, :]:
+            for jj in data[1, :]:
+                ii * jj
     return True
 
 
