@@ -2,7 +2,7 @@ import numpy as np
 import multiprocessing.pool
 import os
 
-os.system("taskset -p 0xff %d" % os.getpid())
+#os.system("taskset -p 0xff %d" % os.getpid())
 
 print(multiprocessing.cpu_count())
 
@@ -19,6 +19,7 @@ results = []
 pool = multiprocessing.pool.ThreadPool(processes=10)
 for i in range(10):
     results.append(pool.apply_async(test, (i,)))
+    print(i)
 
 pool.close()
 pool.join()
