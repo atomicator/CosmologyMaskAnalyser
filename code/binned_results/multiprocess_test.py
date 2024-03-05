@@ -8,7 +8,7 @@ import threading
 #os.system("taskset -p 0xff %d" % os.getpid())
 print(multiprocessing.cpu_count())
 def test(_data):
-    os.system("taskset -p 0xff %d" % os.getpid())
+    #os.system("taskset -p 0xff %d" % os.getpid())
     data = np.random.randn(2, 1000)
     for nn in range(1000):
         for ii in data[0, :]:
