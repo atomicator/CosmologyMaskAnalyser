@@ -327,7 +327,7 @@ for mask_name in mask_names:
         raise ValueError
 
     results = np.zeros((x_len, 2))
-    pool = multiprocessing.pool.ThreadPool(processes=x_len)
+    pool = multiprocessing.pool.Pool(processes=x_len)
     thread_objects = [None] * x_len
     index = 0
     print("test")
