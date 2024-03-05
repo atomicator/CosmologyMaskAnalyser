@@ -1,4 +1,7 @@
 import multiprocessing.pool
+import os
+
+os.system("taskset -p 0xff %d" % os.getpid())
 
 def test(x):
     while True:
