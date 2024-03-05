@@ -9,7 +9,7 @@ def test(x):
 
 
 results = []
-pool = multiprocessing.pool.ThreadPool(processes=5)
+pool = multiprocessing.pool.ThreadPool(processes=10)
 for i in range(10):
     results.append(pool.apply_async(test, (i,)))
 
