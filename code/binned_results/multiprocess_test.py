@@ -21,7 +21,7 @@ for i in range(10):
     results.append(pool.apply_async(test, (i,)))
     print(i)
 
-pool.close()
+#pool.close()
 pool.join()
 
 for i in range(10):
