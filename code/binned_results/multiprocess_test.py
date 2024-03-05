@@ -2,7 +2,7 @@ import multiprocessing.pool
 
 def test(x):
     while True:
-        print(x)
+        #print(x)
         x += 1
         #time.sleep(10)
     return True
