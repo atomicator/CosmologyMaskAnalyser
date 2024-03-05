@@ -2,6 +2,7 @@ import numpy as np
 import multiprocessing.pool
 import os
 import time
+import psutil
 
 os.system("taskset -p 0xff %d" % os.getpid())
 
@@ -23,7 +24,9 @@ for i in range(10):
     results.append(pool.apply_async(test, (i,)))
     print(i)
 
-time.sleep(100)
+psutil.cpu_count()
+p = psutil.Process()
+print(p.cpu_affinity())
 
 pool.close()
 pool.join()
