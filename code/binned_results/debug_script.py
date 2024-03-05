@@ -4,6 +4,8 @@ import numpy as np
 import healpy as hp
 import argparse
 import multiprocessing.pool
+#import multiprocessing
+
 
 parser = argparse.ArgumentParser()
 
