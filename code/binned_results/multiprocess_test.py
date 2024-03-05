@@ -31,5 +31,8 @@ for i in range(10):
 thread_1 = threading.Thread(target=test, args=(1,))
 thread_2 = threading.Thread(target=test, args=(2,))
 
+thread_1.start()
+thread_2.start()
+
 thread_1.join()
 thread_2.join()
