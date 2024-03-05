@@ -1,6 +1,7 @@
 import numpy as np
 import multiprocessing.pool
 import os
+import time
 
 #os.system("taskset -p 0xff %d" % os.getpid())
 
@@ -21,7 +22,9 @@ for i in range(10):
     results.append(pool.apply_async(test, (i,)))
     print(i)
 
-#pool.close()
+time.sleep(100)
+
+pool.close()
 pool.join()
 
 for i in range(10):
