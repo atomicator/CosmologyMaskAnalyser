@@ -75,7 +75,7 @@ else:
 data_mask = args.data_mask
 
 # Regenerate clusters, calc distribution
-# Redo all results for min redshift 8
+# Redo all results for min richness 8
 # plot cross section of an nside
 # Reverse ordering of multi line plots
 
