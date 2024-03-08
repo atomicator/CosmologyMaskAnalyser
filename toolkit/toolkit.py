@@ -753,6 +753,55 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="
     print(np.min(data1 + data2 + data3 + data4), np.max(data1 + data2 + data3 + data4))
 
 
+def run_const(data_set, mask, filter_set, a, cat):
+    data = np.array((
+        np.mean(data_set[0]),
+        np.mean(data_set[1]),
+        np.mean(data_set[2]),
+        np.mean(data_set[3])
+    ))
+    binmap = toolkit.ConstantMap()
+    binmap.bin_catalogue(cat)
+    binmap.load_catalogue(cat)
+    output = binmap.divide_sample(mask, data, True, filter_set, a)
+    mixed = weight_function(*output[1:], skip_n_filter=True)
+    print(f"Mixed C: {mixed[0]} +/- {mixed[1]}")
+    if convert_to_mask_frac:
+        final = np.array(
+            [output[0][0] + (1 - output[0][0] - output[0][1]) * mixed[0], (1 - output[0][0] - output[0][1]) * mixed[1]])
+    else:
+        final = np.array(mixed)
+    print(f"Final C: {final[0]} +/- {final[1]}")
+    return final
+
+
+def run_nside(n, data_set, mask, filter_set, a, cat, weight_function, convert_to_mask_frac):
+    try:
+        data = np.array((
+            hp.ud_grade(data_set[0], n),
+            hp.ud_grade(data_set[1], n),
+            hp.ud_grade(data_set[2], n),
+            hp.ud_grade(data_set[3], n)
+        ))
+        binmap = HealpixBinMap(n)
+        binmap.bin_catalogue(cat)
+        binmap.load_catalogue(cat)
+        output = binmap.divide_sample(mask, data, False, filter_set, a)
+        mixed = weight_function(*output[1:])
+        print(f"Mixed {n}: {mixed[0]} +/- {mixed[1]}")
+        print(output[0])
+        if convert_to_mask_frac:
+            final = np.array([output[0][0] * 100 + (1 - output[0][0] - output[0][1]) * mixed[0],
+                              (1 - output[0][0] - output[0][1]) * mixed[1]])
+        else:
+            final = np.array(mixed)
+        print(f"Final {n}: {final[0]} +/- {final[1]}")
+    except ValueError:
+        final = np.array([np.NaN, np.NaN])
+    #results.append(final)
+    return final
+
+
 def gen_random_coord():
     finished = False
     (lon, lat) = (0, 0)

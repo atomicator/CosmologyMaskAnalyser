@@ -163,56 +163,6 @@ run_const = False
 weight_function = weights.scatter
 mask_names = ["planck_modified_point"]"""
 
-
-def const(*args):
-    global data_set, cat, mask, filter_set, a, convert_to_mask_frac
-    data = np.array((
-        np.mean(data_set[0]),
-        np.mean(data_set[1]),
-        np.mean(data_set[2]),
-        np.mean(data_set[3])
-    ))
-    binmap = toolkit.ConstantMap()
-    binmap.bin_catalogue(cat)
-    binmap.load_catalogue(cat)
-    output = binmap.divide_sample(mask, data, True, filter_set, a)
-    mixed = weight_function(*output[1:], skip_n_filter=True)
-    print(f"Mixed C: {mixed[0]} +/- {mixed[1]}")
-    if convert_to_mask_frac:
-        final = np.array(
-            [output[0][0] + (1 - output[0][0] - output[0][1]) * mixed[0], (1 - output[0][0] - output[0][1]) * mixed[1]])
-    else:
-        final = np.array(mixed)
-    print(f"Final C: {final[0]} +/- {final[1]}")
-    #results.append(final)
-    return final
-
-def nside(n):
-    try:
-        data = np.array((
-            hp.ud_grade(data_set[0], n),
-            hp.ud_grade(data_set[1], n),
-            hp.ud_grade(data_set[2], n),
-            hp.ud_grade(data_set[3], n)
-        ))
-        binmap = toolkit.HealpixBinMap(n)
-        binmap.bin_catalogue(cat)
-        binmap.load_catalogue(cat)
-        output = binmap.divide_sample(mask, data, False, filter_set, a)
-        mixed = weight_function(*output[1:])
-        print(f"Mixed {n}: {mixed[0]} +/- {mixed[1]}")
-        print(output[0])
-        if convert_to_mask_frac:
-            final = np.array([output[0][0] * 100 + (1 - output[0][0] - output[0][1]) * mixed[0],
-                              (1 - output[0][0] - output[0][1]) * mixed[1]])
-        else:
-            final = np.array(mixed)
-        print(f"Final {n}: {final[0]} +/- {final[1]}")
-    except ValueError:
-        final = np.array([np.NaN, np.NaN])
-    #results.append(final)
-    return final
-
 # Old version of code (single threaded)
 """for mask_name in mask_names:
     mask = toolkit.load_mask(mask_name, raise_dir)
@@ -336,14 +286,14 @@ for mask_name in mask_names:
         f.append(0)
     print(f"{mask_name}: f = {f[-1]}")
     if run_const:
-        thread_objects[index] = pool.apply_async(const)
+        thread_objects[index] = pool.apply_async(toolkit.run_const, (data_set, mask, filter_set, a, cat, weight_function, convert_to_mask_frac))
         index += 1
 
     print(thread_objects)
     #print(thread_objects[0].get())
 
     for n in NSIDES:
-        thread_objects[index] = pool.apply_async(nside, (n,))
+        thread_objects[index] = pool.apply_async(toolkit.run_nside, (n, data_set, mask, filter_set, a, cat, weight_function, convert_to_mask_frac))
         index += 1
 
     print(thread_objects)
