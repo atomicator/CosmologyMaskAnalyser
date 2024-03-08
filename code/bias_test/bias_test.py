@@ -19,15 +19,15 @@ parser.add_argument("--overdensity", type=float, default=0.05)
 args = parser.parse_args()
 
 if args.catalogue == "sdss":
-    random_mask = toolkit.load_mask("sdss_mask")
+    random_mask = toolkit.load_mask("sdss_mask", raise_dir=args.raise_dir)
 else:
     raise ValueError
 
 if args.data_mask == "sdss_act":
-    point_mask = toolkit.load_mask("act_point")
-    temp1 = toolkit.load_mask("sdss_mask")
+    point_mask = toolkit.load_mask("act_point", raise_dir=args.raise_dir)
+    temp1 = toolkit.load_mask("sdss_mask", raise_dir=args.raise_dir)
     temp1.map = np.int_(temp1.map)
-    temp2 = toolkit.load_mask("act_point")
+    temp2 = toolkit.load_mask("act_point", raise_dir=args.raise_dir)
     temp1.map = 1 - temp1.map
     overdensity_mask = toolkit.CombinationMask(temp1, temp2, invert=True, use_and=False)
     sky_mask_frac = 0.02024328631080069
