@@ -51,9 +51,9 @@ def func():
     global data_set
     random_points = toolkit.gen_random_coords(args.target, random_mask).transpose()[::-1]
     bias_points = toolkit.gen_random_coords(len(random_points) * args.overdensity * sky_mask_frac * 5, overdensity_mask).transpose()[::-1]
-    plt.scatter(random_points.transpose())
+    plt.scatter(*random_points.transpose())
     plt.show()
-    plt.scatter(bias_points.transpose())
+    plt.scatter(*bias_points.transpose())
     plt.show()
     cat = toolkit.StarCatalogue()
     cat.lon_lat = np.append(random_points, bias_points[:int(len(random_points) * args.overdensity * sky_mask_frac)], axis=0)
@@ -67,8 +67,8 @@ for i in range(args.iterations):
     threads.append(pool.apply_async(func))
 
 #pool.join()
-print(pool.close())
-print(pool.join())
+#print(pool.close())
+#print(pool.join())
 
 results = []
 for thread in threads:
