@@ -22,25 +22,25 @@ NSIDES = [1, 2, 4, 8, 16, 32, 64, 128]
 #files = ["./planck_r/bin/planck_r_bin_1.npy", "./planck_r/bin/planck_r_bin_2.npy", "./planck_r/bin/planck_r_bin_3.npy",
 #         "./planck_r/bin/planck_r_bin_4.npy", "./planck_r/min/planck_r_min_4.npy"]
 
-title = "The excess of the ACT point mask, as a function of richness (min)"
-#save_path = "./act_min_richness.png"
-save_path = "test.png"
-#files = ["./act_r/min/act_excess.npy", "./act_r/min/act_r_min_1.npy", "./act_r/min/act_r_min_2.npy",
-#         "./act_r/min/act_r_min_3.npy", "./act_r/min/act_r_min_4.npy"]
-files = ["./act_r/min/act_r_min_2.npy"]
+title = "The excess of the ACT point mask, as a function of minimum richness"
+save_path = "./act_min_richness.png"
+#save_path = "test.png"
+files = ["./act_r/min/act_excess.npy", "./act_r/min/act_r_min_1.npy", "./act_r/min/act_r_min_2.npy",
+         "./act_r/min/act_r_min_3.npy", "./act_r/min/act_r_min_4.npy"]
+#files = ["./act_r/min/act_r_min_2.npy"]
 
-#title = "The excess of the Planck point mask, as a function of richness (min)"
+#title = "The excess of the Planck point mask, as a function of minimum richness"
 #save_path = "./planck_min_richness.png"
 #files = ["./planck_r/bin/planck_excess.npy", "./planck_r/min/planck_r_min_1.npy", "./planck_r/min/planck_r_min_2.npy",
 #         "./planck_r/min/planck_r_min_3.npy", "./planck_r/min/planck_r_min_4.npy"]
 
 #labels = [r"$\lambda < 10$", r"$10 < \lambda < 20$", r"$20 < \lambda < 50$", r"$50 < \lambda < 100$", r"$100 < \lambda$"]
-#labels = [r"All results", r"$10 < \lambda$", r"$20 < \lambda$", r"$50 < \lambda$", r"$100 < \lambda$"]
-labels = ["test"]
+labels = [r"All results", r"$10 < \lambda$", r"$20 < \lambda$", r"$50 < \lambda$", r"$100 < \lambda$"]
+#labels = ["test"]
 
 y_axis_label = "Excess"
 
-for file in files:
+for file in files[::-1]:
     result_set = np.load(file)
     color = line_colors[files.index(file)]
     error_bar_color = error_bar_colors[files.index(file)]
