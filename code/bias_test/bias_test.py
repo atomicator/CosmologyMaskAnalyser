@@ -58,8 +58,9 @@ def func():
     cat = toolkit.StarCatalogue()
     cat.lon_lat = np.append(random_points, bias_points[:int(len(random_points) * args.overdensity * sky_mask_frac)], axis=0)
     print(np.shape(cat.lon_lat))
-    print(random_mask.lookup_point(*cat.lon_lat.transpose()[::-1]))
-    print(point_mask.lookup_point(*cat.lon_lat.transpose()[::-1]))
+    print(np.sum(random_mask.lookup_point(*cat.lon_lat.transpose()[::-1])) / len(cat.lon_lat))
+    print(np.sum(point_mask.lookup_point(*cat.lon_lat.transpose()[::-1])) / len(cat.lon_lat))
+    print(np.sum(point_mask.lookup_point(*bias_points.transpose()[::-1])) / len(bias_points.lon_lat))
     return toolkit.run_nside(args.nside, data_set, point_mask, filter_set, 0, cat,
                              weights.excess_measurement, False)
 
