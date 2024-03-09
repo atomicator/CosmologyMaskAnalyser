@@ -51,19 +51,18 @@ def func():
     global data_set
     random_points = toolkit.gen_random_coords(args.target, random_mask).transpose()[::-1]
     bias_points = toolkit.gen_random_coords(len(random_points) * args.overdensity * sky_mask_frac * 5, overdensity_mask).transpose()[::-1]
-    plt.scatter(*random_points.transpose())
+    plt.scatter(*random_points.transpose()[::-1], marker="+")
     plt.show()
-    plt.scatter(*bias_points.transpose())
+    plt.scatter(*bias_points.transpose()[::-1], marker="+")
     plt.show()
     cat = toolkit.StarCatalogue()
     cat.lon_lat = np.append(random_points, bias_points[:int(len(random_points) * args.overdensity * sky_mask_frac)], axis=0)
     print(np.shape(cat.lon_lat))
     print(np.sum(random_mask.lookup_point(*cat.lon_lat.transpose()[::-1])) / len(cat.lon_lat))
     print(np.sum(point_mask.lookup_point(*cat.lon_lat.transpose()[::-1])) / len(cat.lon_lat))
-    print(np.sum(point_mask.lookup_point(*bias_points.transpose()[::-1])) / len(bias_points.lon_lat))
+    print(np.sum(point_mask.lookup_point(*bias_points.transpose()[::-1])) / len(bias_points))
     return toolkit.run_nside(args.nside, data_set, point_mask, filter_set, 0, cat,
                              weights.excess_measurement, False)
-
 
 
 for i in range(args.iterations):
