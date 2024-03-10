@@ -777,6 +777,7 @@ def run_const(data_set, mask, filter_set, a, cat, weight_function, convert_to_ma
 
 def run_nside(n, data_set, mask, filter_set, a, cat, weight_function, convert_to_mask_frac):
     try:
+        print(f"Shape: {np.shape(cat.lon_lat)}")
         data = np.array((
             hp.ud_grade(data_set[0], n),
             hp.ud_grade(data_set[1], n),
@@ -784,6 +785,8 @@ def run_nside(n, data_set, mask, filter_set, a, cat, weight_function, convert_to
             hp.ud_grade(data_set[3], n)
         ))
         binmap = HealpixBinMap(n)
+        print(np.min(cat.lon_lat[0]), np.max(cat.lon_lat[0]))
+        print(np.min(cat.lon_lat[1]), np.max(cat.lon_lat[1]))
         binmap.bin_catalogue(cat)
         binmap.load_catalogue(cat)
         output = binmap.divide_sample(mask, data, False, filter_set, a)
@@ -796,7 +799,7 @@ def run_nside(n, data_set, mask, filter_set, a, cat, weight_function, convert_to
         else:
             final = np.array(mixed)
         print(f"Final {n}: {final[0]} +/- {final[1]}")
-    except ValueError:
+    except NotMaskError:
         final = np.array([np.NaN, np.NaN])
     #results.append(final)
     return final
