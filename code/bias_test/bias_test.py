@@ -56,7 +56,7 @@ def test_function():
     print(f"Mixed C: {mixed[0]} +/- {mixed[1]}")
     final = np.array(mixed)
     print(f"Final C: {final[0]} +/- {final[1]}")
-    results.append(final)
+    temp.append(final)
     for n in NSIDES:
         try:
             data = np.array((
