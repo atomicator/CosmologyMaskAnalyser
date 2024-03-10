@@ -164,7 +164,7 @@ weight_function = weights.scatter
 mask_names = ["planck_modified_point"]"""
 
 # Old version of code (single threaded)
-"""for mask_name in mask_names:
+for mask_name in mask_names:
     mask = toolkit.load_mask(mask_name, raise_dir)
     mask.set_fig_ax(fig, ax)
     if data_mask == "full_sky":
@@ -243,11 +243,11 @@ mask_names = ["planck_modified_point"]"""
             final = np.array([np.NaN, np.NaN])
         results.append(final)
     results = np.array(results).transpose()
-    result_set.append(results)"""
+    result_set.append(results)
 # new version (multithreaded)
 
 print("test")
-
+"""
 for mask_name in mask_names:
     mask = toolkit.load_mask(mask_name, raise_dir)
     mask.set_fig_ax(fig, ax)
@@ -288,10 +288,10 @@ for mask_name in mask_names:
         f.append(0)
     #print(f"{mask_name}: f = {f[-1]}")
     print("running const")
-    pool.close()
     if run_const:
         thread_objects[index] = pool.apply_async(toolkit.run_const, (data_set, mask, filter_set, a, cat, weight_function, convert_to_mask_frac))
         index += 1
+
     print("running everything else")
     #print(thread_objects)
     #print(thread_objects[0].get())
@@ -310,7 +310,7 @@ for mask_name in mask_names:
 
     results = np.array(results).transpose()
     result_set.append(results)
-
+"""
 print(result_set)
 plt.clf()
 fig = plt.figure()
