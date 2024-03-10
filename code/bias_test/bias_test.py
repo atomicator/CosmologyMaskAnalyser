@@ -20,7 +20,7 @@ parser.add_argument("--data_mask", default="sdss_act")
 parser.add_argument("--overdensity", type=float, default=0.05)
 args = parser.parse_args()
 
-NSIDES = [1, 2, 4, 8, 16, 32, 64, 128, 256]
+NSIDES = [1, 2, 4, 8, 16, 32, 64, 128]
 
 def test_function():
     global data_set
