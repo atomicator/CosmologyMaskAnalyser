@@ -51,8 +51,8 @@ def func():
     global data_set
     random_points = toolkit.gen_random_coords(args.target, random_mask).transpose()[::1]
     bias_points = toolkit.gen_random_coords(len(random_points) * args.overdensity * sky_mask_frac * 5, overdensity_mask).transpose()[::1]
-    print(np.min(random_points[0]), np.max(random_points[0]))
-    print(np.min(random_points[1]), np.max(random_points[1]))
+    print(np.min(random_points[:, 0]), np.max(random_points[:, 0]))
+    print(np.min(random_points[:, 1]), np.max(random_points[:, 1]))
     print(np.min(bias_points[0]), np.max(bias_points[0]))
     print(np.min(bias_points[1]), np.max(bias_points[1]))
     cat = toolkit.StarCatalogue()
