@@ -51,6 +51,7 @@ def func():
     global data_set
     random_points = toolkit.gen_random_coords(args.target, random_mask).transpose()[::1]
     bias_points = toolkit.gen_random_coords(len(random_points) * args.overdensity * sky_mask_frac * 5, overdensity_mask).transpose()[::1]
+    print(np.shape(random_points), np.shape(bias_points))
     print(np.min(random_points[:, 0]), np.max(random_points[:, 0]))
     print(np.min(random_points[:, 1]), np.max(random_points[:, 1]))
     print(np.min(bias_points[0]), np.max(bias_points[0]))
@@ -63,6 +64,7 @@ def func():
     print(np.sum(point_mask.lookup_point(*bias_points.transpose()[::-1])) / len(bias_points))
     print(np.min(cat.lon_lat[0]), np.max(cat.lon_lat[0]))
     print(np.min(cat.lon_lat[1]), np.max(cat.lon_lat[1]))
+    cat.lon_lat = cat.lon_lat.transpose()
     return toolkit.run_nside(args.nside, data_set, point_mask, filter_set, 0, cat,
                              weights.excess_measurement, False)
 
