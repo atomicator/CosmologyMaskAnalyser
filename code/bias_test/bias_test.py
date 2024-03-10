@@ -4,6 +4,7 @@ import argparse
 import multiprocessing.pool
 import numpy as np
 import healpy as hp
+import random
 
 
 parser = argparse.ArgumentParser()
@@ -84,7 +85,7 @@ if args.data_mask == "sdss_act":
 else:
     raise ValueError
 
-pool = multiprocessing.pool.Pool(processes=args.threads)
+pool = multiprocessing.pool.Pool(processes=args.threads, initializer=random.seed)
 threads = []
 
 

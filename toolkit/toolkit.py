@@ -974,7 +974,7 @@ def fraction_masked_pair(mask1, mask2, n=int(1e3), ram_limited=False, weight_map
 
 
 def gen_random_coords(n, mask=None):
-    random.seed()
+    #random.seed()
     if mask:
         n = n / mask.calc_exact_unmasked_fraction()  # correct for masked fraction
     n = int(n * 6 / np.pi)  # correct for volume generation
