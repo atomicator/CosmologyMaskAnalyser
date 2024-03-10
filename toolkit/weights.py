@@ -37,7 +37,7 @@ def excess_measurement(f_s, f_c, n, skip_n_filter=False, minimum_n=0, **_kwargs)
         n = n[bin_filter]
         f_c = f_c[bin_filter]
         f_s = f_s[bin_filter]
-    print(np.array((f_s, f_c, n)))
+    print(f_s, f_c, n)
     print(np.min(f_s), np.max(f_s))
     excess = (f_c - f_s) / f_s
     print(f"Mean N: {np.mean(n)}, {np.sum(n)}")
