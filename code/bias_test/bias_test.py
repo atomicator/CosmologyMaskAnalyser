@@ -12,7 +12,6 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--catalogue", default="sdss")
 parser.add_argument("--save_path", default="test.npy")
 parser.add_argument("--raise_dir", type=int, default=2)
-parser.add_argument("--nside", type=int, default=2)
 parser.add_argument("--weight_function", default="excess")
 parser.add_argument("--threads", type=int, default=1)
 parser.add_argument("--iterations", type=int, default=1)
@@ -21,6 +20,7 @@ parser.add_argument("--data_mask", default="sdss_act")
 parser.add_argument("--overdensity", type=float, default=0.05)
 args = parser.parse_args()
 
+NSIDES = [1, 2, 4, 8, 16, 32, 64, 128, 256]
 
 def test_function():
     global data_set
@@ -41,26 +41,43 @@ def test_function():
     #print(np.min(cat.lon_lat[0]), np.max(cat.lon_lat[0]))
     #print(np.min(cat.lon_lat[1]), np.max(cat.lon_lat[1]))
     #cat.lon_lat = cat.lon_lat.transpose()
-    try:
-        data = np.array((
-            hp.ud_grade(data_set[0], args.nside),
-            hp.ud_grade(data_set[1], args.nside),
-            hp.ud_grade(data_set[2], args.nside),
-            hp.ud_grade(data_set[3], args.nside)
-        ))
-        binmap = toolkit.HealpixBinMap(args.nside)
-        binmap.bin_catalogue(cat)
-        binmap.load_catalogue(cat)
-        output = binmap.divide_sample(point_mask, data, False, filter_set, 0)
-        mixed = weights.excess_measurement(*output[1:])
-        print(f"Mixed {args.nside}: {mixed[0]} +/- {mixed[1]}")
-        print(output[0])
-        final = np.array(mixed)
-        print(f"Final {args.nside}: {final[0]} +/- {final[1]}")
-    except ValueError:
-        final = np.array([np.NaN, np.NaN])
-    # results.append(final)
-    return final
+    temp = []
+    data = np.array((
+        np.mean(data_set[0]),
+        np.mean(data_set[1]),
+        np.mean(data_set[2]),
+        np.mean(data_set[3])
+    ))
+    binmap = toolkit.ConstantMap()
+    binmap.bin_catalogue(cat)
+    binmap.load_catalogue(cat)
+    output = binmap.divide_sample(point_mask, data, True, filter_set, 0)
+    mixed = weights.excess_measurement(*output[1:], skip_n_filter=True)
+    print(f"Mixed C: {mixed[0]} +/- {mixed[1]}")
+    final = np.array(mixed)
+    print(f"Final C: {final[0]} +/- {final[1]}")
+    results.append(final)
+    for n in NSIDES:
+        try:
+            data = np.array((
+                hp.ud_grade(data_set[0], n),
+                hp.ud_grade(data_set[1], n),
+                hp.ud_grade(data_set[2], n),
+                hp.ud_grade(data_set[3], n)
+            ))
+            binmap = toolkit.HealpixBinMap(n)
+            binmap.bin_catalogue(cat)
+            binmap.load_catalogue(cat)
+            output = binmap.divide_sample(point_mask, data, False, filter_set, 0)
+            mixed = weights.excess_measurement(*output[1:])
+            print(f"Mixed {n}: {mixed[0]} +/- {mixed[1]}")
+            print(output[0])
+            final = np.array(mixed)
+            print(f"Final {n}: {final[0]} +/- {final[1]}")
+        except ValueError:
+            final = np.array([np.NaN, np.NaN])
+        temp.append(final)
+    return temp
 
 
 if args.catalogue == "sdss":
