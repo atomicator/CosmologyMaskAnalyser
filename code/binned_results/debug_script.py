@@ -296,6 +296,7 @@ for mask_name in mask_names:
     #print(thread_objects[0].get())
 
     for n in NSIDES:
+        print(n)
         thread_objects[index] = pool.apply_async(toolkit.run_nside, (n, data_set, mask, filter_set, a, cat, weight_function, convert_to_mask_frac))
         index += 1
 
