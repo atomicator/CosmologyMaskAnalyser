@@ -162,7 +162,7 @@ ax = fig.add_subplot(111)
 run_const = False
 weight_function = weights.scatter
 mask_names = ["planck_modified_point"]"""
-
+"""
 # Old version of code (single threaded)
 print("Using old version of code\n")
 for mask_name in mask_names:
@@ -245,10 +245,9 @@ for mask_name in mask_names:
         results.append(final)
     results = np.array(results).transpose()
     result_set.append(results)
-# new version (multithreaded)
-
-print("test")
 """
+# new version (multithreaded)
+print("Using new version of code")
 for mask_name in mask_names:
     mask = toolkit.load_mask(mask_name, raise_dir)
     mask.set_fig_ax(fig, ax)
@@ -311,7 +310,7 @@ for mask_name in mask_names:
 
     results = np.array(results).transpose()
     result_set.append(results)
-"""
+
 print(result_set)
 plt.clf()
 fig = plt.figure()
