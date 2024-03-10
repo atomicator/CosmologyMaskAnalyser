@@ -784,6 +784,8 @@ def run_nside(n, data_set, mask, filter_set, a, cat, weight_function, convert_to
             hp.ud_grade(data_set[3], n)
         ))
         binmap = HealpixBinMap(n)
+        print(np.min(cat.lon_lat[0]), np.max(cat.lon_lat[0]))
+        print(np.min(cat.lon_lat[1]), np.max(cat.lon_lat[1]))
         binmap.bin_catalogue(cat)
         binmap.load_catalogue(cat)
         output = binmap.divide_sample(mask, data, False, filter_set, a)

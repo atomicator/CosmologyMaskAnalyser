@@ -158,22 +158,6 @@ line_colors = ["xkcd:electric blue", "red", "xkcd:grass green", "purple"]
 fig = plt.figure()
 ax = fig.add_subplot(111)
 
-random_mask = toolkit.load_mask("act_point")
-point_mask = toolkit.load_mask("act_point", raise_dir=raise_dir)
-temp1 = toolkit.load_mask("sdss_mask", raise_dir=raise_dir)
-temp1.map = np.int_(temp1.map)
-#temp2 = toolkit.load_mask("act_point", raise_dir=args.raise_dir)
-temp1.map = 1 - temp1.map
-overdensity_mask = toolkit.CombinationMask(temp1, point_mask, invert=True, use_and=False)
-random_points = toolkit.gen_random_coords(400000, random_mask).transpose()[::-1]
-bias_points = toolkit.gen_random_coords(len(random_points) * 0.02 * 0.05 * 5, overdensity_mask).transpose()[::-1]
-plt.scatter(*random_points.transpose()[::-1], marker="+")
-plt.show()
-plt.scatter(*bias_points.transpose()[::-1], marker="+")
-plt.show()
-cat = toolkit.StarCatalogue()
-cat.lon_lat = np.append(random_points, bias_points[:int(len(random_points) * 0.05 * 0.02)], axis=0)
-
 """NSIDES = [32]
 run_const = False
 weight_function = weights.scatter
