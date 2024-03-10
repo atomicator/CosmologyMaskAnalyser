@@ -250,7 +250,7 @@ for mask_name in mask_names:
 print("Using new version of code")
 
 
-def run_const(data_set, mask, filter_set, a, weight_function, convert_to_mask_frac):
+def run_const(): # Note: These don't work if variables are passed as parameters, I don't know why
     data = np.array((
         np.mean(data_set[0]),
         np.mean(data_set[1]),
@@ -273,7 +273,7 @@ def run_const(data_set, mask, filter_set, a, weight_function, convert_to_mask_fr
     return final
 
 
-def run_nside(n, data_set, mask, filter_set, a, weight_function, convert_to_mask_frac):
+def run_nside(n):
     try:
         data = np.array((
             hp.ud_grade(data_set[0], n),
@@ -342,8 +342,7 @@ for mask_name in mask_names:
     print("running const")
     if run_const:
         #thread_objects[index] = pool.apply_async(toolkit.run_const, (data_set, mask, filter_set, a, cat, weight_function, convert_to_mask_frac))
-        thread_objects[index] = pool.apply_async(run_const, (data_set, mask, filter_set, a, weight_function,
-                                                             convert_to_mask_frac))
+        thread_objects[index] = pool.apply_async(run_const)
         index += 1
 
     print("running everything else")
@@ -353,8 +352,7 @@ for mask_name in mask_names:
     for n in NSIDES:
         print(n)
         #thread_objects[index] = pool.apply_async(toolkit.run_nside, (n, data_set, mask, filter_set, a, cat, weight_function, convert_to_mask_frac))
-        thread_objects[index] = pool.apply_async(run_nside, (n, data_set, mask, filter_set, a, weight_function,
-                                                             convert_to_mask_frac))
+        thread_objects[index] = pool.apply_async(run_nside, (n,))
         index += 1
 
     print("all running")
