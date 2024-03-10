@@ -304,6 +304,8 @@ for mask_name in mask_names:
     print("all running")
     #print(thread_objects)
 
+    pool.close()
+
     for i in range(x_len):
         results[i] = thread_objects[i].get()
         print(results[i])
