@@ -24,7 +24,7 @@ NSIDES = [1, 2, 4, 8, 16, 32, 64, 128, 256]
 
 def test_function():
     global data_set
-    sky_mask_frac = 0.015567657065637092
+    sky_mask_frac = 0.009859934289099422
     random_points = toolkit.gen_random_coords(args.target, random_mask)[::-1].transpose()[::-1]
     bias_points = toolkit.gen_random_coords(len(random_points) * args.overdensity * sky_mask_frac * 5, overdensity_mask)[::-1].transpose()[::-1]
     #print(np.shape(random_points), np.shape(bias_points))
