@@ -61,6 +61,8 @@ def func():
     print(np.sum(random_mask.lookup_point(*cat.lon_lat.transpose()[::-1])) / len(cat.lon_lat))
     print(np.sum(point_mask.lookup_point(*cat.lon_lat.transpose()[::-1])) / len(cat.lon_lat))
     print(np.sum(point_mask.lookup_point(*bias_points.transpose()[::-1])) / len(bias_points))
+    print(np.min(cat.lon_lat[0]), np.max(cat.lon_lat[0]))
+    print(np.min(cat.lon_lat[1]), np.max(cat.lon_lat[1]))
     return toolkit.run_nside(args.nside, data_set, point_mask, filter_set, 0, cat,
                              weights.excess_measurement, False)
 
