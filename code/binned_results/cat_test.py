@@ -53,7 +53,7 @@ data = (
 final = data
 print((0.015567657065637092 + 0.05) * 401074 * data[1] / (data[1] + data[3]))
 #print(0.05 * 401074)
-# ACT: 0.02024328631080069
+# ACT: 0.015567657065637092
 #data = (
 #    np.mean(toolkit.load_mask("planck_modified_point").map),
 #    np.mean(toolkit.load_mask("planck_modified_galactic").map)
