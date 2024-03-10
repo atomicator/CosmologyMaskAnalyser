@@ -1,9 +1,9 @@
 import matplotlib.pyplot as plt
-
 from toolkit import toolkit, weights
 import argparse
 import multiprocessing.pool
 import numpy as np
+import healpy as hp
 
 
 parser = argparse.ArgumentParser()
@@ -65,8 +65,26 @@ def func():
     print(np.min(cat.lon_lat[0]), np.max(cat.lon_lat[0]))
     print(np.min(cat.lon_lat[1]), np.max(cat.lon_lat[1]))
     #cat.lon_lat = cat.lon_lat.transpose()
-    return toolkit.run_nside(args.nside, data_set, point_mask, filter_set, 0, cat,
-                             weights.excess_measurement, False)
+    try:
+        data = np.array((
+            hp.ud_grade(data_set[0], args.nside),
+            hp.ud_grade(data_set[1], args.nside),
+            hp.ud_grade(data_set[2], args.nside),
+            hp.ud_grade(data_set[3], args.nside)
+        ))
+        binmap = toolkit.HealpixBinMap(args.nside)
+        binmap.bin_catalogue(cat)
+        binmap.load_catalogue(cat)
+        output = binmap.divide_sample(point_mask, data, False, filter_set, 0)
+        mixed = weights.excess_measurement(*output[1:])
+        print(f"Mixed {args.nside}: {mixed[0]} +/- {mixed[1]}")
+        print(output[0])
+        final = np.array(mixed)
+        print(f"Final {args.nside}: {final[0]} +/- {final[1]}")
+    except ValueError:
+        final = np.array([np.NaN, np.NaN])
+    # results.append(final)
+    return final
 
 
 for i in range(args.iterations):
