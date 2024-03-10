@@ -777,6 +777,7 @@ def run_const(data_set, mask, filter_set, a, cat, weight_function, convert_to_ma
 
 def run_nside(n, data_set, mask, filter_set, a, cat, weight_function, convert_to_mask_frac):
     try:
+        print(f"Shape: {np.shape(cat.lon_lat)}")
         data = np.array((
             hp.ud_grade(data_set[0], n),
             hp.ud_grade(data_set[1], n),
