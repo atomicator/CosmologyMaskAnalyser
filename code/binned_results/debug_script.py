@@ -164,7 +164,8 @@ weight_function = weights.scatter
 mask_names = ["planck_modified_point"]"""
 
 # Old version of code (single threaded)
-"""for mask_name in mask_names:
+print("Using old version of code")
+for mask_name in mask_names:
     mask = toolkit.load_mask(mask_name, raise_dir)
     mask.set_fig_ax(fig, ax)
     if data_mask == "full_sky":
@@ -243,9 +244,11 @@ mask_names = ["planck_modified_point"]"""
             final = np.array([np.NaN, np.NaN])
         results.append(final)
     results = np.array(results).transpose()
-    result_set.append(results)"""
+    result_set.append(results)
 # new version (multithreaded)
 
+print("test")
+"""
 for mask_name in mask_names:
     mask = toolkit.load_mask(mask_name, raise_dir)
     mask.set_fig_ax(fig, ax)
@@ -284,19 +287,23 @@ for mask_name in mask_names:
         f.append((1 - np.sum(mask.lookup_point(*cat.lon_lat.transpose())) / len(cat.lon_lat)) * 100)
     else:
         f.append(0)
-    print(f"{mask_name}: f = {f[-1]}")
+    #print(f"{mask_name}: f = {f[-1]}")
+    print("running const")
     if run_const:
         thread_objects[index] = pool.apply_async(toolkit.run_const, (data_set, mask, filter_set, a, cat, weight_function, convert_to_mask_frac))
         index += 1
 
-    print(thread_objects)
+    print("running everything else")
+    #print(thread_objects)
     #print(thread_objects[0].get())
 
     for n in NSIDES:
+        print(n)
         thread_objects[index] = pool.apply_async(toolkit.run_nside, (n, data_set, mask, filter_set, a, cat, weight_function, convert_to_mask_frac))
         index += 1
 
-    print(thread_objects)
+    print("all running")
+    #print(thread_objects)
 
     for i in range(x_len):
         results[i] = thread_objects[i].get()
@@ -304,7 +311,7 @@ for mask_name in mask_names:
 
     results = np.array(results).transpose()
     result_set.append(results)
-
+"""
 print(result_set)
 plt.clf()
 fig = plt.figure()
