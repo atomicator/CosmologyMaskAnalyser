@@ -24,7 +24,6 @@ NSIDES = [1, 2, 4, 8, 16, 32, 64, 128]
 
 def test_function():
     global data_set
-    sky_mask_frac = 0.009859934289099422
     random_points = toolkit.gen_random_coords(args.target, random_mask)[::-1].transpose()[::-1]
     bias_points = toolkit.gen_random_coords(len(random_points) * args.overdensity * sky_mask_frac * 5, overdensity_mask)[::-1].transpose()[::-1]
     #print(np.shape(random_points), np.shape(bias_points))
@@ -98,6 +97,21 @@ if args.data_mask == "sdss_act":
         toolkit.HealpyMask("../" * args.raise_dir + f"code/binned_results/sdss_mask_act_point_256_2.fits").map,
         toolkit.HealpyMask("../" * args.raise_dir + f"code/binned_results/sdss_mask_act_point_256_3.fits").map,
         toolkit.HealpyMask("../" * args.raise_dir + f"code/binned_results/sdss_mask_act_point_256_4.fits").map
+    )))
+    filter_set = "n_only"
+elif args.data_mask == "sdss_planck":
+    point_mask = toolkit.load_mask("planck_modified_point", raise_dir=args.raise_dir)
+    temp1 = toolkit.load_mask("sdss_mask", raise_dir=args.raise_dir)
+    temp1.map = np.int_(temp1.map)
+    # temp2 = toolkit.load_mask("act_point", raise_dir=args.raise_dir)
+    temp1.map = 1 - temp1.map
+    overdensity_mask = toolkit.CombinationMask(temp1, point_mask, invert=True, use_and=False)
+    sky_mask_frac = 0.0138443493342983
+    data_set = np.float_(np.array((
+        toolkit.HealpyMask("../" * args.raise_dir + f"code/binned_results/sdss_mask_planck_modified_point_256_1.fits").map,
+        toolkit.HealpyMask("../" * args.raise_dir + f"code/binned_results/sdss_mask_planck_modified_point_256_2.fits").map,
+        toolkit.HealpyMask("../" * args.raise_dir + f"code/binned_results/sdss_mask_planck_modified_point_256_3.fits").map,
+        toolkit.HealpyMask("../" * args.raise_dir + f"code/binned_results/sdss_mask_planck_modified_point_256_4.fits").map
     )))
     filter_set = "n_only"
 else:
