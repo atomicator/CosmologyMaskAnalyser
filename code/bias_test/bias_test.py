@@ -107,11 +107,13 @@ elif args.data_mask == "sdss_planck":
     temp1.map = 1 - temp1.map
     overdensity_mask = toolkit.CombinationMask(temp1, point_mask, invert=True, use_and=False)
     sky_mask_frac = 0.0138443493342983
+    sdss_mask = toolkit.load_mask("sdss_mask", args.raise_dir)
+    temp = point_mask.map + 1j * sdss_mask.map
     data_set = np.float_(np.array((
-        toolkit.HealpyMask("../" * args.raise_dir + f"code/binned_results/sdss_mask_planck_modified_point_256_1.fits").map,
-        toolkit.HealpyMask("../" * args.raise_dir + f"code/binned_results/sdss_mask_planck_modified_point_256_2.fits").map,
-        toolkit.HealpyMask("../" * args.raise_dir + f"code/binned_results/sdss_mask_planck_modified_point_256_3.fits").map,
-        toolkit.HealpyMask("../" * args.raise_dir + f"code/binned_results/sdss_mask_planck_modified_point_256_4.fits").map
+        temp == 0,
+        temp == 1j,
+        temp == 1,
+        temp == 1 + 1j
     )))
     filter_set = "n_only"
 else:
