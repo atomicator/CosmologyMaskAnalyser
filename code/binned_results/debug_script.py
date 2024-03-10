@@ -287,18 +287,19 @@ for mask_name in mask_names:
     else:
         f.append(0)
     #print(f"{mask_name}: f = {f[-1]}")
+    print("running const")
     if run_const:
         thread_objects[index] = pool.apply_async(toolkit.run_const, (data_set, mask, filter_set, a, cat, weight_function, convert_to_mask_frac))
         index += 1
-
-    print(thread_objects)
+    print("running everything else")
+    #print(thread_objects)
     #print(thread_objects[0].get())
 
     for n in NSIDES:
         thread_objects[index] = pool.apply_async(toolkit.run_nside, (n, data_set, mask, filter_set, a, cat, weight_function, convert_to_mask_frac))
         index += 1
 
-    print(thread_objects)
+    #print(thread_objects)
 
     for i in range(x_len):
         results[i] = thread_objects[i].get()
