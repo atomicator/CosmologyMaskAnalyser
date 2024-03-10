@@ -250,7 +250,7 @@ for mask_name in mask_names:
 print("Using new version of code")
 
 
-def run_const():
+def run_const(data_set, mask, filter_set, a, weight_function, convert_to_mask_frac):
     data = np.array((
         np.mean(data_set[0]),
         np.mean(data_set[1]),
@@ -273,7 +273,7 @@ def run_const():
     return final
 
 
-def run_nside(n):
+def run_nside(n, data_set, mask, filter_set, a, weight_function, convert_to_mask_frac):
     try:
         data = np.array((
             hp.ud_grade(data_set[0], n),
@@ -342,7 +342,8 @@ for mask_name in mask_names:
     print("running const")
     if run_const:
         #thread_objects[index] = pool.apply_async(toolkit.run_const, (data_set, mask, filter_set, a, cat, weight_function, convert_to_mask_frac))
-        thread_objects[index] = pool.apply_async(run_const)
+        thread_objects[index] = pool.apply_async(run_const, (data_set, mask, filter_set, a, weight_function,
+                                                             convert_to_mask_frac))
         index += 1
 
     print("running everything else")
@@ -352,13 +353,14 @@ for mask_name in mask_names:
     for n in NSIDES:
         print(n)
         #thread_objects[index] = pool.apply_async(toolkit.run_nside, (n, data_set, mask, filter_set, a, cat, weight_function, convert_to_mask_frac))
-        thread_objects[index] = pool.apply_async(run_nside, (n,))
+        thread_objects[index] = pool.apply_async(run_nside, (n, data_set, mask, filter_set, a, weight_function,
+                                                             convert_to_mask_frac))
         index += 1
 
     print("all running")
     #print(thread_objects)
 
-    pool.close()
+    #pool.close()
 
     for i in range(x_len):
         results[i] = thread_objects[i].get()
