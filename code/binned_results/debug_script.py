@@ -246,6 +246,8 @@ mask_names = ["planck_modified_point"]"""
     result_set.append(results)"""
 # new version (multithreaded)
 
+print("test")
+
 for mask_name in mask_names:
     mask = toolkit.load_mask(mask_name, raise_dir)
     mask.set_fig_ax(fig, ax)
