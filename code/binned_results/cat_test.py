@@ -50,7 +50,7 @@ data = (
 )
 #point_masked_fraction = data[0] + data[1]
 #final = point_masked_fraction / (1 - galactic_masked_fraction)
-final = data
+final =  data[1] / (data[1] + data[3])
 print((0.015567657065637092 + 0.05) * 401074 * data[1] / (data[1] + data[3]))
 #print(0.05 * 401074)
 # ACT: 0.015567657065637092
