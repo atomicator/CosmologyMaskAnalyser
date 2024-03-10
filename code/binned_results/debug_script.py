@@ -164,7 +164,7 @@ weight_function = weights.scatter
 mask_names = ["planck_modified_point"]"""
 
 # Old version of code (single threaded)
-print("Using old version of code\n")
+print("Using old version of code")
 for mask_name in mask_names:
     mask = toolkit.load_mask(mask_name, raise_dir)
     mask.set_fig_ax(fig, ax)
