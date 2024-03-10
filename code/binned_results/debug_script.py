@@ -143,7 +143,7 @@ NSIDES = [1, 2, 4, 8, 16, 32, 64, 128]
 #NSIDES = [1]
 #NSIDES = [1, 2, 4, 8, 16, 32, 64, 128, 256]
 #NSIDES = [2, 8, 32]
-run_const = True
+run_const = False
 x_len = len(NSIDES)
 if run_const:
     x_len += 1
