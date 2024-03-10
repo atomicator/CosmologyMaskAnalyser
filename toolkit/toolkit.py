@@ -753,14 +753,14 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="
     print(np.min(data1 + data2 + data3 + data4), np.max(data1 + data2 + data3 + data4))
 
 
-def run_const(data_set, mask, filter_set, a, cat):
+def run_const(data_set, mask, filter_set, a, cat, weight_function, convert_to_mask_frac):
     data = np.array((
         np.mean(data_set[0]),
         np.mean(data_set[1]),
         np.mean(data_set[2]),
         np.mean(data_set[3])
     ))
-    binmap = toolkit.ConstantMap()
+    binmap = ConstantMap()
     binmap.bin_catalogue(cat)
     binmap.load_catalogue(cat)
     output = binmap.divide_sample(mask, data, True, filter_set, a)
@@ -796,7 +796,7 @@ def run_nside(n, data_set, mask, filter_set, a, cat, weight_function, convert_to
         else:
             final = np.array(mixed)
         print(f"Final {n}: {final[0]} +/- {final[1]}")
-    except ValueError:
+    except NotMaskError:
         final = np.array([np.NaN, np.NaN])
     #results.append(final)
     return final
