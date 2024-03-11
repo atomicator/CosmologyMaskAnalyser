@@ -34,12 +34,21 @@ lower = np.median(results[results < median])
 print(upper, median, lower)
 """
 
-data = (
+"""data = (
     np.mean(toolkit.HealpyMask("./sdss_mask_planck_modified_point_256_1.fits").map),
     np.mean(toolkit.HealpyMask("./sdss_mask_planck_modified_point_256_2.fits").map),
     np.mean(toolkit.HealpyMask("./sdss_mask_planck_modified_point_256_3.fits").map),
     np.mean(toolkit.HealpyMask("./sdss_mask_planck_modified_point_256_4.fits").map)
-)
+)"""
+point_mask = toolkit.load_mask("planck_modified_point", 2)
+sdss_mask = toolkit.load_mask("sdss_mask", 2)
+temp = point_mask.map + 1j * sdss_mask.map
+data = np.float_(np.array((
+    np.mean(np.float_(temp == 0)),
+    np.mean(np.float_(temp == 1j)),
+    np.mean(np.float_(temp == 1)),
+    np.mean(np.float_(temp == 1 + 1j))
+)))
 """
 galactic_masked_fraction = data[0] + data[1]"""
 """

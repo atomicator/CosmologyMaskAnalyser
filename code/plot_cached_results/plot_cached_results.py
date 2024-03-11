@@ -28,7 +28,7 @@ save_path = "test.png"
 #files = ["./act_r/min/act_excess.npy", "./act_r/min/act_r_min_1.npy", "./act_r/min/act_r_min_2.npy",
 #         "./act_r/min/act_r_min_3.npy", "./act_r/min/act_r_min_4.npy"]
 
-files = ["./act_r/min/act_excess.npy", "./act_r/min/act_r_min_1.npy"]
+#files = ["./act_r/min/act_excess.npy", "./act_r/min/act_r_min_1.npy"]
 
 #title = "The excess of the Planck point mask, as a function of minimum richness"
 #save_path = "./planck_min_richness.png"
@@ -53,10 +53,13 @@ title = "The excess of the Planck point mask, as a function of minimum redshift"
 labels = [r"All results", "$z > 0.319$", "$z > 0.319$", "$z > 0.420$", "$z > 0.489$", "$z > 0.500$"]
 #labels = ["test"]
 
+files = ["./../../code/binned_results/planck_excess.npy"]
+
 y_axis_label = "Excess"
 
 for file in files[::-1]:
     result_set = np.load(file)
+    print(result_set)
     color = line_colors[files.index(file)]
     error_bar_color = error_bar_colors[files.index(file)]
     label = labels[files.index(file)]
