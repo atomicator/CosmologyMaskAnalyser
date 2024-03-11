@@ -12,7 +12,7 @@ ax = fig.add_subplot(111)
 error_bar_colors = ["xkcd:aqua blue", "orange", "xkcd:mint green", "pink"]
 line_colors = ["xkcd:electric blue", "red", "xkcd:grass green", "purple"]
 
-labels = ["test1", "test2"]
+labels = ["Error on mean", "Deviation"]
 
 mean = np.zeros(len(data[0]))
 variance = np.zeros(len(data[0]))
@@ -53,7 +53,7 @@ ax.set_xticks([0.5] + NSIDES, ["C"] + NSIDES)
 ax.legend()
 ax.set_xlabel("NSIDE")
 ax.set_ylabel("Excess")
-ax.set_title(f"Title")
-plt.savefig("test.png")
+ax.set_title(f"Biased Planck data, 64 iterations")
+plt.savefig("planck_bias.png")
 plt.show()
 
