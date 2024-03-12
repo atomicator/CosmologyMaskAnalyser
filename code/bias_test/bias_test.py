@@ -82,12 +82,12 @@ else:
     raise ValueError
 
 if args.data_mask == "sdss_act":
-    point_mask = toolkit.load_mask("act_point", raise_dir=args.raise_dir)
-    temp1 = toolkit.load_mask("sdss_mask", raise_dir=args.raise_dir)
+    point_mask = multiprocessing.managers.BaseManager.toolkit.load_mask("act_point", raise_dir=args.raise_dir)
+    temp1 = multiprocessing.managers.BaseManager.toolkit.load_mask("sdss_mask", raise_dir=args.raise_dir)
     temp1.map = np.int_(temp1.map)
     #temp2 = toolkit.load_mask("act_point", raise_dir=args.raise_dir)
     temp1.map = 1 - temp1.map
-    overdensity_mask = toolkit.CombinationMask(temp1, point_mask, invert=True, use_and=False)
+    overdensity_mask = multiprocessing.managers.BaseManager.toolkit.CombinationMask(temp1, point_mask, invert=True, use_and=False)
     sky_mask_frac = 0.009859934289099422
     data_set = np.float_(np.array((
         toolkit.HealpyMask("../" * args.raise_dir + f"code/binned_results/sdss_mask_act_point_256_1.fits").map,
