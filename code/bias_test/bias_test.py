@@ -28,7 +28,7 @@ def test_function():
     random_points = toolkit.gen_random_coords(args.target, random_mask)[::-1].transpose()
     #bias_points = toolkit.gen_random_coords(len(random_points) * args.overdensity * sky_mask_frac * 5, overdensity_mask)[::-1].transpose()
     bias_points = toolkit.gen_random_coords(args.target * args.overdensity, random_mask)[::-1].transpose()
-    bias_points = bias_points[:, point_mask.lookup_point(*bias_points.transpose()) == 0]
+    bias_points = bias_points[point_mask.lookup_point(*bias_points.transpose()) == 0]
     cat = toolkit.StarCatalogue()
     cat.lon_lat = np.append(random_points, bias_points[:int(len(random_points) * args.overdensity * sky_mask_frac)], axis=0)
     temp = []
