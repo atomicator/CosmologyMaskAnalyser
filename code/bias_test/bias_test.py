@@ -22,24 +22,15 @@ args = parser.parse_args()
 
 NSIDES = [1, 2, 4, 8, 16, 32, 64, 128]
 
+
 def test_function():
     global data_set
-    random_points = toolkit.gen_random_coords(args.target, random_mask)[::-1].transpose()[::-1]
-    bias_points = toolkit.gen_random_coords(len(random_points) * args.overdensity * sky_mask_frac * 5, overdensity_mask)[::-1].transpose()[::-1]
-    #print(np.shape(random_points), np.shape(bias_points))
-    #print(np.min(random_points[:, 0]), np.max(random_points[:, 0]))
-    #print(np.min(random_points[:, 1]), np.max(random_points[:, 1]))
-    #print(np.min(bias_points[0]), np.max(bias_points[0]))
-    #print(np.min(bias_points[1]), np.max(bias_points[1]))
+    random_points = toolkit.gen_random_coords(args.target, random_mask)[::-1].transpose()
+    #bias_points = toolkit.gen_random_coords(len(random_points) * args.overdensity * sky_mask_frac * 5, overdensity_mask)[::-1].transpose()
+    bias_points = toolkit.gen_random_coords(args.target * args.overdensity, random_mask)[::-1].transpose()
+    bias_points = bias_points[:, point_mask.lookup_point(*bias_points) == 0]
     cat = toolkit.StarCatalogue()
     cat.lon_lat = np.append(random_points, bias_points[:int(len(random_points) * args.overdensity * sky_mask_frac)], axis=0)
-    #print(np.shape(cat.lon_lat))
-    #print(np.sum(random_mask.lookup_point(*cat.lon_lat.transpose()[::1])) / len(cat.lon_lat))
-    #print(np.sum(point_mask.lookup_point(*cat.lon_lat.transpose()[::1])) / len(cat.lon_lat))
-    #print(np.sum(point_mask.lookup_point(*bias_points.transpose()[::1])) / len(bias_points))
-    #print(np.min(cat.lon_lat[0]), np.max(cat.lon_lat[0]))
-    #print(np.min(cat.lon_lat[1]), np.max(cat.lon_lat[1]))
-    #cat.lon_lat = cat.lon_lat.transpose()
     temp = []
     data = np.array((
         np.mean(data_set[0]),
@@ -56,6 +47,7 @@ def test_function():
     final = np.array(mixed)
     print(f"Final C: {final[0]} +/- {final[1]}")
     temp.append(final)
+    exit()
     for n in NSIDES:
         try:
             data = np.array((
