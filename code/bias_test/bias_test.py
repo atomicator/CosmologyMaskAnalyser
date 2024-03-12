@@ -23,6 +23,10 @@ args = parser.parse_args()
 
 NSIDES = [1, 2, 4, 8, 16, 32, 64, 128]
 
+multiprocessing.managers.BaseManager.register("HealpyMask", toolkit.HealpyMask)
+multiprocessing.managers.BaseManager.register("PixellMask", toolkit.PixellMask)
+multiprocessing.managers.BaseManager.register("CombinationMask", toolkit.CombinationMask)
+
 
 def test_function():
     global data_set
@@ -111,10 +115,6 @@ elif args.data_mask == "sdss_planck":
     filter_set = "n_only"
 else:
     raise ValueError
-
-multiprocessing.managers.BaseManager.register("HealpyMask", toolkit.HealpyMask)
-multiprocessing.managers.BaseManager.register("PixellMask", toolkit.PixellMask)
-multiprocessing.managers.BaseManager.register("CombinationMask", toolkit.CombinationMask)
 
 pool = multiprocessing.pool.Pool(processes=args.threads, initializer=random.seed)
 threads = []
