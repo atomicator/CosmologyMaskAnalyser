@@ -5,6 +5,7 @@ import multiprocessing.pool
 import numpy as np
 import healpy as hp
 import random
+import multiprocessing.managers
 
 
 parser = argparse.ArgumentParser()
@@ -110,6 +111,10 @@ elif args.data_mask == "sdss_planck":
     filter_set = "n_only"
 else:
     raise ValueError
+
+multiprocessing.managers.BaseManager.register("HealpyMask", toolkit.HealpyMask)
+multiprocessing.managers.BaseManager.register("PixellMask", toolkit.PixellMask)
+multiprocessing.managers.BaseManager.register("CombinationMask", toolkit.CombinationMask)
 
 pool = multiprocessing.pool.Pool(processes=args.threads, initializer=random.seed)
 threads = []
