@@ -131,16 +131,16 @@ overdensities = np.linspace(0, 0.2, 21)
 j = 0
 
 for overdensity in overdensities:
-    threads.append([])
+    temp = []
     for i in range(args.iterations):
-        threads[j].append(pool.apply_async(test_function, args=(True, overdensity)))
-    j += 1
+        temp.append(pool.apply_async(test_function, args=(True, overdensity)))
+    threads.append(temp)
 
 results = np.zeros(np.shape(threads))
 
 for j in range(len(results)):
     for i in range(len(results[j])):
-        results[i, j] = threads[i][j].get()
+        results[j, i] = threads[j][i].get()
 
 print(results)
 results = np.array(results)
