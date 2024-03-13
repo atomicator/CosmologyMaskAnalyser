@@ -5,7 +5,6 @@ import multiprocessing.pool
 import numpy as np
 import healpy as hp
 import random
-import multiprocessing.managers
 
 
 parser = argparse.ArgumentParser()
@@ -19,23 +18,20 @@ parser.add_argument("--iterations", type=int, default=1)
 parser.add_argument("--target", type=int, default=400000)
 parser.add_argument("--data_mask", default="sdss_act")
 parser.add_argument("--overdensity", type=float, default=0.05)
+parser.add_argument("--const_only", type=bool, default=True)
 args = parser.parse_args()
 
 NSIDES = [1, 2, 4, 8, 16, 32, 64, 128]
 
-multiprocessing.managers.BaseManager.register("HealpyMask", toolkit.HealpyMask)
-multiprocessing.managers.BaseManager.register("PixellMask", toolkit.PixellMask)
-multiprocessing.managers.BaseManager.register("CombinationMask", toolkit.CombinationMask)
 
-
-def test_function():
+def test_function(const_only=True, overdensity=args.overdensity):
     global data_set
     random_points = toolkit.gen_random_coords(args.target, random_mask)[::-1].transpose()
     #bias_points = toolkit.gen_random_coords(len(random_points) * args.overdensity * sky_mask_frac * 5, overdensity_mask)[::-1].transpose()
-    bias_points = toolkit.gen_random_coords(args.target * args.overdensity, random_mask)[::-1].transpose()
+    bias_points = toolkit.gen_random_coords(args.target * overdensity, random_mask)[::-1].transpose()
     bias_points = bias_points[point_mask.lookup_point(*bias_points.transpose()) == 0]
     cat = toolkit.StarCatalogue()
-    cat.lon_lat = np.append(random_points, bias_points[:int(len(random_points) * args.overdensity * sky_mask_frac)], axis=0)
+    cat.lon_lat = np.append(random_points, bias_points[:int(len(random_points) * overdensity * sky_mask_frac)], axis=0)
     temp = []
     data = np.array((
         np.mean(data_set[0]),
@@ -52,27 +48,27 @@ def test_function():
     final = np.array(mixed)
     print(f"Final C: {final[0]} +/- {final[1]}")
     temp.append(final)
-    return final
-    for n in NSIDES:
-        try:
-            data = np.array((
-                hp.ud_grade(data_set[0], n),
-                hp.ud_grade(data_set[1], n),
-                hp.ud_grade(data_set[2], n),
-                hp.ud_grade(data_set[3], n)
-            ))
-            binmap = toolkit.HealpixBinMap(n)
-            binmap.bin_catalogue(cat)
-            binmap.load_catalogue(cat)
-            output = binmap.divide_sample(point_mask, data, False, filter_set, 0)
-            mixed = weights.excess_measurement(*output[1:])
-            print(f"Mixed {n}: {mixed[0]} +/- {mixed[1]}")
-            print(output[0])
-            final = np.array(mixed)
-            print(f"Final {n}: {final[0]} +/- {final[1]}")
-        except ValueError:
-            final = np.array([np.NaN, np.NaN])
-        temp.append(final)
+    if not const_only:
+        for n in NSIDES:
+            try:
+                data = np.array((
+                    hp.ud_grade(data_set[0], n),
+                    hp.ud_grade(data_set[1], n),
+                    hp.ud_grade(data_set[2], n),
+                    hp.ud_grade(data_set[3], n)
+                ))
+                binmap = toolkit.HealpixBinMap(n)
+                binmap.bin_catalogue(cat)
+                binmap.load_catalogue(cat)
+                output = binmap.divide_sample(point_mask, data, False, filter_set, 0)
+                mixed = weights.excess_measurement(*output[1:])
+                print(f"Mixed {n}: {mixed[0]} +/- {mixed[1]}")
+                print(output[0])
+                final = np.array(mixed)
+                print(f"Final {n}: {final[0]} +/- {final[1]}")
+            except ValueError:
+                final = np.array([np.NaN, np.NaN])
+            temp.append(final)
     return temp
 
 
@@ -82,12 +78,12 @@ else:
     raise ValueError
 
 if args.data_mask == "sdss_act":
-    point_mask = multiprocessing.managers.BaseManager.toolkit.load_mask("act_point", raise_dir=args.raise_dir)
-    temp1 = multiprocessing.managers.BaseManager.toolkit.load_mask("sdss_mask", raise_dir=args.raise_dir)
+    point_mask = toolkit.load_mask("act_point", raise_dir=args.raise_dir)
+    temp1 = toolkit.load_mask("sdss_mask", raise_dir=args.raise_dir)
     temp1.map = np.int_(temp1.map)
     #temp2 = toolkit.load_mask("act_point", raise_dir=args.raise_dir)
     temp1.map = 1 - temp1.map
-    overdensity_mask = multiprocessing.managers.BaseManager.toolkit.CombinationMask(temp1, point_mask, invert=True, use_and=False)
+    overdensity_mask = toolkit.CombinationMask(temp1, point_mask, invert=True, use_and=False)
     sky_mask_frac = 0.009859934289099422
     data_set = np.float_(np.array((
         toolkit.HealpyMask("../" * args.raise_dir + f"code/binned_results/sdss_mask_act_point_256_1.fits").map,
@@ -118,8 +114,7 @@ else:
 
 pool = multiprocessing.pool.Pool(processes=args.threads, initializer=random.seed)
 threads = []
-
-
+"""
 for i in range(args.iterations):
     threads.append(pool.apply_async(test_function))
 
@@ -130,6 +125,23 @@ for i in range(args.iterations):
 results = []
 for thread in threads:
     results.append(thread.get())
+"""
+
+overdensities = np.linspace(0, 0.2, 21)
+j = 0
+
+for overdensity in overdensities:
+    threads.append([])
+    for i in range(args.iterations):
+        threads[j].append(pool.apply_async(test_function, args=(True, overdensity)))
+    j += 1
+
+results = np.zeros(np.shape(threads))
+
+for j in range(len(results)):
+    for i in range(len(results[j])):
+        results[i, j] = threads[i][j].get()
+
 print(results)
 results = np.array(results)
 np.save(args.save_path, results)
