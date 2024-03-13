@@ -139,9 +139,9 @@ for overdensity in overdensities:
 print(threads)
 results = []
 
-for j in range(len(results)):
+for j in range(len(threads)):
     temp = []
-    for i in range(len(results[j])):
+    for i in range(len(threads[j])):
         temp.append(threads[j][i].get())
     results.append(temp)
 results = np.array(results)
