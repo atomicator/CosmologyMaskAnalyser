@@ -136,11 +136,14 @@ for overdensity in overdensities:
         temp.append(pool.apply_async(test_function, args=(True, overdensity)))
     threads.append(temp)
 
-results = np.zeros(np.shape(threads))
+results = []
 
 for j in range(len(results)):
+    temp = []
     for i in range(len(results[j])):
-        results[j, i] = threads[j][i].get()
+        temp.append(threads[j][i].get())
+    results.append(temp)
+results = np.array(results)
 
 print(results)
 results = np.array(results)
