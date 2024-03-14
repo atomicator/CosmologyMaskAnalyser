@@ -136,6 +136,7 @@ elif data_mask == "full_sky":
     labels = ["Planck Total", "Planck Galactic"]
 elif data_mask == "sdss_act_lon_shift":
     mask_names = ["act_point_lon_test"]
+    labels = ["ACT point shifted"]
 else:
     raise ValueError
 
