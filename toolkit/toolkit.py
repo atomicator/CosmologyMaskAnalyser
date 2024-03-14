@@ -48,7 +48,7 @@ class __Mask(object):  # overwite this with pixell and healpy specific versions
 
 
 class PixellMask(__Mask):
-    def __init__(self, path, step=1, mask_using_latlon=True, invert=True, **kwargs):
+    def __init__(self, path, step=1, mask_using_latlon=True, invert=True, lon_shift=None, **kwargs):
         # Load data from fits file
         self.imap = pixell.enmap.read_fits(path, **kwargs)
         self.map = np.array(self.imap)
@@ -63,6 +63,7 @@ class PixellMask(__Mask):
         self.ax = None
         self.mask_using_latlon = mask_using_latlon
         self.invert = invert
+        self.lon_shift = False
 
     def update_angle_range(self, lat_min=-90, lat_max=90, lon_min=0, lon_max=360):
         self.lat_min = lat_min
@@ -75,6 +76,10 @@ class PixellMask(__Mask):
             c = astropy.coordinates.SkyCoord(lon, lat, unit="deg", frame="galactic")  # convert to galactic co ords
             lon = c.icrs.ra.degree
             lat = c.icrs.dec.degree
+        if self.lon_shift:
+            lon += self.lon_shift
+            lon[lon > 180] -= 360
+            lon[lon < -180] += 360
         # point = self.map[np.int_(((90 + lat) / 180) * self.x), np.int_(((lon - 180) / 360) * self.y)]
         pix = np.int_(pixell.enmap.sky2pix(self.imap.shape, self.imap.wcs, np.array((lat, lon)) * np.pi / 180))
         point = np.zeros(np.shape(pix)[1:])
@@ -699,7 +704,7 @@ class HealpixBinMap(_BinMap):
         self.weighted_map = self.map * inverted_fraction_map
 
 
-def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="", res=int(1e4)):
+def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="", write=True):
     """pix = np.linspace(0, NSIDE_internal - 1, NSIDE_internal)
     print(mask1.NSIDE, mask2.NSIDE)
     sum = mask1.map + 1j * mask2.map
@@ -736,8 +741,6 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="
     sum = mask1.lookup_point(*points) + 1j * mask2.lookup_point(*points)
     mask1_masked = mask1.lookup_point(*points) == 0.0
     mask2_masked = mask2.lookup_point(*points) == 0.0
-    print(np.shape(sum))
-    print(sum)
     """data1 = hp.ud_grade(sum == 0.0, NSIDE)
     data2 = hp.ud_grade(sum == 1.0, NSIDE)
     data3 = hp.ud_grade(sum == 1j, NSIDE)
@@ -747,12 +750,12 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="
     data3 = hp.ud_grade(np.float_(np.bitwise_and(mask1_masked, np.bitwise_not(mask2_masked))), NSIDE)
     data4 = hp.ud_grade(np.float_(np.bitwise_and(np.bitwise_not(mask1_masked), np.bitwise_not(mask2_masked))), NSIDE)
     results = np.float_(np.array([data1, data2, data3, data4]))
-    hp.fitsfunc.write_map(f"./{name}_{NSIDE}_1.fits", results[0], overwrite=True)
-    hp.fitsfunc.write_map(f"./{name}_{NSIDE}_2.fits", results[1], overwrite=True)
-    hp.fitsfunc.write_map(f"./{name}_{NSIDE}_3.fits", results[2], overwrite=True)
-    hp.fitsfunc.write_map(f"./{name}_{NSIDE}_4.fits", results[3], overwrite=True)
-    print(results)
-    print(np.min(data1 + data2 + data3 + data4), np.max(data1 + data2 + data3 + data4))
+    if write:
+        hp.fitsfunc.write_map(f"./{name}_{NSIDE}_1.fits", results[0], overwrite=True)
+        hp.fitsfunc.write_map(f"./{name}_{NSIDE}_2.fits", results[1], overwrite=True)
+        hp.fitsfunc.write_map(f"./{name}_{NSIDE}_3.fits", results[2], overwrite=True)
+        hp.fitsfunc.write_map(f"./{name}_{NSIDE}_4.fits", results[3], overwrite=True)
+    return results
 
 
 def run_const(data_set, mask, filter_set, a, cat, weight_function, convert_to_mask_frac):
@@ -831,7 +834,7 @@ def get_header_info(hdu_list):
         print(hdu.header)
 
 
-def load_mask(mask, raise_dir=2, nside=8, invert=False):
+def load_mask(mask, raise_dir=2, nside=8, invert=False, **kwargs):
     value = None
     if mask == "planck_galactic":
         # value = HealpyMask("../" * raise_dir + "data/HFI_PCCS_SZ-selfunc-union-survey_R2.08.fits", mask_using_latlon=True, hdu=1, partial=False)
@@ -895,7 +898,7 @@ def load_mask(mask, raise_dir=2, nside=8, invert=False):
         final_filter = CombinationMask(act_mask, test, use_and=False, invert=False)
         value = CombinationMask(act_graph_filter, final_filter, use_and=True, invert=False)
     elif mask == "act_point":
-        act_mask = PixellMask("../" * raise_dir + "data/ACT_mask.fits", hdu=1, invert=False, mask_using_latlon=False)
+        act_mask = PixellMask("../" * raise_dir + "data/ACT_mask.fits", hdu=1, invert=False, mask_using_latlon=False, **kwargs)
         galactic_mask = load_mask("act_galactic", raise_dir, nside, invert)
         galactic_mask.invert = True
         value = CombinationMask(act_mask, galactic_mask, use_and=False)

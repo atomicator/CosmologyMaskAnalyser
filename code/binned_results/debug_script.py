@@ -18,6 +18,7 @@ parser.add_argument("--max_z", type=float, default=20.0)
 parser.add_argument("--max_r", type=float, default=10000.0)
 parser.add_argument("--data_mask", default="sdss_act")
 parser.add_argument("--mask_set", default="both")
+parser.add_argument("--mask_lon_shift", type=float, default=5.0)
 args = parser.parse_args()
 
 def filter(redshift, richness):
@@ -133,6 +134,8 @@ elif data_mask == "sdss_act":
 elif data_mask == "full_sky":
     mask_names = ["planck_point_test", "planck_galactic_test"]
     labels = ["Planck Total", "Planck Galactic"]
+elif data_mask == "sdss_act_lon_shift":
+    mask_names = ["act_point_lon_test"]
 else:
     raise ValueError
 
@@ -301,7 +304,10 @@ def run_nside(n):
 
 
 for mask_name in mask_names:
-    mask = toolkit.load_mask(mask_name, raise_dir)
+    if mask_name == "act_point_lon_test":
+        mask = toolkit.load_mask("act_point", lon_shift=args.lon_shift)
+    else:
+        mask = toolkit.load_mask(mask_name, raise_dir)
     mask.set_fig_ax(fig, ax)
     if data_mask == "full_sky":
         data_set = np.array((
@@ -326,6 +332,9 @@ for mask_name in mask_names:
             toolkit.HealpyMask("../" * raise_dir + f"code/binned_results/sdss_mask_{mask_name}_256_3.fits").map,
             toolkit.HealpyMask("../" * raise_dir + f"code/binned_results/sdss_mask_{mask_name}_256_4.fits").map
         )))
+    elif data_mask == "sdss_act_lon_shift":
+        sdss_mask = toolkit.load_mask("sdss_mask", raise_dir)
+        data_set = toolkit.gen_mask_comparison_map(sdss_mask, mask)
     else:
         raise ValueError
 
