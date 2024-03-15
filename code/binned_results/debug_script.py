@@ -307,6 +307,7 @@ def run_nside(n):
 for mask_name in mask_names:
     if mask_name == "act_point_lon_test":
         mask = toolkit.load_mask("act_point", raise_dir=raise_dir, lon_shift=args.lon_shift)
+        print(f"Shift: {mask.lon_shift}")
     else:
         mask = toolkit.load_mask(mask_name, raise_dir)
     mask.set_fig_ax(fig, ax)
@@ -334,7 +335,7 @@ for mask_name in mask_names:
             toolkit.HealpyMask("../" * raise_dir + f"code/binned_results/sdss_mask_{mask_name}_256_4.fits").map
         )))
     elif data_mask == "sdss_act_lon_shift":
-        sdss_mask = toolkit.load_mask("sdss_mask", raise_dir, lon_shift=args.lon_shift)
+        sdss_mask = toolkit.load_mask("sdss_mask", raise_dir)
         data_set = toolkit.gen_mask_comparison_map(sdss_mask, mask, write=False)
     else:
         raise ValueError
