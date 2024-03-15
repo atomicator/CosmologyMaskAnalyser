@@ -834,7 +834,7 @@ def get_header_info(hdu_list):
         print(hdu.header)
 
 
-def load_mask(mask, raise_dir=2, nside=8, invert=False, **kwargs):
+def load_mask(mask, raise_dir=2, nside=8, invert=False, lon_shift=0.0, **kwargs):
     value = None
     if mask == "planck_galactic":
         # value = HealpyMask("../" * raise_dir + "data/HFI_PCCS_SZ-selfunc-union-survey_R2.08.fits", mask_using_latlon=True, hdu=1, partial=False)
@@ -898,8 +898,8 @@ def load_mask(mask, raise_dir=2, nside=8, invert=False, **kwargs):
         final_filter = CombinationMask(act_mask, test, use_and=False, invert=False)
         value = CombinationMask(act_graph_filter, final_filter, use_and=True, invert=False)
     elif mask == "act_point":
-        act_mask = PixellMask("../" * raise_dir + "data/ACT_mask.fits", hdu=1, invert=False, mask_using_latlon=False, **kwargs)
-        galactic_mask = load_mask("act_galactic", raise_dir, nside, invert)
+        act_mask = PixellMask("../" * raise_dir + "data/ACT_mask.fits", hdu=1, invert=False, mask_using_latlon=False, lon_shift=lon_shift)
+        galactic_mask = load_mask("act_galactic", raise_dir, nside, invert, lon_shift=lon_shift)
         galactic_mask.invert = True
         value = CombinationMask(act_mask, galactic_mask, use_and=False)
     else:
