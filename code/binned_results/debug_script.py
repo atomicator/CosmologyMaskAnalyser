@@ -307,7 +307,6 @@ def run_nside(n):
 for mask_name in mask_names:
     if mask_name == "act_point_lon_test":
         mask = toolkit.load_mask("act_point", raise_dir=raise_dir, lon_shift=args.lon_shift)
-        print(f"Shift: {mask.lon_shift}")
     else:
         mask = toolkit.load_mask(mask_name, raise_dir)
     mask.set_fig_ax(fig, ax)
