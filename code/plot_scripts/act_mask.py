@@ -43,11 +43,11 @@ act_graph_filter.map = np.load("../../data/act_galactic_mask_array.npy")
 test = SquareMaskFilter((-10, 20), (40, 100), lonlat=False)
 final_filter = toolkit.CombinationMask(act_mask, test, use_and=False, invert=False)
 galactic_mask = toolkit.CombinationMask(act_graph_filter, final_filter, use_and=True, invert=False)"""
-galactic_mask = toolkit.load_mask("act_galactic")
+#galactic_mask = toolkit.load_mask("act_galactic")
 
-plot_mask = galactic_mask
-plot_mask.set_fig_ax(fig, ax)
-plot_mask.plot(cbar=False, label="Galactic", cmap="bwr", show=False, clear=False)
+#plot_mask = galactic_mask
+#plot_mask.set_fig_ax(fig, ax)
+#plot_mask.plot(cbar=False, label="Galactic", cmap="bwr", show=False, clear=False)
 
 # Point mask
 """galactic_mask.invert = True
@@ -56,15 +56,22 @@ point_mask = toolkit.load_mask("act_point")
 
 plot_mask = point_mask
 plot_mask.set_fig_ax(fig, ax)
-plot_mask.plot(cbar=False, label="Galactic", cmap="bwr_r", show=False, clear=False)
+plot_mask.plot(cbar=False, label="1", cmap="bwr", show=False, clear=False)
+#print(plot_mask.lon_shift)
+
+point_mask = toolkit.load_mask("act_point", lon_shift=25.0)
+plot_mask = point_mask
+plot_mask.set_fig_ax(fig, ax)
+plot_mask.plot(cbar=False, label="2", cmap="bwr_r", show=False, clear=False)
+#print(plot_mask.lon_shift)
 
 plt.ylabel("Latitude")
 plt.xlabel("Longitude")
 plt.title(r"The \enquote{Galactic} and \enquote{Point} components of the ACT mask")
-
+#plt.legend()
 #plt.ylabel("Declination")
 #plt.xlabel("Right Ascension")
 #plt.title(r"The ACT mask with the fill filter")
 
-plt.savefig("act_mask_final_lat_lon.png")
+#plt.savefig("act_mask_final_lat_lon.png")
 plt.show()

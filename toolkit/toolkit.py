@@ -63,7 +63,7 @@ class PixellMask(__Mask):
         self.ax = None
         self.mask_using_latlon = mask_using_latlon
         self.invert = invert
-        self.lon_shift = False
+        self.lon_shift = lon_shift
 
     def update_angle_range(self, lat_min=-90, lat_max=90, lon_min=0, lon_max=360):
         self.lat_min = lat_min
@@ -880,7 +880,7 @@ def load_mask(mask, raise_dir=2, nside=8, invert=False, lon_shift=0.0, **kwargs)
         planck_only.NPIX = hp.nside2npix(nside)
         return planck_only
     elif mask.lower() == "act":
-        value = PixellMask("../" * raise_dir + "data/ACT_mask.fits", hdu=1, mask_using_latlon=False, invert=invert)
+        value = PixellMask("../" * raise_dir + "data/ACT_mask.fits", hdu=1, lon_shift=lon_shift, mask_using_latlon=False, invert=invert)
     elif mask == "sdss_planck_point_only":
         mask1 = load_mask("sdss_mask", raise_dir)
         mask2 = load_mask("planck_modified_point", raise_dir)
