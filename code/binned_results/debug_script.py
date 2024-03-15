@@ -335,7 +335,7 @@ for mask_name in mask_names:
         )))
     elif data_mask == "sdss_act_lon_shift":
         sdss_mask = toolkit.load_mask("sdss_mask", raise_dir)
-        data_set = toolkit.gen_mask_comparison_map(sdss_mask, mask, write=False)
+        data_set = toolkit.gen_mask_comparison_map(sdss_mask, mask, write=False, NSIDE=128, NSIDE_internal=1024)
     else:
         raise ValueError
 
