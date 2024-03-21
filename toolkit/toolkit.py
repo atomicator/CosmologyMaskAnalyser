@@ -359,8 +359,12 @@ class StarCatalogue(object):
                 lon = self.data.field('GLON')
                 lat = self.data.field('GLAT')
             except KeyError:
-                dec = self.data.field('DEC')
-                ra = self.data.field('RA')
+                try:
+                    dec = self.data.field('DEC')
+                    ra = self.data.field('RA')
+                except KeyError:
+                    dec = self.data.field('decDeg')
+                    ra = self.data.field('RADeg')
                 c = astropy.coordinates.SkyCoord(ra, dec, unit="deg")  # convert to galactic co ords
                 lon = c.galactic.l.degree
                 lat = c.galactic.b.degree

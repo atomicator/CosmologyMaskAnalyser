@@ -50,10 +50,17 @@ title = "The excess of the Planck point mask, as a function of minimum redshift"
 #labels = [r"$\lambda < 10$", r"$10 < \lambda < 20$", r"$20 < \lambda < 50$", r"$50 < \lambda < 100$", r"$100 < \lambda$"]
 #labels = [r"All results", r"$10 < \lambda$", r"$20 < \lambda$", r"$50 < \lambda$", r"$100 < \lambda$"]
 #labels = [r"$\lambda < 10$", r"$10 < \lambda < 20$", r"$20 < \lambda < 50$", r"$50 < \lambda < 100$", r"$100 < \lambda$"]
-labels = [r"All results", "$z > 0.319$", "$z > 0.319$", "$z > 0.420$", "$z > 0.489$", "$z > 0.500$"]
+#labels = [r"All results", "$z > 0.319$", "$z > 0.319$", "$z > 0.420$", "$z > 0.489$", "$z > 0.500$"]
 #labels = ["test"]
 
-files = ["./../../code/binned_results/planck_excess.npy"]
+#files = ["./../../code/binned_results/planck_excess.npy"]
+
+#files = ["./act_r/min/act_excess.npy", "./rotations/rot_10.npy", "./rotations/rot_20.npy", "./rotations/rot_30.npy", "./rotations/rot_40.npy", ]
+#labels = [0, 10, 20, 30, 40]
+files = ["./act_r/min/act_excess.npy", "./rotations/rot_1.npy", "./rotations/rot_2.npy", "./rotations/rot_3.npy", "./rotations/rot_4.npy", ]
+labels = [0, 1, 2, 3, 4]
+title = "ACT Rotation"
+
 
 y_axis_label = "Excess"
 

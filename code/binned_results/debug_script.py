@@ -261,6 +261,7 @@ def run_const(): # Note: These don't work if variables are passed as parameters,
         np.mean(data_set[2]),
         np.mean(data_set[3])
     ))
+    print(data)
     binmap = toolkit.ConstantMap()
     binmap.bin_catalogue(cat)
     binmap.load_catalogue(cat)
