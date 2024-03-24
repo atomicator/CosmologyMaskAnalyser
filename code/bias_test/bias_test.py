@@ -18,8 +18,8 @@ parser.add_argument("--iterations", type=int, default=1)
 parser.add_argument("--target", type=int, default=400000)
 parser.add_argument("--data_mask", default="sdss_act")
 parser.add_argument("--overdensity", type=float, default=0.05)
-parser.add_argument("--const_only", type=bool, default=True)
-parser.add_argument("--invert_bias", type=bool, default=False)
+parser.add_argument("--const_only", default=False, type=lambda x: (str(x).lower() == 'true'))
+parser.add_argument("--invert_bias", default=False, type=lambda x: (str(x).lower() == 'true'))
 args = parser.parse_args()
 
 NSIDES = [1, 2, 4, 8, 16, 32, 64, 128]
