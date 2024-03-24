@@ -24,6 +24,7 @@ args = parser.parse_args()
 
 NSIDES = [1, 2, 4, 8, 16, 32, 64, 128]
 
+print(args.const_only)
 
 def test_function(const_only=args.const_only, overdensity=args.overdensity):
     global data_set
