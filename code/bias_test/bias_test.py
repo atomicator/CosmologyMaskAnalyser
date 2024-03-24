@@ -76,6 +76,7 @@ def test_function(const_only=args.const_only, overdensity=args.overdensity):
             except ValueError:
                 final = np.array([np.NaN, np.NaN])
             temp.append(final)
+    print(temp)
     return temp
 
 
