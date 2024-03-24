@@ -37,7 +37,8 @@ def test_function(const_only=args.const_only, overdensity=args.overdensity):
         bias_points = bias_points[point_mask.lookup_point(*bias_points.transpose()) != 0]
     print(len(bias_points))
     cat = toolkit.StarCatalogue()
-    cat.lon_lat = np.append(random_points, bias_points[:int(len(random_points) * overdensity * sky_mask_frac)], axis=0)
+    #cat.lon_lat = np.append(random_points, bias_points[:int(len(random_points) * overdensity * sky_mask_frac)], axis=0)
+    cat.lon_lat = np.append(random_points, bias_points, axis=0)
     temp = []
     data = np.array((
         np.mean(data_set[0]),
