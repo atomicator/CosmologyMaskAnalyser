@@ -27,6 +27,7 @@ NSIDES = [1, 2, 4, 8, 16, 32, 64, 128]
 
 def test_function(const_only=args.const_only, overdensity=args.overdensity):
     global data_set
+    print(const_only)
     random_points = toolkit.gen_random_coords(args.target, random_mask)[::-1].transpose()
     #bias_points = toolkit.gen_random_coords(len(random_points) * args.overdensity * sky_mask_frac * 5, overdensity_mask)[::-1].transpose()
     bias_points = toolkit.gen_random_coords(args.target * overdensity, random_mask)[::-1].transpose()
