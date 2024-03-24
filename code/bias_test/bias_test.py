@@ -34,6 +34,7 @@ def test_function(const_only=True, overdensity=args.overdensity):
         bias_points = bias_points[point_mask.lookup_point(*bias_points.transpose()) == 0]
     else:
         bias_points = bias_points[point_mask.lookup_point(*bias_points.transpose()) == 1]
+    print(len(bias_points))
     cat = toolkit.StarCatalogue()
     cat.lon_lat = np.append(random_points, bias_points[:int(len(random_points) * overdensity * sky_mask_frac)], axis=0)
     temp = []
@@ -118,7 +119,7 @@ else:
 
 pool = multiprocessing.pool.Pool(processes=args.threads, initializer=random.seed)
 threads = []
-"""
+
 for i in range(args.iterations):
     threads.append(pool.apply_async(test_function))
 
@@ -140,7 +141,7 @@ for overdensity in overdensities:
         temp.append(pool.apply_async(test_function, args=(True, overdensity)))
     threads.append(temp)
 
-print(threads)
+#print(threads)
 results = []
 
 for j in range(len(threads)):
@@ -148,7 +149,7 @@ for j in range(len(threads)):
     for i in range(len(threads[j])):
         temp.append(threads[j][i].get())
     results.append(temp)
-results = np.array(results)
+results = np.array(results)"""
 
 print(results)
 results = np.array(results)
