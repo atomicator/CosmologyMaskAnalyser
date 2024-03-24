@@ -78,6 +78,7 @@ def test_function(const_only=args.const_only, overdensity=args.overdensity):
                 final = np.array([np.NaN, np.NaN])
             finally:
                 temp.append(final)
+    temp = np.array(temp)
     print(temp)
     return temp
 
@@ -156,6 +157,7 @@ for j in range(len(threads)):
     results.append(temp)
 results = np.array(results)"""
 
-print(results)
+
 results = np.array(results)
+print(results)
 np.save(args.save_path, results)
