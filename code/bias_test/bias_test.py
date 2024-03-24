@@ -75,7 +75,8 @@ def test_function(const_only=args.const_only, overdensity=args.overdensity):
                 print(f"Final {n}: {final[0]} +/- {final[1]}")
             except ValueError:
                 final = np.array([np.NaN, np.NaN])
-            temp.append(final)
+            finally:
+                temp.append(final)
     print(temp)
     return temp
 
