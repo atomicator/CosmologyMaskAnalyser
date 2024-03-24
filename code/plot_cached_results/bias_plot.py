@@ -57,3 +57,8 @@ ax.set_title(f"Biased Planck data, 64 iterations")
 plt.savefig("planck_bias.png")
 plt.show()
 
+# To do:
+# Regenerate random catalogue
+# Gen random catalogue with negative excess
+# Add other catalogues to plot
+# Create scatter from ACT data and pipeline

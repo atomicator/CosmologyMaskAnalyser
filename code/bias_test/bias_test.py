@@ -19,6 +19,7 @@ parser.add_argument("--target", type=int, default=400000)
 parser.add_argument("--data_mask", default="sdss_act")
 parser.add_argument("--overdensity", type=float, default=0.05)
 parser.add_argument("--const_only", type=bool, default=True)
+parser.add_argument("--invert_bias", type=bool, default=False)
 args = parser.parse_args()
 
 NSIDES = [1, 2, 4, 8, 16, 32, 64, 128]
@@ -29,7 +30,10 @@ def test_function(const_only=True, overdensity=args.overdensity):
     random_points = toolkit.gen_random_coords(args.target, random_mask)[::-1].transpose()
     #bias_points = toolkit.gen_random_coords(len(random_points) * args.overdensity * sky_mask_frac * 5, overdensity_mask)[::-1].transpose()
     bias_points = toolkit.gen_random_coords(args.target * overdensity, random_mask)[::-1].transpose()
-    bias_points = bias_points[point_mask.lookup_point(*bias_points.transpose()) == 0]
+    if not args.invert_bias:
+        bias_points = bias_points[point_mask.lookup_point(*bias_points.transpose()) == 0]
+    else:
+        bias_points = bias_points[point_mask.lookup_point(*bias_points.transpose()) == 1]
     cat = toolkit.StarCatalogue()
     cat.lon_lat = np.append(random_points, bias_points[:int(len(random_points) * overdensity * sky_mask_frac)], axis=0)
     temp = []
