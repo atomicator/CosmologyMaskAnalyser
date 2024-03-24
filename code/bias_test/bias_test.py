@@ -22,7 +22,8 @@ parser.add_argument("--const_only", default=False, type=lambda x: (str(x).lower(
 parser.add_argument("--invert_bias", default=False, type=lambda x: (str(x).lower() == 'true'))
 args = parser.parse_args()
 
-NSIDES = [1, 2, 4, 8, 16, 32, 64, 128]
+#NSIDES = [1, 2, 4, 8, 16, 32, 64, 128]
+NSIDES = [1, 2, 4, 8, 16]
 
 print(args.const_only)
 
