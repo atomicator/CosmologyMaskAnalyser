@@ -6,6 +6,8 @@ python3 ../code/binned_results/debug_script.py --save_path="rot_3.png" --lon_shi
 python3 ../code/binned_results/debug_script.py --save_path="rot_4.png" --lon_shift=4.0 --data_mask="sdss_act_lon_shift" --raise_path=1 --catalogue="sdss_filtered" --min_r=34.297874262894396 &
 python3 ../code/binned_results/debug_script.py --save_path="rot_5.png" --lon_shift=5.0 --data_mask="sdss_act_lon_shift" --raise_path=1 --catalogue="sdss_filtered" --min_r=34.297874262894396 &
 
+wait
+
 python3 ../code/binned_results/debug_script.py --save_path="rot_10.png" --lon_shift=10.0 --data_mask="sdss_act_lon_shift" --raise_path=1 --catalogue="sdss_filtered" --min_r=34.297874262894396 &
 python3 ../code/binned_results/debug_script.py --save_path="rot_15.png" --lon_shift=15.0 --data_mask="sdss_act_lon_shift" --raise_path=1 --catalogue="sdss_filtered" --min_r=34.297874262894396 &
 python3 ../code/binned_results/debug_script.py --save_path="rot_20.png" --lon_shift=20.0 --data_mask="sdss_act_lon_shift" --raise_path=1 --catalogue="sdss_filtered" --min_r=34.297874262894396 &
@@ -19,6 +21,8 @@ python3 ../code/binned_results/debug_script.py --save_path="rot_50.png" --lon_sh
 python3 ../code/binned_results/debug_script.py --save_path="rot_60.png" --lon_shift=60.0 --data_mask="sdss_act_lon_shift" --raise_path=1 --catalogue="sdss_filtered" --min_r=34.297874262894396 &
 python3 ../code/binned_results/debug_script.py --save_path="rot_70.png" --lon_shift=70.0 --data_mask="sdss_act_lon_shift" --raise_path=1 --catalogue="sdss_filtered" --min_r=34.297874262894396 &
 python3 ../code/binned_results/debug_script.py --save_path="rot_80.png" --lon_shift=80.0 --data_mask="sdss_act_lon_shift" --raise_path=1 --catalogue="sdss_filtered" --min_r=34.297874262894396 &
+
+wait
 
 python3 ../code/binned_results/debug_script.py --save_path="rot_90.png" --lon_shift=90.0 --data_mask="sdss_act_lon_shift" --raise_path=1 --catalogue="sdss_filtered" --min_r=34.297874262894396 &
 python3 ../code/binned_results/debug_script.py --save_path="rot_100.png" --lon_shift=100.0 --data_mask="sdss_act_lon_shift" --raise_path=1 --catalogue="sdss_filtered" --min_r=34.297874262894396 &
