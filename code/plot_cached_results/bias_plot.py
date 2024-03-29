@@ -4,10 +4,14 @@ from toolkit import toolkit
 
 toolkit.plt_use_tex()
 
-data = np.load("./bias_data/bias_test_planck.npy")
+data = np.load("./bias_data/invert_bias(1).npy")
 
 fig = plt.figure()
 ax = fig.add_subplot(111)
+
+print(data)
+
+print(np.shape(data))
 
 error_bar_colors = ["xkcd:aqua blue", "orange", "xkcd:mint green", "pink"]
 line_colors = ["xkcd:electric blue", "red", "xkcd:grass green", "purple"]
@@ -45,7 +49,7 @@ ax.plot(x, mean, color=line_colors[0])
 ax.set_xscale("log", base=2)
 ax.set_xlim(1/2 * np.sqrt(1/2), NSIDES[-1] * np.sqrt(2))
 
-ax.plot([1/2, NSIDES[-1]], np.ones(2) * 0.05, color="k")
+ax.plot([1/2, NSIDES[-1]], np.ones(2) * -.05, color="k")
 ax.set_xticks([0.5] + NSIDES, ["C"] + NSIDES)
 
 #plt.ylim(-0.005, 0.005)
@@ -53,8 +57,8 @@ ax.set_xticks([0.5] + NSIDES, ["C"] + NSIDES)
 ax.legend()
 ax.set_xlabel("NSIDE")
 ax.set_ylabel("Excess")
-ax.set_title(f"Biased Planck data, 64 iterations")
-plt.savefig("planck_bias.png")
+ax.set_title(f"Biased ACT data, 100 realisations")
+plt.savefig("ACT_negative_bias.png")
 plt.show()
 
 # To do:

@@ -62,7 +62,7 @@ print(act_noise)
 
 #exit()
 
-"""
+
 sdss_cat = toolkit.load_catalogue("sdss")
 sdss_data = []
 sdss_cat.load_with_selection(test, ("LAMBDA_CHISQ",), True)
@@ -70,19 +70,19 @@ sdss_data = np.array(sdss_data)
 sdss_height = np.zeros(len(bins) - 1)
 for i in range(len(bins) - 1):
     sdss_height[i] = np.sum(np.float_(np.bitwise_and(sdss_data > bins[i], sdss_data < bins[i + 1]))) / (len(sdss_data) / 100)
-plt.stairs(sdss_height, bins, label="SDSS")
+#plt.stairs(sdss_height, bins, label="SDSS")
 
-sdss_cat = toolkit.StarCatalogue("../../data/DR5_cluster-catalog_v1.1.fits", hdu=1, table=True)
-sdss_data = []
-sdss_cat.load_with_selection(test, ("RM_LAMBDA", "RMDESY3_LAMBDA_CHISQ", "CAMIRA_N_mem"), True)
-sdss_data = np.array(sdss_data)
-sdss_height = np.zeros(len(bins) - 1)
-for i in range(len(bins) - 1):
-    sdss_height[i] = np.sum(np.float_(np.bitwise_and(sdss_data > bins[i], sdss_data < bins[i + 1]))) / (len(sdss_data) / 100)
-plt.stairs(sdss_height, bins, label="ACT")
-print(np.sum(sdss_height))
-print(np.min(sdss_data), np.max(sdss_data))
-print(np.sum(sdss_data < 0))"""
+#sdss_cat = toolkit.StarCatalogue("../../data/DR5_cluster-catalog_v1.1.fits", hdu=1, table=True)
+#sdss_data = []
+#sdss_cat.load_with_selection(test, ("RM_LAMBDA", "RMDESY3_LAMBDA_CHISQ", "CAMIRA_N_mem"), True)
+#sdss_data = np.array(sdss_data)
+#sdss_height = np.zeros(len(bins) - 1)
+#for i in range(len(bins) - 1):
+#    sdss_height[i] = np.sum(np.float_(np.bitwise_and(sdss_data > bins[i], sdss_data < bins[i + 1]))) / (len(sdss_data) / 100)
+#plt.stairs(sdss_height, bins, label="ACT")
+#print(np.sum(sdss_height))
+#print(np.min(sdss_data), np.max(sdss_data))
+#print(np.sum(sdss_data < 0))
 
 min_richness = 0
 sdss_cat = toolkit.load_catalogue("sdss")
@@ -146,12 +146,12 @@ act_cat = toolkit.StarCatalogue("../../data/DR5_cluster-catalog_v1.1.fits", hdu=
 
 
 plt.legend()
-plt.title("The cluster count of the catalogues, as a function of redshift")
+plt.title("The cluster count of the catalogues, as a function of ACT SNR")
 #plt.yscale("log")
 plt.ylabel("Percentage")
 plt.xlabel("SNR")
 
-
+"""
 act_cat = toolkit.StarCatalogue("../../data/DR5_cluster-catalog_v1.1.fits", hdu=1, table=True)
 sdss_richness = []
 sdss_snr = []
@@ -166,7 +166,7 @@ def load_act_richness(flag, richness, snr, redshift):
         sdss_redshift.append(redshift)
 
 
-"""act_cat.load_with_selection(load_act_richness, ("RM", "RM_LAMBDA", "SNR", "redshift"), True)
+act_cat.load_with_selection(load_act_richness, ("RM", "RM_LAMBDA", "fixed_SNR", "redshift"), True)
 sdss_snr = np.array(sdss_snr)
 sdss_richness = np.array(sdss_richness)
 sdss_redshift = np.array(sdss_redshift)
@@ -184,8 +184,13 @@ print(sdss_mass_200_m)
 new_mass = np.array(new_mass)
 y_0 = mass_to_act_y0(new_mass, sdss_redshift)
 snr = y_0 / act_noise
-plt.scatter(sdss_snr, snr, marker="+")
-plt.plot((0, 40), (0, 40))
-plt.xlim(0, 40)
-plt.ylim(0, 40)"""
+plt.scatter(sdss_snr, sdss_richness, marker="+")
+#plt.plot((0, 40), (0, 40), color="k")
+#plt.xlim(0, 40)
+#plt.ylim(0, 40)
+plt.title("Matching clusters with both SNR and richness measurements")
+plt.xlabel("ACT measured SNR")
+#plt.ylabel("SDSS richness, mapped to ACT SNR")
+plt.ylabel("SDSS richness")"""
+plt.savefig("ACT_SNR.png", dpi=1000)
 plt.show()
