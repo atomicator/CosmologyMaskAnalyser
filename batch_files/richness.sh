@@ -21,6 +21,6 @@
 #python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered" --weight_function="excess" --save_path="./planck_r_min_4.png" --min_r=100.0 --mask_set="point" --data_mask="sdss_planck" &
 
 python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered" --weight_function="excess" --save_path="./planck_r_min_crit.png" --min_r=34.297874262894396 --mask_set="both" --data_mask="sdss_planck" &
-python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered" --weight_function="excess" --save_path="./act_r_min_crit.png" --min_r=34.297874262894396 --mask_set="both" --data_mask="sdss_act" &
+python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered"  --weight_function="excess" --save_path="./act_r_min_crit.png" --min_r=34.297874262894396 --mask_set="both" --data_mask="sdss_act" &
 
 wait

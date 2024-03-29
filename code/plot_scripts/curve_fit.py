@@ -72,19 +72,22 @@ print(popt_two, np.sqrt(np.diag(pcov_two)))
 print(f"Chi^2: {np.sum(np.square((linear_two_d((log_richness, log_z), *popt_two) - log_snr) / log_s_err))}")
 print(f"Chi^2 / N: {np.sum(np.square((linear_two_d((log_richness, log_z), *popt_two) - log_snr) / log_s_err)) / len(snr)}")
 
+plt.scatter(log_snr, linear_one_d(log_richness, *popt_one), marker="+", color="r")
+plt.plot((1.5, 3.5), (1.5, 3.5))
+
 bins = np.linspace(0, 25, 51)
 sdss_height = np.zeros(len(bins) - 1)
 for i in range(len(bins) - 1):
     sdss_height[i] = np.sum(np.float_(np.bitwise_and(snr > bins[i], snr < bins[i + 1])))
 sdss_height = 100 * sdss_height / np.sum(sdss_height)
-plt.stairs(sdss_height, bins, label="ACT, complete")
+#plt.stairs(sdss_height, bins, label="ACT, complete")
 print(np.sum(sdss_height))
 sdss_height = np.zeros(len(bins) - 1)
 snr = snr[snr > 5]
 for i in range(len(bins) - 1):
     sdss_height[i] = np.sum(np.float_(np.bitwise_and(snr > bins[i], snr < bins[i + 1])))
 sdss_height = 100 * sdss_height / np.sum(sdss_height)
-plt.stairs(sdss_height, bins, label="ACT, SNR > 5")
+#plt.stairs(sdss_height, bins, label="ACT, SNR > 5")
 print(np.sum(sdss_height))
 
 min_richness = 0
@@ -103,7 +106,7 @@ sdss_height = np.zeros(len(bins) - 1)
 for i in range(len(bins) - 1):
     sdss_height[i] = np.sum(np.float_(np.bitwise_and(snr > bins[i], snr < bins[i + 1])))
 sdss_height = 100 * sdss_height / np.sum(sdss_height)
-plt.stairs(sdss_height, bins, label="SDSS, complete")
+#plt.stairs(sdss_height, bins, label="SDSS, complete")
 
 min_richness = np.exp((np.log(5) - popt_one[0]) / popt_one[1])
 print(min_richness)
@@ -114,15 +117,21 @@ sdss_cat.load_with_selection(load_richness_redshift, ("LAMBDA_CHISQ", "Z"), True
 sdss_redshift = np.array(sdss_redshift)
 sdss_richness = np.array(sdss_richness)
 snr = np.exp(linear_one_d(np.log(sdss_richness), *popt_one))
+print(f"N: {len(snr)}")
 sdss_height = np.zeros(len(bins) - 1)
 for i in range(len(bins) - 1):
     sdss_height[i] = np.sum(np.float_(np.bitwise_and(snr > bins[i], snr < bins[i + 1])))
 sdss_height = 100 * sdss_height / np.sum(sdss_height)
-plt.stairs(sdss_height, bins, label=r"SDSS, $\lambda > \lambda_{min}$")
+#plt.stairs(sdss_height, bins, label=r"SDSS, $\lambda > \lambda_{min}$")
 
 plt.legend()
-plt.title("The cluster count of the catalogues, as a function of ACT SNR")
+#plt.title("The cluster count of the catalogues, as a function of ACT SNR")
 #plt.yscale("log")
-plt.ylabel("Percentage")
-plt.xlabel("SNR")
+#plt.ylabel("Percentage")
+#plt.xlabel("SNR")
+
+plt.xlabel("ln SNR")
+plt.ylabel("ln f(richness)")
+plt.title("Measured vs mapped SNR")
+
 plt.show()
