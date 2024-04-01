@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 import scipy
 from toolkit import toolkit
 
+toolkit.plt_use_tex()
+
 
 def load_act_richness(flag, cluster_richness, cluster_snr, cluster_redshift, y_error, y):
     if flag == 0.0:
@@ -23,6 +25,10 @@ def linear_two_d(x, alpha, beta, gamma):
     return alpha + x[0] * beta + x[1] * gamma
 
 
+def power_law_two(x, alpha, beta, gamma, delta):
+    return alpha * x ** beta + gamma * x ** delta
+
+
 def load_richness_redshift(richness, redshift):
     if richness <= min_richness:
         return False
@@ -30,6 +36,11 @@ def load_richness_redshift(richness, redshift):
         sdss_richness.append(richness)
         sdss_redshift.append(redshift)
         return True
+
+
+def exponential(x, alpha, beta):
+    return alpha * np.exp(x * beta)
+
 
 min_richness = 0
 act_cat = toolkit.StarCatalogue("../../data/DR5_cluster-catalog_v1.1.fits", hdu=1, table=True)
@@ -72,8 +83,79 @@ print(popt_two, np.sqrt(np.diag(pcov_two)))
 print(f"Chi^2: {np.sum(np.square((linear_two_d((log_richness, log_z), *popt_two) - log_snr) / log_s_err))}")
 print(f"Chi^2 / N: {np.sum(np.square((linear_two_d((log_richness, log_z), *popt_two) - log_snr) / log_s_err)) / len(snr)}")
 
-plt.scatter(log_snr, linear_one_d(log_richness, *popt_one), marker="+", color="r")
-plt.plot((1.5, 3.5), (1.5, 3.5))
+popt_three, pcov_three = scipy.optimize.curve_fit(power_law_two, log_richness, log_snr, sigma=log_s_err)
+
+print(popt_three, np.sqrt(np.diag(pcov_three)))
+print(f"Chi^2: {np.sum(np.square((power_law_two(log_richness, *popt_three) - log_snr) / log_s_err))}")
+print(f"Chi^2 / N: {np.sum(np.square((power_law_two(log_richness, *popt_three) - log_snr) / log_s_err)) / len(snr)}")
+
+popt_four, pcov_four = scipy.optimize.curve_fit(exponential, log_richness, log_snr, sigma=log_s_err)
+
+print(popt_four, np.sqrt(np.diag(pcov_four)))
+print(f"Chi^2: {np.sum(np.square((exponential(log_richness, *popt_four) - log_snr) / log_s_err))}")
+print(f"Chi^2 / N: {np.sum(np.square((exponential(log_richness, *popt_four) - log_snr) / log_s_err)) / len(snr)}")
+
+sorted_richness = np.sort(log_richness)
+sorted_snr = np.zeros(np.shape(snr))
+log_richness = list(log_richness)
+for i in range(len(snr)):
+    sorted_snr[i] = log_snr[log_richness.index(sorted_richness[i])]
+print(len(log_richness))
+variance_bins = 10
+sigma = np.zeros(np.shape(snr))
+deviation = []
+for i in range(variance_bins):
+    bin_min, bin_max = int(i * len(snr) / variance_bins), int((i + 1) * len(snr) / variance_bins)
+    deviation.append(np.std(sorted_snr[bin_min:bin_max]))
+    sigma[bin_min:bin_max] = np.ones(np.shape(sigma[bin_min:bin_max])) * deviation[-1]
+
+print("test")
+
+popt_one, pcov_one = scipy.optimize.curve_fit(linear_one_d, sorted_richness, sorted_snr, sigma=sigma)
+
+print(popt_one, np.sqrt(np.diag(pcov_one)))
+print(f"Chi^2: {np.sum(np.square((linear_one_d(sorted_richness, *popt_one) - sorted_snr) / sigma))}")
+print(f"Chi^2 / N: {np.sum(np.square((linear_one_d(sorted_richness, *popt_one) - sorted_snr) / sigma)) / len(snr)}")
+
+#popt_three, pcov_three = scipy.optimize.curve_fit(power_law_two, log_richness, sorted_snr, sigma=sigma)
+
+#print(popt_three, np.sqrt(np.diag(pcov_three)))
+#print(f"Chi^2: {np.sum(np.square((power_law_two(sorted_richness, *popt_three) - sorted_snr) / sigma))}")
+#print(f"Chi^2 / N: {np.sum(np.square((power_law_two(sorted_richness, *popt_three) - sorted_snr) / sigma)) / len(snr)}")
+
+popt_four, pcov_four = scipy.optimize.curve_fit(exponential, sorted_richness, sorted_snr, sigma=sigma)
+
+print(popt_four, np.sqrt(np.diag(pcov_four)))
+print(f"Chi^2: {np.sum(np.square((exponential(sorted_richness, *popt_four) - sorted_snr) / sigma))}")
+print(f"Chi^2 / N: {np.sum(np.square((exponential(sorted_richness, *popt_four) - sorted_snr) / sigma)) / len(snr)}")
+
+
+plt.scatter(log_richness, log_snr, color="r", marker="+")
+x = np.linspace(3, 6, 1000)
+func = exponential
+pcov = pcov_four
+params = popt_four
+middle = func(x, *params)
+lower = func(x, *(params - np.sqrt(np.diag(pcov))))
+upper = func(x, *(params + np.sqrt(np.diag(pcov))))
+
+plt.plot(x, middle, color="b")
+plt.plot(x, lower, color="b", linestyle="dashed")
+plt.plot(x, upper, color="b", linestyle="dashed")
+
+plt.xlabel("ln Richness")
+plt.ylabel("ln SNR")
+plt.title("Exponential fit, approximated sigma")
+plt.show()
+
+exit()
+
+plt.clf()
+plt.scatter(richness, snr, color="r", marker="+")
+x = np.exp(x)
+plt.plot(x, np.exp(middle), color="b")
+plt.plot(x, np.exp(lower), color="b", linestyle="dashed")
+plt.plot(x, np.exp(upper), color="b", linestyle="dashed")
 
 bins = np.linspace(0, 25, 51)
 sdss_height = np.zeros(len(bins) - 1)
@@ -133,5 +215,8 @@ plt.legend()
 plt.xlabel("ln SNR")
 plt.ylabel("ln f(richness)")
 plt.title("Measured vs mapped SNR")
+
+plt.xlim(0, 200)
+plt.ylim(0, 40)
 
 plt.show()
