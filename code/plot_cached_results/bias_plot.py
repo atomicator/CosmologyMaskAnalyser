@@ -4,7 +4,7 @@ from toolkit import toolkit
 
 toolkit.plt_use_tex()
 
-data = np.load("./bias_data/invert_bias(1).npy")
+data = np.load("./bias_data/fewer_clusters.npy")
 
 fig = plt.figure()
 ax = fig.add_subplot(111)
@@ -49,7 +49,7 @@ ax.plot(x, mean, color=line_colors[0])
 ax.set_xscale("log", base=2)
 ax.set_xlim(1/2 * np.sqrt(1/2), NSIDES[-1] * np.sqrt(2))
 
-ax.plot([1/2, NSIDES[-1]], np.ones(2) * -.05, color="k")
+ax.plot([1/2, NSIDES[-1]], np.ones(2) * .05, color="k")
 ax.set_xticks([0.5] + NSIDES, ["C"] + NSIDES)
 
 #plt.ylim(-0.005, 0.005)

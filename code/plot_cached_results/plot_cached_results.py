@@ -42,7 +42,7 @@ save_path = "test.png"
 #         "./act_z/min/act_z_min_3.npy", "./act_z/min/act_z_min_4.npy"]
 #files = ["./act_r/min/act_r_min_2.npy"]
 
-title = "The excess of the Planck point mask, as a function of minimum redshift"
+#title = "The excess of the Planck point mask, as a function of minimum redshift"
 #save_path = "./planck_min_z.png"
 #files = ["./planck_z/bin/planck_excess.npy", "./planck_z/min/planck_z_min_1.npy", "./planck_z/min/planck_z_min_2.npy",
 #         "./planck_z/min/planck_z_min_3.npy", "./planck_z/min/planck_z_min_4.npy"]
@@ -57,11 +57,20 @@ title = "The excess of the Planck point mask, as a function of minimum redshift"
 
 #files = ["./act_r/min/act_excess.npy", "./rotations/rot_10.npy", "./rotations/rot_20.npy", "./rotations/rot_30.npy", "./rotations/rot_40.npy", ]
 #labels = [0, 10, 20, 30, 40]
-files = ["./act_r/min/act_excess.npy", "./rotations/rot_1.npy", "./rotations/rot_2.npy", "./rotations/rot_3.npy", "./rotations/rot_4.npy", ]
-labels = [0, 1, 2, 3, 4]
-title = "ACT Rotation"
+#files = ["./act_r/min/act_excess.npy", "./rotations/rot_1.npy", "./rotations/rot_2.npy", "./rotations/rot_3.npy", "./rotations/rot_4.npy", ]
+#labels = [0, 1, 2, 3, 4]
+#title = "ACT Rotation"
 
+#title = "ACT excess, as a function of ACT SNR ($s$)"
+#files = ["./act_s/act_s_3.npy", "./act_s/act_s_4.npy", "./act_s/act_s_5.npy", "./act_s/act_s_6.npy", "./act_s/act_s_7.npy"]#, "./act_s/act_s_8.npy"]
+#files = ["./act_s/act_s_4.npy", "./act_s/act_s_5.npy", "./act_s/act_s_6.npy", "./act_s/act_s_7.npy", "./act_s/act_s_8.npy"]
 
+title = "ACT excess, as a function of ACT SNR ($s$)"
+files = ["./act_s/act_s_4.npy", "./act_s/act_s_5.npy", "./act_s/act_s_6.npy", "./act_s/act_s_7.npy", "./act_s/act_s_8.npy"]
+#files = ["./planck_s/planck_s_4.npy", "./planck_s/planck_s_5.npy", "./planck_s/planck_s_6.npy", "./planck_s/planck_s_7.npy", "./planck_s/planck_s_8.npy"]
+
+labels = ["$4 < s < 5$", "$5 < s < 6$", "$6 < s < 7$", "$7 < s < 8$", "$8 < s$"]
+point_only = True
 y_axis_label = "Excess"
 
 for file in files[::-1]:
@@ -79,6 +88,8 @@ for file in files[::-1]:
         ax.errorbar(x, result_set[i][0], result_set[i][1], marker="+", ecolor=error_bar_color,
                     ls="none", color=color, capsize=3, capthick=1, label=label)
         ax.plot(x, result_set[i][0], color=color)
+        if point_only:
+            break
 
 ax.set_xscale("log", base=2)
 ax.set_xlim(1/2 * np.sqrt(1/2), NSIDES[-1] * np.sqrt(2))
