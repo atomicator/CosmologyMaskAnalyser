@@ -46,6 +46,10 @@ def exponential(x, alpha, beta):
     return alpha * np.exp(x * beta)
 
 
+def inverse_exponential(x, alpha, beta):
+    return beta * np.log(x / alpha)
+
+
 min_richness = 0
 act_cat = toolkit.StarCatalogue("../../data/DR5_cluster-catalog_v1.1.fits", hdu=1, table=True)
 sdss_richness = []
@@ -145,10 +149,12 @@ print(f"Chi^2 / N: {np.sum(np.square((exponential(sorted_richness, *popt_four) -
 plt.scatter(log_richness, log_snr, color="r", marker="+")
 func = linear_one_d
 inverse_func = inverse_linear_one_d
+#func = exponential
+#inverse_func = inverse_exponential
 pcov = np.matrix(((lin_reg.intercept_stderr ** 2, 0.0), (0.0, lin_reg.stderr ** 2)))
 params = (lin_reg.intercept, lin_reg.slope)
-#pcov = pcov_one
-#params = popt_one
+#pcov = pcov_four
+#params = popt_four
 rotated = True
 
 if not rotated:
@@ -256,4 +262,4 @@ plt.xlabel("SNR")
 #plt.xlim(0, 200)
 #plt.ylim(0, 40)
 
-plt.show()
+#plt.show()

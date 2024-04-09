@@ -40,5 +40,13 @@ python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="s
 python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered" --weight_function="excess" --save_path="./planck_s_7.png" --min_r=66.09321276 --mask_set="both" --data_mask="sdss_planck" &
 python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered"  --weight_function="excess" --save_path="./act_s_7.png" --min_r=66.09321276 --mask_set="both" --data_mask="sdss_act" &
 
+python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered" --weight_function="excess" --save_path="./planck_s_36.png" --min_r=40.4324751 --max_r=60.44045502 --mask_set="both" --data_mask="sdss_planck" &
+python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered"  --weight_function="excess" --save_path="./act_s_36.png" --min_r=40.4324751 --max_r=60.44045502 --mask_set="both" --data_mask="sdss_act" &
+python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered" --weight_function="excess" --save_path="./planck_s_6.png" --min_r=60.44045502 --mask_set="both" --data_mask="sdss_planck" &
+python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered"  --weight_function="excess" --save_path="./act_s_6.png" --min_r=60.44045502 --mask_set="both" --data_mask="sdss_act" &
+
+python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered" --weight_function="excess" --save_path="./planck_s_3.png" --min_r=40.4324751 --mask_set="both" --data_mask="sdss_planck" &
+python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered"  --weight_function="excess" --save_path="./act_s_3.png" --min_r=40.4324751 --mask_set="both" --data_mask="sdss_act" &
+
 
 wait
