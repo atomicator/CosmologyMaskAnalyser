@@ -193,14 +193,14 @@ sdss_height = np.zeros(len(bins) - 1)
 for i in range(len(bins) - 1):
     sdss_height[i] = np.sum(np.float_(np.bitwise_and(snr > bins[i], snr < bins[i + 1])))
 sdss_height = 100 * sdss_height / np.sum(sdss_height)
-plt.stairs(sdss_height, bins, label="ACT, complete")
+plt.stairs(sdss_height, bins, label=rf"ACT, complete $(N = {len(snr)})$")
 print(np.sum(sdss_height))
 sdss_height = np.zeros(len(bins) - 1)
 snr = snr[snr > 5]
 for i in range(len(bins) - 1):
     sdss_height[i] = np.sum(np.float_(np.bitwise_and(snr > bins[i], snr < bins[i + 1])))
 sdss_height = 100 * sdss_height / np.sum(sdss_height)
-plt.stairs(sdss_height, bins, label="ACT, SNR $>$ 5")
+plt.stairs(sdss_height, bins, label=rf"ACT, SNR $>$ 5 $(N = {len(snr)})$")
 print(np.sum(sdss_height))
 
 min_richness = 0
@@ -220,15 +220,15 @@ for i in range(len(bins) - 1):
     sdss_height[i] = np.sum(np.float_(np.bitwise_and(snr > bins[i], snr < bins[i + 1])))
 sdss_height = 100 * sdss_height / np.sum(sdss_height)
 print(sdss_height)
-plt.stairs(sdss_height, bins, label="SDSS, complete")
+plt.stairs(sdss_height, bins, label=rf"SDSS, complete $(N = {len(snr)})$")
 
 #min_richness = np.exp((np.log(5) - popt_one[0]) / popt_one[1])
-min_snr = 5
+min_snr = 3
 bin_search_min = 0
 bin_search_max = 1000
 bin_search_iterations = 100
 for i in range(bin_search_iterations):
-    if func(np.log((bin_search_max + bin_search_min) / 2), *params) > np.log(5):
+    if inverse_func((bin_search_max + bin_search_min) / 2, *params) > np.log10(min_snr):
         bin_search_max = (bin_search_min + bin_search_max) / 2
     else:
         bin_search_min = (bin_search_min + bin_search_max) / 2
@@ -247,7 +247,7 @@ sdss_height = np.zeros(len(bins) - 1)
 for i in range(len(bins) - 1):
     sdss_height[i] = np.sum(np.float_(np.bitwise_and(snr > bins[i], snr < bins[i + 1])))
 sdss_height = 100 * sdss_height / np.sum(sdss_height)
-plt.stairs(sdss_height, bins, label=r"SDSS, $\lambda > \lambda_{min}$")
+plt.stairs(sdss_height, bins, label=fr"SDSS, $f(\lambda) > {min_snr}$" + f"$(N = {len(snr)})$")
 
 plt.legend()
 plt.title("The cluster count of the catalogues, as a function of ACT SNR")
@@ -262,4 +262,4 @@ plt.xlabel("SNR")
 #plt.xlim(0, 200)
 #plt.ylim(0, 40)
 
-#plt.show()
+plt.show()
