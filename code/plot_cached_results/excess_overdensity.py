@@ -9,7 +9,7 @@ line_colors = ["xkcd:electric blue", "red", "xkcd:grass green", "purple"]
 
 overdensities = np.linspace(0.0, 0.2, 21)
 
-data = np.load("./bias_data/bias_test_planck_const_range_planck.npy")
+data = np.load("bias_data_old/bias_test_planck_const_range_planck.npy")
 
 results = []
 
@@ -26,7 +26,7 @@ plt.errorbar(x=overdensities, y=results[0], yerr=results[1], label="Planck", cap
              color=line_colors[0], ecolor=error_bar_colors[0])
 #plt.plot(overdensities, 0.01 * np.abs(results[0] - overdensities)/results[1])
 
-data = np.load("./bias_data/bias_test_planck_const_range_act.npy")
+data = np.load("bias_data_old/bias_test_planck_const_range_act.npy")
 
 results = []
 

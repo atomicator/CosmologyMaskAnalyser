@@ -4,7 +4,7 @@ from toolkit import toolkit
 
 toolkit.plt_use_tex()
 
-data = np.load("./bias_data/bias_test_planck_const_only.npy")
+data = np.load("bias_data_old/bias_test_planck_const_only.npy")
 
 plt.hist(data[:, 0], bins=25)
 plt.show()
