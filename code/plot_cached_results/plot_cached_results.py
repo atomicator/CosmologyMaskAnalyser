@@ -56,10 +56,10 @@ save_path = "test.png"
 
 #files = ["./../../code/binned_results/planck_excess.npy"]
 
-#files = ["./act_r/min/act_excess.npy", "./rotations/rot_10.npy", "./rotations/rot_20.npy", "./rotations/rot_30.npy", "./rotations/rot_40.npy", ]
-#labels = [0, 10, 20, 30, 40]
-files = ["./act_r/min/act_excess.npy", "./rotations/sdss_act_rot_1.npy", "./rotations/sdss_act_rot_2.npy", "./rotations/sdss_act_rot_3.npy", "./rotations/sdss_act_rot_4.npy", ]
-labels = [0, 1, 2, 3, 4]
+files = ["./act_r/min/act_excess.npy", "./rotations/sdss_act_lon_shift_rot_5.npy", "./rotations/sdss_act_lon_shift_rot_50.npy", "./rotations/sdss_act_lon_shift_rot_100.npy", "./rotations/sdss_act_lon_shift_rot_150.npy"]
+labels = [r"$0^{\circ}$", r"$10^{\circ}$", r"$20^{\circ}$", r"$30^{\circ}$", r"$40^{\circ}$"]
+#files = ["./act_r/min/act_excess.npy", "./rotations/sdss_act_lon_shift_rot_1.npy", "./rotations/sdss_act_lon_shift_rot_2.npy", "./rotations/sdss_act_lon_shift_rot_3.npy", "./rotations/sdss_act_lon_shift_rot_4.npy"]
+#labels = [r"$0^{\circ}$", r"$1^{\circ}$", r"$2^{\circ}$", r"$3^{\circ}$", r"$4^{\circ}$"]
 title = "ACT Rotation"
 
 #title = "ACT excess, as a function of ACT SNR ($s$)"
@@ -72,7 +72,7 @@ title = "ACT Rotation"
 #files = ["./act_s/act_s_13.npy", "./act_s/act_s_35.npy", "./act_s/act_s_57.npy", "./act_s/act_s_7.npy"]
 #files = ["./planck_s/planck_s_4.npy", "./planck_s/planck_s_5.npy", "./planck_s/planck_s_6.npy", "./planck_s/planck_s_7.npy", "./planck_s/planck_s_8.npy"]
 
-labels = ["$1 < s < 2$", "$2 < s < 3$", "$3 < s < 4$", "$4 < s < 5$", "$5 < s < 6$", "$6 < s < 7$", "$7 < s < 8$", "$8 < s$"]
+#labels = ["$1 < s < 2$", "$2 < s < 3$", "$3 < s < 4$", "$4 < s < 5$", "$5 < s < 6$", "$6 < s < 7$", "$7 < s < 8$", "$8 < s$"]
 #labels = ["$1 < s < 3$", "$3 < s < 5$", "$5 < s < 7$", "$7 < s$"]
 point_only = True
 y_axis_label = "Excess"
