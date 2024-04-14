@@ -34,7 +34,7 @@ sdss_height = np.zeros(len(bins) - 1)
 for i in range(len(bins) - 1):
     sdss_height[i] = (np.sum(np.float_(np.bitwise_and(sdss_redshift > bins[i], sdss_redshift < bins[i + 1]))) /
                       (len(sdss_redshift) / 100))
-plt.stairs(sdss_height, bins, label="SDSS, complete")
+plt.stairs(sdss_height, bins, label="SDSS, complete" + f" $(N = {len(sdss_richness)})$")
 
 
 min_richness = 20
@@ -48,7 +48,7 @@ sdss_height = np.zeros(len(bins) - 1)
 for i in range(len(bins) - 1):
     sdss_height[i] = (np.sum(np.float_(np.bitwise_and(sdss_redshift > bins[i], sdss_redshift < bins[i + 1]))) /
                       (len(sdss_redshift) / 100))
-plt.stairs(sdss_height, bins, label=r"SDSS, $\lambda > 20$")
+plt.stairs(sdss_height, bins, label=r"SDSS, $\lambda > 20$" + f" $(N = {len(sdss_richness)})$")
 
 min_richness = 0
 
@@ -60,7 +60,7 @@ sdss_height = np.zeros(len(bins) - 1)
 for i in range(len(bins) - 1):
     sdss_height[i] = (np.sum(np.float_(np.bitwise_and(sdss_redshift > bins[i], sdss_redshift < bins[i + 1]))) /
                       (len(sdss_redshift) / 100))
-plt.stairs(sdss_height, bins, label=r"ACT")
+plt.stairs(sdss_height, bins, label=r"ACT" + f" $(N = {len(sdss_richness)})$")
 
 cat = toolkit.StarCatalogue("../../data/HFI_PCCS_SZ-union_R2.08.fits", hdu=1)
 #cat.load_lon_lat()
@@ -72,13 +72,12 @@ cat.load_with_selection(planck_cat_selection_func, ["SNR", "PIPE_DET", "COSMO", 
 sdss_height = np.zeros(len(bins) - 1)
 for i in range(len(bins) - 1):
     sdss_height[i] = (np.sum(np.float_(np.bitwise_and(sdss_redshift > bins[i], sdss_redshift < bins[i + 1]))) / (len(sdss_redshift) / 100))
-plt.stairs(sdss_height, bins, label=r"Planck")
+plt.stairs(sdss_height, bins, label=r"Planck" + f" $(N = {len(sdss_richness)})$")
 
 plt.legend()
 plt.title("The cluster count of the catalogues, as a function of redshift")
 #plt.yscale("log")
 plt.ylabel("Percentage")
 plt.xlabel("Redshift")
-
-plt.savefig("redshift_histogram.png", dpi=1000)
+plt.savefig("redshift_histogram.pdf")
 plt.show()

@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy
 from toolkit import toolkit
+import matplotlib
 
 toolkit.plt_use_tex()
 
@@ -112,7 +113,7 @@ log_richness = list(log_richness)
 for i in range(len(snr)):
     sorted_snr[i] = log_snr[log_richness.index(sorted_richness[i])]
 print(len(log_richness))
-variance_bins = 10
+variance_bins = 20
 sigma = np.zeros(np.shape(snr))
 deviation = []
 for i in range(variance_bins):
@@ -145,8 +146,8 @@ print(popt_four, np.sqrt(np.diag(pcov_four)))
 print(f"Chi^2: {np.sum(np.square((exponential(sorted_richness, *popt_four) - sorted_snr) / sigma))}")
 print(f"Chi^2 / N: {np.sum(np.square((exponential(sorted_richness, *popt_four) - sorted_snr) / sigma)) / len(snr)}")
 
-
-plt.scatter(log_richness, log_snr, color="r", marker="+")
+print(f"N: {len(sorted_richness)}")
+plt.scatter(np.power(10, log_richness), np.power(10, log_snr), color="r", marker="+")
 func = linear_one_d
 inverse_func = inverse_linear_one_d
 #func = exponential
@@ -162,23 +163,33 @@ if not rotated:
 else:
     x = np.linspace(0.55, 1.8, 1000)
 
-middle = func(x, *params)
-lower = func(x, *(params - np.sqrt(np.diag(pcov))))
-upper = func(x, *(params + np.sqrt(np.diag(pcov))))
+middle = np.power(10, func(x, *params))
+lower = np.power(10, func(x, *(params - np.sqrt(np.diag(pcov)))))
+upper = np.power(10, func(x, *(params + np.sqrt(np.diag(pcov)))))
+x = np.power(10, x)
 
 plt.plot(x, middle, color="b")
 plt.plot(x, lower, color="b", linestyle="dashed")
 plt.plot(x, upper, color="b", linestyle="dashed")
 
 if not rotated:
-    plt.xlabel("ln Richness")
-    plt.ylabel("ln SNR")
+    plt.xlabel("Richness")
+    plt.ylabel("SNR")
 else:
-    plt.ylabel("ln Richness")
-    plt.xlabel("ln SNR")
-plt.title("Exponential fit, approximated sigma")
+    plt.ylabel("Richness")
+    plt.xlabel("SNR")
+plt.title("Power law fit to SNR - richness data")
+plt.xscale("log")
+plt.yscale("log")
+x_ticks = [4, 6, 8, 10, 20, 40, 60]
+plt.xticks(x_ticks, labels=x_ticks)
+y_ticks = [20, 40, 60, 80, 100, 200]
+plt.yticks(y_ticks, labels=y_ticks)
 plt.show()
 
+print(np.mean(sigma), np.std(sigma))
+print(np.min(richness))
+plt.savefig("snr_richness.pdf")
 #exit()
 
 plt.clf()
@@ -223,7 +234,7 @@ print(sdss_height)
 plt.stairs(sdss_height, bins, label=rf"SDSS, complete $(N = {len(snr)})$")
 
 #min_richness = np.exp((np.log(5) - popt_one[0]) / popt_one[1])
-min_snr = 3
+min_snr = 4
 bin_search_min = 0
 bin_search_max = 1000
 bin_search_iterations = 100
@@ -233,7 +244,6 @@ for i in range(bin_search_iterations):
     else:
         bin_search_min = (bin_search_min + bin_search_max) / 2
 min_richness = 10 ** ((bin_search_max + bin_search_min) / 2)
-
 print(f"min richness: {min_richness}")
 sdss_cat = toolkit.load_catalogue("sdss")
 sdss_richness = []
@@ -247,7 +257,23 @@ sdss_height = np.zeros(len(bins) - 1)
 for i in range(len(bins) - 1):
     sdss_height[i] = np.sum(np.float_(np.bitwise_and(snr > bins[i], snr < bins[i + 1])))
 sdss_height = 100 * sdss_height / np.sum(sdss_height)
-plt.stairs(sdss_height, bins, label=fr"SDSS, $f(\lambda) > {min_snr}$" + f"$(N = {len(snr)})$")
+plt.stairs(sdss_height, bins, label=fr"SDSS, $f(\lambda) > {min_snr}$ " + f"$(N = {len(snr)})$")
+
+min_richness = 20
+print(f"min richness: {min_richness}")
+sdss_cat = toolkit.load_catalogue("sdss")
+sdss_richness = []
+sdss_redshift = []
+sdss_cat.load_with_selection(load_richness_redshift, ("LAMBDA_CHISQ", "Z"), True)
+sdss_redshift = np.array(sdss_redshift)
+sdss_richness = np.array(sdss_richness)
+snr = np.power(10, inverse_func(np.log10(sdss_richness), *params))
+print(f"N: {len(snr)}")
+sdss_height = np.zeros(len(bins) - 1)
+for i in range(len(bins) - 1):
+    sdss_height[i] = np.sum(np.float_(np.bitwise_and(snr > bins[i], snr < bins[i + 1])))
+sdss_height = 100 * sdss_height / np.sum(sdss_height)
+plt.stairs(sdss_height, bins, label=fr"SDSS, $\lambda > {min_richness}$ " + f"$(N = {len(snr)})$")
 
 plt.legend()
 plt.title("The cluster count of the catalogues, as a function of ACT SNR")
@@ -262,4 +288,5 @@ plt.xlabel("SNR")
 #plt.xlim(0, 200)
 #plt.ylim(0, 40)
 
+plt.savefig("cluster_count_snr.pdf")
 plt.show()

@@ -40,7 +40,7 @@ print(upper, median, lower)
     np.mean(toolkit.HealpyMask("./sdss_mask_planck_modified_point_256_3.fits").map),
     np.mean(toolkit.HealpyMask("./sdss_mask_planck_modified_point_256_4.fits").map)
 )"""
-point_mask = toolkit.load_mask("planck_modified_point", 2)
+"""point_mask = toolkit.load_mask("planck_modified_point", 2)
 sdss_mask = toolkit.load_mask("sdss_mask", 2)
 temp = point_mask.map + 1j * sdss_mask.map
 data = np.float_(np.array((
@@ -48,16 +48,17 @@ data = np.float_(np.array((
     np.mean(np.float_(temp == 1j)),
     np.mean(np.float_(temp == 1)),
     np.mean(np.float_(temp == 1 + 1j))
-)))
+)))"""
 """
 galactic_masked_fraction = data[0] + data[1]"""
-"""
+
+mask_name = "sdss_mask_planck_modified_point"
 data = (
-    np.mean(toolkit.HealpyMask("./sdss_mask_act_point_256_1.fits").map),
-    np.mean(toolkit.HealpyMask("./sdss_mask_act_point_256_2.fits").map),
-    np.mean(toolkit.HealpyMask("./sdss_mask_act_point_256_3.fits").map),
-    np.mean(toolkit.HealpyMask("./sdss_mask_act_point_256_4.fits").map)
-)"""
+    np.mean(toolkit.HealpyMask(f"./{mask_name}_256_1.fits").map),
+    np.mean(toolkit.HealpyMask(f"./{mask_name}_256_2.fits").map),
+    np.mean(toolkit.HealpyMask(f"./{mask_name}_256_3.fits").map),
+    np.mean(toolkit.HealpyMask(f"./{mask_name}_256_4.fits").map)
+)
 #point_masked_fraction = data[0] + data[1]
 #final = point_masked_fraction / (1 - galactic_masked_fraction)
 final = data[1] / (data[1] + data[3])
@@ -72,4 +73,10 @@ final = data[1] / (data[1] + data[3])
 
 # ACT: 0.009859934289099422
 #401074
+# Planck - 0.0138443493342983
 print(final)
+
+
+#  Results:
+# ACT point: 0.01771962453092031
+# Planck point: 0.0138443493342983

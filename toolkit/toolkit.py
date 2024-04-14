@@ -163,13 +163,14 @@ class PixellMask(__Mask):
 
 
 class HealpyMask(__Mask):
-    def __init__(self, path, nest=False, mask_using_latlon=True, **kwargs):  # Load data from fits file
+    def __init__(self, path, nest=False, mask_using_latlon=True, lon_shift=None, **kwargs):  # Load data from fits file
         self.map, header = hp.read_map(path, h=True, nest=nest, **kwargs)
         self.header = dict(header)
         self.NSIDE = int(self.header["NSIDE"])
         self.NPIX = 12 * self.NSIDE ** 2
         self.nest = nest
         self.mask_using_latlon = mask_using_latlon
+        self.lon_shift = lon_shift
 
     def lookup_point(self, lon, lat, correction_applied=False):
         if self.mask_using_latlon or correction_applied:
@@ -180,6 +181,10 @@ class HealpyMask(__Mask):
             dec = c.icrs.dec.degree
             # print(ra, dec)
             pix = hp.ang2pix(self.NSIDE, ra, dec, lonlat=True, nest=self.nest)
+        if self.lon_shift:
+            lon += self.lon_shift
+            lon[lon > 180] -= 360
+            lon[lon < -180] += 360
         return self.map[pix]
 
     def plot_quick(self, save_path=None, xsize=1e4, title="", graticule=False, clear=True, show=True):
@@ -860,8 +865,8 @@ def load_mask(mask, raise_dir=2, nside=8, invert=False, lon_shift=0.0, **kwargs)
         value.map[value.map < 0.5] = 0
         # value.map = (value.map - 1) * -1
     elif mask == "planck_modified_galactic":
-        point_mask = load_mask("planck_point", raise_dir=raise_dir)
-        galactic_mask = load_mask("planck_galactic", raise_dir=raise_dir)
+        point_mask = load_mask("planck_point", raise_dir=raise_dir, lon_shift=lon_shift)
+        galactic_mask = load_mask("planck_galactic", raise_dir=raise_dir, lon_shift=lon_shift)
         compound_map = load_mask("planck_point", raise_dir=raise_dir)
         value = load_mask("planck_point", raise_dir=raise_dir)
         compound_map.map = 2 * point_mask.map + galactic_mask.map
