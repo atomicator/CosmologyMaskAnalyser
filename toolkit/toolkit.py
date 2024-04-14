@@ -867,15 +867,15 @@ def load_mask(mask, raise_dir=2, nside=8, invert=False, lon_shift=0.0, **kwargs)
     elif mask == "planck_modified_galactic":
         point_mask = load_mask("planck_point", raise_dir=raise_dir, lon_shift=lon_shift)
         galactic_mask = load_mask("planck_galactic", raise_dir=raise_dir, lon_shift=lon_shift)
-        compound_map = load_mask("planck_point", raise_dir=raise_dir)
-        value = load_mask("planck_point", raise_dir=raise_dir)
+        compound_map = load_mask("planck_point", raise_dir=raise_dir, lon_shift=lon_shift)
+        value = load_mask("planck_point", raise_dir=raise_dir, lon_shift=lon_shift)
         compound_map.map = 2 * point_mask.map + galactic_mask.map
         value.map = np.float_(np.bitwise_not(compound_map.map == 0))
     elif mask == "planck_modified_point":
-        point_mask = load_mask("planck_point", raise_dir=raise_dir)
-        galactic_mask = load_mask("planck_galactic", raise_dir=raise_dir)
-        compound_map = load_mask("planck_point", raise_dir=raise_dir)
-        value = load_mask("planck_point", raise_dir=raise_dir)
+        point_mask = load_mask("planck_point", raise_dir=raise_dir, lon_shift=lon_shift)
+        galactic_mask = load_mask("planck_galactic", raise_dir=raise_dir, lon_shift=lon_shift)
+        compound_map = load_mask("planck_point", raise_dir=raise_dir, lon_shift=lon_shift)
+        value = load_mask("planck_point", raise_dir=raise_dir, lon_shift=lon_shift)
         compound_map.map = 2 * point_mask.map + galactic_mask.map
         value.map = np.float_(np.bitwise_not(compound_map.map == 1))
     elif mask == "comparison_sdss_planck_galactic":

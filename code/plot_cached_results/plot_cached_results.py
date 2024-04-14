@@ -58,17 +58,17 @@ save_path = "test.png"
 
 #files = ["./act_r/min/act_excess.npy", "./rotations/rot_10.npy", "./rotations/rot_20.npy", "./rotations/rot_30.npy", "./rotations/rot_40.npy", ]
 #labels = [0, 10, 20, 30, 40]
-#files = ["./act_r/min/act_excess.npy", "./rotations/rot_1.npy", "./rotations/rot_2.npy", "./rotations/rot_3.npy", "./rotations/rot_4.npy", ]
-#labels = [0, 1, 2, 3, 4]
-#title = "ACT Rotation"
+files = ["./act_r/min/act_excess.npy", "./rotations/sdss_act_rot_1.npy", "./rotations/sdss_act_rot_2.npy", "./rotations/sdss_act_rot_3.npy", "./rotations/sdss_act_rot_4.npy", ]
+labels = [0, 1, 2, 3, 4]
+title = "ACT Rotation"
 
 #title = "ACT excess, as a function of ACT SNR ($s$)"
 #files = ["./act_s/act_s_3.npy", "./act_s/act_s_4.npy", "./act_s/act_s_5.npy", "./act_s/act_s_6.npy", "./act_s/act_s_7.npy"]#, "./act_s/act_s_8.npy"]
 #files = ["./act_s/act_s_4.npy", "./act_s/act_s_5.npy", "./act_s/act_s_6.npy", "./act_s/act_s_7.npy", "./act_s/act_s_8.npy"]
 
-title = "ACT excess, as a function of ACT SNR ($s$)"
-files = ["./act_s/act_s_12.npy", "./act_s/act_s_23.npy", "./act_s/act_s_34.npy", "./act_s/act_s_45.npy",
-         "./act_s/act_s_56.npy", "./act_s/act_s_67.npy", "./act_s/act_s_78.npy", "./act_s/act_s_8.npy"]
+#title = "ACT excess, as a function of ACT SNR ($s$)"
+#files = ["./act_s/act_s_12.npy", "./act_s/act_s_23.npy", "./act_s/act_s_34.npy", "./act_s/act_s_45.npy",
+#         "./act_s/act_s_56.npy", "./act_s/act_s_67.npy", "./act_s/act_s_78.npy", "./act_s/act_s_8.npy"]
 #files = ["./act_s/act_s_13.npy", "./act_s/act_s_35.npy", "./act_s/act_s_57.npy", "./act_s/act_s_7.npy"]
 #files = ["./planck_s/planck_s_4.npy", "./planck_s/planck_s_5.npy", "./planck_s/planck_s_6.npy", "./planck_s/planck_s_7.npy", "./planck_s/planck_s_8.npy"]
 
@@ -120,6 +120,6 @@ plt.show()
 print(len(nside_eight_excess), len(nside_eight_error), len(nside_eight_snr))
 
 plt.clf()
-
+exit()
 plt.errorbar(nside_eight_snr, nside_eight_excess, nside_eight_error)
 plt.show()

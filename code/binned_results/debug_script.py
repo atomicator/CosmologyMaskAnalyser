@@ -137,6 +137,9 @@ elif data_mask == "full_sky":
 elif data_mask == "sdss_act_lon_shift":
     mask_names = ["act_point_lon_test"]
     labels = ["ACT point shifted"]
+elif data_mask == "sdss_planck_lon_shift":
+    mask_names = ["sdss_planck_lon_shifted"]
+    labels = ["Planck point shifted"]
 else:
     raise ValueError
 
@@ -334,7 +337,7 @@ for mask_name in mask_names:
             toolkit.HealpyMask("../" * raise_dir + f"code/binned_results/sdss_mask_{mask_name}_256_3.fits").map,
             toolkit.HealpyMask("../" * raise_dir + f"code/binned_results/sdss_mask_{mask_name}_256_4.fits").map
         )))
-    elif data_mask == "sdss_act_lon_shift":
+    elif data_mask == "sdss_act_lon_shift" or "sdss_planck_lon_shift":
         sdss_mask = toolkit.load_mask("sdss_mask", raise_dir)
         data_set = toolkit.gen_mask_comparison_map(sdss_mask, mask, write=False, NSIDE=128, NSIDE_internal=1024)
     else:
