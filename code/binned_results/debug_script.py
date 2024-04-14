@@ -138,7 +138,7 @@ elif data_mask == "sdss_act_lon_shift":
     mask_names = ["act_point_lon_test"]
     labels = ["ACT point shifted"]
 elif data_mask == "sdss_planck_lon_shift":
-    mask_names = ["sdss_planck_lon_shifted"]
+    mask_names = ["planck_modified_point"]
     labels = ["Planck point shifted"]
 else:
     raise ValueError
