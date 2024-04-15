@@ -32,9 +32,16 @@ y_std = np.zeros((len(folders), len(x)))
 
 for folder in folders:
     files = os.listdir(folder)
+    new_files = []
+    for file in files:
+        if "-" in file:
+            new_files.append(file)
+    files = new_files[0:1]
+    print(files)
     sigma = np.zeros((len(files), len(x)))
     for file in files:
         data = np.load(folder + file)[0]
+        print(data)
         sigma[files.index(file)] = np.abs(data[0] / data[1])
     for i in range(len(y[0])):
         y[folders.index(folder)][i] = np.mean(sigma[:, i])
