@@ -48,7 +48,7 @@ class __Mask(object):  # overwite this with pixell and healpy specific versions
 
 
 class PixellMask(__Mask):
-    def __init__(self, path, step=1, mask_using_latlon=True, invert=True, lon_shift=None, **kwargs):
+    def __init__(self, path, step=1, mask_using_latlon=True, invert=True, **kwargs):
         # Load data from fits file
         self.imap = pixell.enmap.read_fits(path, **kwargs)
         self.map = np.array(self.imap)
@@ -63,7 +63,6 @@ class PixellMask(__Mask):
         self.ax = None
         self.mask_using_latlon = mask_using_latlon
         self.invert = invert
-        self.lon_shift = lon_shift
 
     def update_angle_range(self, lat_min=-90, lat_max=90, lon_min=0, lon_max=360):
         self.lat_min = lat_min
@@ -76,10 +75,6 @@ class PixellMask(__Mask):
             c = astropy.coordinates.SkyCoord(lon, lat, unit="deg", frame="galactic")  # convert to galactic co ords
             lon = c.icrs.ra.degree
             lat = c.icrs.dec.degree
-        if self.lon_shift:
-            lon += self.lon_shift
-            lon[lon > 180] -= 360
-            lon[lon < -180] += 360
         # point = self.map[np.int_(((90 + lat) / 180) * self.x), np.int_(((lon - 180) / 360) * self.y)]
         pix = np.int_(pixell.enmap.sky2pix(self.imap.shape, self.imap.wcs, np.array((lat, lon)) * np.pi / 180))
         point = np.zeros(np.shape(pix)[1:])
@@ -163,24 +158,15 @@ class PixellMask(__Mask):
 
 
 class HealpyMask(__Mask):
-    def __init__(self, path, nest=False, mask_using_latlon=True, lon_shift=None, **kwargs):  # Load data from fits file
+    def __init__(self, path, nest=False, mask_using_latlon=True, **kwargs):  # Load data from fits file
         self.map, header = hp.read_map(path, h=True, nest=nest, **kwargs)
         self.header = dict(header)
         self.NSIDE = int(self.header["NSIDE"])
         self.NPIX = 12 * self.NSIDE ** 2
         self.nest = nest
         self.mask_using_latlon = mask_using_latlon
-        self.lon_shift = lon_shift
 
     def lookup_point(self, lon, lat, correction_applied=False):
-        print("test1")
-        if self.lon_shift:
-            print(f"test {self.lon_shift}")
-            print(lon)
-            lon += self.lon_shift
-            lon[lon > 180] -= 360
-            lon[lon < -180] += 360
-            print(lon)
         if self.mask_using_latlon or correction_applied:
             pix = hp.ang2pix(self.NSIDE, lon, lat, lonlat=True, nest=self.nest)
         else:
@@ -847,18 +833,16 @@ def get_header_info(hdu_list):
         print(hdu.header)
 
 
-def load_mask(mask, raise_dir=2, nside=8, invert=False, lon_shift=None, **kwargs):
+def load_mask(mask, raise_dir=2, nside=8, invert=False, **kwargs):
     value = None
-    if lon_shift == 0.0:
-        lon_shift = None
     if mask == "planck_galactic":
         # value = HealpyMask("../" * raise_dir + "data/HFI_PCCS_SZ-selfunc-union-survey_R2.08.fits", mask_using_latlon=True, hdu=1, partial=False)
-        value = HealpyMask("../" * raise_dir + "data/planck_galactic_mask.fits", partial=True, mask_using_latlon=True, lon_shift=lon_shift)
+        value = HealpyMask("../" * raise_dir + "data/planck_galactic_mask.fits", partial=True, mask_using_latlon=True)
     elif mask == "planck_point" or mask == "planck_modified_total":
         value = HealpyMask("../" * raise_dir + "data/HFI_PCCS_SZ-selfunc-inter-cosmo_2.02.fits", partial=False,
-                           mask_using_latlon=True, lon_shift=lon_shift)
+                           mask_using_latlon=True)
     elif mask == "planck_survey":
-        value = HealpyMask("../" * raise_dir + "data/planck_survey_mask.fits", partial=True, mask_using_latlon=True, lon_shift=lon_shift)
+        value = HealpyMask("../" * raise_dir + "data/planck_survey_mask.fits", partial=True, mask_using_latlon=True)
     elif mask == "sdss_mask":
         value = HealpyMask("../" * raise_dir + "data/redmapper_dr8_public_v6.3_zmask.fits", mask_using_latlon=False,
                            hdu=1, partial=True)
@@ -871,23 +855,23 @@ def load_mask(mask, raise_dir=2, nside=8, invert=False, lon_shift=None, **kwargs
         value.map[value.map < 0.5] = 0
         # value.map = (value.map - 1) * -1
     elif mask == "planck_modified_galactic":
-        point_mask = load_mask("planck_point", raise_dir=raise_dir, lon_shift=lon_shift)
-        galactic_mask = load_mask("planck_galactic", raise_dir=raise_dir, lon_shift=lon_shift)
-        compound_map = load_mask("planck_point", raise_dir=raise_dir, lon_shift=lon_shift)
-        value = load_mask("planck_point", raise_dir=raise_dir, lon_shift=lon_shift)
+        point_mask = load_mask("planck_point", raise_dir=raise_dir)
+        galactic_mask = load_mask("planck_galactic", raise_dir=raise_dir)
+        compound_map = load_mask("planck_point", raise_dir=raise_dir)
+        value = load_mask("planck_point", raise_dir=raise_dir)
         compound_map.map = 2 * point_mask.map + galactic_mask.map
         value.map = np.float_(np.bitwise_not(compound_map.map == 0))
     elif mask == "planck_modified_point":
-        point_mask = load_mask("planck_point", raise_dir=raise_dir, lon_shift=lon_shift)
-        galactic_mask = load_mask("planck_galactic", raise_dir=raise_dir, lon_shift=lon_shift)
-        compound_map = load_mask("planck_point", raise_dir=raise_dir, lon_shift=lon_shift)
-        value = load_mask("planck_point", raise_dir=raise_dir, lon_shift=lon_shift)
+        point_mask = load_mask("planck_point", raise_dir=raise_dir)
+        galactic_mask = load_mask("planck_galactic", raise_dir=raise_dir)
+        compound_map = load_mask("planck_point", raise_dir=raise_dir)
+        value = load_mask("planck_point", raise_dir=raise_dir)
         compound_map.map = 2 * point_mask.map + galactic_mask.map
         value.map = np.float_(np.bitwise_not(compound_map.map == 1))
     elif mask == "comparison_sdss_planck_galactic":
         # masked by
-        planck_only = HealpyMask("../../data/cached_results/sdss_mask_planck_point_32_2.fits", lon_shift=lon_shift)
-        neither = HealpyMask("../../data/cached_results/sdss_mask_planck_point_32_4.fits", lon_shift=lon_shift)
+        planck_only = HealpyMask("../../data/cached_results/sdss_mask_planck_point_32_2.fits")
+        neither = HealpyMask("../../data/cached_results/sdss_mask_planck_point_32_4.fits")
         data = planck_only.map / (planck_only.map + neither.map + 1e-30)
         data = hp.pixelfunc.ud_grade(data, nside)
         planck_only.map = data
@@ -895,26 +879,26 @@ def load_mask(mask, raise_dir=2, nside=8, invert=False, lon_shift=None, **kwargs
         planck_only.NPIX = hp.nside2npix(nside)
         return planck_only
     elif mask.lower() == "act":
-        value = PixellMask("../" * raise_dir + "data/ACT_mask.fits", hdu=1, lon_shift=lon_shift, mask_using_latlon=False, invert=invert)
+        value = PixellMask("../" * raise_dir + "data/ACT_mask.fits", hdu=1, mask_using_latlon=False, invert=invert)
     elif mask == "sdss_planck_point_only":
-        mask1 = load_mask("sdss_mask", raise_dir, lon_shift=lon_shift)
-        mask2 = load_mask("planck_modified_point", raise_dir, lon_shift=lon_shift)
+        mask1 = load_mask("sdss_mask", raise_dir)
+        mask2 = load_mask("planck_modified_point", raise_dir)
         mask2.map = 1 - mask2.map
         value = CombinationMask(mask1, mask2)
     elif mask == "planck_galactic_test":
-        value = HealpyMask("../" * raise_dir + "data/planck_galactic_mask.fits", partial=True, mask_using_latlon=True, lon_shift=lon_shift)
+        value = HealpyMask("../" * raise_dir + "data/planck_galactic_mask.fits", partial=True, mask_using_latlon=True)
     elif mask == "planck_point_test":
-        value = HealpyMask("../" * raise_dir + "data/planck_point_mask.fits", partial=True, mask_using_latlon=True, lon_shift=lon_shift)
+        value = HealpyMask("../" * raise_dir + "data/planck_point_mask.fits", partial=True, mask_using_latlon=True)
     elif mask == "act_galactic":
-        act_mask = PixellMask("../" * raise_dir + "data/ACT_mask.fits", hdu=1, invert=False, mask_using_latlon=False, lon_shift=lon_shift)
-        act_graph_filter = PixellMask("../" * raise_dir + "data/ACT_mask.fits", hdu=1, invert=False, mask_using_latlon=False, lon_shift=lon_shift)
+        act_mask = PixellMask("../" * raise_dir + "data/ACT_mask.fits", hdu=1, invert=False, mask_using_latlon=False)
+        act_graph_filter = PixellMask("../" * raise_dir + "data/ACT_mask.fits", hdu=1, invert=False, mask_using_latlon=False)
         act_graph_filter.map = np.load("../" * raise_dir + "data/act_galactic_mask_array.npy")
-        test = filters.SquareMaskFilter((-10, 20), (40, 100), lonlat=False, lon_shift=lon_shift)
+        test = filters.SquareMaskFilter((-10, 20), (40, 100), lonlat=False)
         final_filter = CombinationMask(act_mask, test, use_and=False, invert=False)
         value = CombinationMask(act_graph_filter, final_filter, use_and=True, invert=False)
     elif mask == "act_point":
-        act_mask = PixellMask("../" * raise_dir + "data/ACT_mask.fits", hdu=1, invert=False, mask_using_latlon=False, lon_shift=lon_shift)
-        galactic_mask = load_mask("act_galactic", raise_dir, nside, invert, lon_shift=lon_shift)
+        act_mask = PixellMask("../" * raise_dir + "data/ACT_mask.fits", hdu=1, invert=False, mask_using_latlon=False)
+        galactic_mask = load_mask("act_galactic", raise_dir, nside, invert)
         galactic_mask.invert = True
         value = CombinationMask(act_mask, galactic_mask, use_and=False)
     else:

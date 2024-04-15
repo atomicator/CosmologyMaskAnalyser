@@ -8,17 +8,17 @@ import multiprocessing.pool
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument("--catalogue", default="sdss")
+parser.add_argument("--catalogue", default="sdss_filtered")
 parser.add_argument("--save_path", default="act_excess.png")
 parser.add_argument("--raise_path", type=int, default=2)
 parser.add_argument("--weight_function", default="excess")
 parser.add_argument("--min_z", type=float, default=0.0)
-parser.add_argument("--min_r", type=float, default=0.0)
+parser.add_argument("--min_r", type=float, default=20.0)
 parser.add_argument("--max_z", type=float, default=20.0)
 parser.add_argument("--max_r", type=float, default=10000.0)
 parser.add_argument("--data_mask", default="sdss_act")
 parser.add_argument("--mask_set", default="both")
-parser.add_argument("--lon_shift", type=float, default=0.0)
+parser.add_argument("--lon_shift", type=float, default=350.0)
 args = parser.parse_args()
 
 def filter(redshift, richness):
@@ -43,6 +43,11 @@ elif args.catalogue == "sdss":
 elif args.catalogue == "sdss_filtered":
     cat = toolkit.load_catalogue("sdss", raise_dir)
     cat.load_with_selection(filter, ["ZRED", "LAMBDA_CHISQ"], lon_lat=True)
+    #print(cat.lon_lat)
+    cat.lon_lat[:, 0] += args.lon_shift
+    cat.lon_lat[cat.lon_lat[:, 0] < 0, 0] += 360
+    cat.lon_lat[cat.lon_lat[:, 0] > 360, 0] -= 360
+    #print(cat.lon_lat)
     data_name = "\n" + rf"Filtered: ${args.min_z} < z < {args.max_z}$, ${args.min_r} < r < {args.max_r}$"
 elif args.catalogue in ("10m", "400k", "80k"):
     cat = toolkit.StarCatalogue("./" + raise_dir * "../" + f"code/binned_results/random_sdss_{args.catalogue}.fits", table=True)
@@ -72,6 +77,7 @@ elif args.catalogue == "act_bias":
 else:
     raise ValueError
 
+exit()
 data_mask = args.data_mask
 
 # Regenerate clusters, calc distribution
