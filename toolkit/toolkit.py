@@ -173,7 +173,9 @@ class HealpyMask(__Mask):
         self.lon_shift = lon_shift
 
     def lookup_point(self, lon, lat, correction_applied=False):
+        print("test1")
         if self.lon_shift:
+            print("test")
             lon += self.lon_shift
             lon[lon > 180] -= 360
             lon[lon < -180] += 360
@@ -857,7 +859,7 @@ def load_mask(mask, raise_dir=2, nside=8, invert=False, lon_shift=None, **kwargs
         value = HealpyMask("../" * raise_dir + "data/planck_survey_mask.fits", partial=True, mask_using_latlon=True, lon_shift=lon_shift)
     elif mask == "sdss_mask":
         value = HealpyMask("../" * raise_dir + "data/redmapper_dr8_public_v6.3_zmask.fits", mask_using_latlon=False,
-                           hdu=1, partial=True, lon_shift=lon_shift)
+                           hdu=1, partial=True)
         value.map[value.map > 0.4] = 1.0
         value.map[value.map < 0.3] = 0
         rotator = hp.Rotator(coord=["C", "G"])
