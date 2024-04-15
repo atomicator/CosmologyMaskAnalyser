@@ -903,9 +903,9 @@ def load_mask(mask, raise_dir=2, nside=8, invert=False, lon_shift=None, **kwargs
         value = HealpyMask("../" * raise_dir + "data/planck_point_mask.fits", partial=True, mask_using_latlon=True, lon_shift=lon_shift)
     elif mask == "act_galactic":
         act_mask = PixellMask("../" * raise_dir + "data/ACT_mask.fits", hdu=1, invert=False, mask_using_latlon=False, lon_shift=lon_shift)
-        act_graph_filter = PixellMask("../" * raise_dir + "data/ACT_mask.fits", hdu=1, invert=False, mask_using_latlon=False, lon_shift=lon_shift)
+        act_graph_filter = PixellMask("../" * raise_dir + "data/ACT_mask.fits", hdu=1, invert=False, mask_using_latlon=False)
         act_graph_filter.map = np.load("../" * raise_dir + "data/act_galactic_mask_array.npy")
-        test = filters.SquareMaskFilter((-10, 20), (40, 100), lonlat=False, lon_shift=lon_shift)
+        test = filters.SquareMaskFilter((-10, 20), (40, 100), lonlat=False)
         final_filter = CombinationMask(act_mask, test, use_and=False, invert=False)
         value = CombinationMask(act_graph_filter, final_filter, use_and=True, invert=False)
     elif mask == "act_point":
