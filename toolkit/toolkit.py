@@ -173,6 +173,10 @@ class HealpyMask(__Mask):
         self.lon_shift = lon_shift
 
     def lookup_point(self, lon, lat, correction_applied=False):
+        if self.lon_shift:
+            lon += self.lon_shift
+            lon[lon > 180] -= 360
+            lon[lon < -180] += 360
         if self.mask_using_latlon or correction_applied:
             pix = hp.ang2pix(self.NSIDE, lon, lat, lonlat=True, nest=self.nest)
         else:
@@ -181,10 +185,6 @@ class HealpyMask(__Mask):
             dec = c.icrs.dec.degree
             # print(ra, dec)
             pix = hp.ang2pix(self.NSIDE, ra, dec, lonlat=True, nest=self.nest)
-        if self.lon_shift:
-            lon += self.lon_shift
-            lon[lon > 180] -= 360
-            lon[lon < -180] += 360
         return self.map[pix]
 
     def plot_quick(self, save_path=None, xsize=1e4, title="", graticule=False, clear=True, show=True):
