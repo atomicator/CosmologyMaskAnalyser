@@ -52,11 +52,11 @@ galactic_mask = toolkit.CombinationMask(act_graph_filter, final_filter, use_and=
 # Point mask
 """galactic_mask.invert = True
 point_mask = toolkit.CombinationMask(act_mask, galactic_mask, use_and=False)"""
-point_mask = toolkit.load_mask("act_point")
+point_mask = toolkit.load_mask("act_point", lon_shift=90)
 
 plot_mask = point_mask
 plot_mask.set_fig_ax(fig, ax)
-plot_mask.plot(cbar=False, label="1", cmap="bwr", show=False, clear=False, lon_shift=90)
+plot_mask.plot(cbar=False, label="1", cmap="bwr", show=False, clear=False)
 #print(plot_mask.lon_shift)
 """
 point_mask = toolkit.load_mask("act_point")
