@@ -185,12 +185,12 @@ x_ticks = [4, 6, 8, 10, 20, 40, 60]
 plt.xticks(x_ticks, labels=x_ticks)
 y_ticks = [20, 40, 60, 80, 100, 200]
 plt.yticks(y_ticks, labels=y_ticks)
+plt.savefig("snr_richness.pdf")
 plt.show()
 
 print(np.mean(sigma), np.std(sigma))
 print(np.min(richness))
-plt.savefig("snr_richness.pdf")
-#exit()
+exit()
 
 plt.clf()
 #plt.scatter(richness, snr, color="r", marker="+")
