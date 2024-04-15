@@ -59,7 +59,7 @@ plot_mask.set_fig_ax(fig, ax)
 plot_mask.plot(cbar=False, label="1", cmap="bwr", show=False, clear=False)
 #print(plot_mask.lon_shift)
 
-point_mask = toolkit.load_mask("act_point", lon_shift=25.0)
+point_mask = toolkit.load_mask("act_galactic", lon_shift=180)
 plot_mask = point_mask
 plot_mask.set_fig_ax(fig, ax)
 plot_mask.plot(cbar=True, label="2", cmap="bwr_r", show=False, clear=False)
