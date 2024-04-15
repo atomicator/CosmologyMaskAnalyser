@@ -175,10 +175,12 @@ class HealpyMask(__Mask):
     def lookup_point(self, lon, lat, correction_applied=False):
         print("test1")
         if self.lon_shift:
-            print("test")
+            print(f"test {self.lon_shift}")
+            print(lon)
             lon += self.lon_shift
             lon[lon > 180] -= 360
             lon[lon < -180] += 360
+            print(lon)
         if self.mask_using_latlon or correction_applied:
             pix = hp.ang2pix(self.NSIDE, lon, lat, lonlat=True, nest=self.nest)
         else:
