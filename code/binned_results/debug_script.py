@@ -77,7 +77,7 @@ elif args.catalogue == "act_bias":
 else:
     raise ValueError
 
-exit()
+#exit()
 data_mask = args.data_mask
 
 # Regenerate clusters, calc distribution
