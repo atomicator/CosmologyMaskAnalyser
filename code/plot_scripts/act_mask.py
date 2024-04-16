@@ -48,11 +48,11 @@ galactic_mask = toolkit.CombinationMask(act_graph_filter, final_filter, use_and=
 #plot_mask = galactic_mask
 #plot_mask.set_fig_ax(fig, ax)
 #plot_mask.plot(cbar=False, label="Galactic", cmap="bwr", show=False, clear=False)
-
+lon_shift = 200
 # Point mask
 """galactic_mask.invert = True
 point_mask = toolkit.CombinationMask(act_mask, galactic_mask, use_and=False)"""
-point_mask = toolkit.load_mask("sdss_mask", lon_shift=200)
+point_mask = toolkit.load_mask("sdss_mask", lon_shift=lon_shift)
 
 plot_mask = point_mask
 plot_mask.set_fig_ax(fig, ax)
@@ -68,6 +68,15 @@ plot_mask.plot(cbar=False, label="2", cmap="bwr_r", show=False, clear=False)"""
 plt.ylabel("Latitude")
 plt.xlabel("Longitude")
 plt.title(r"The \enquote{Galactic} and \enquote{Point} components of the ACT mask")
+
+cat = toolkit.load_catalogue("sdss")
+cat.load_with_selection(filter, ["ZRED", "LAMBDA_CHISQ"], lon_lat=True)
+cat.lon_lat[:, 0] -= lon_shift
+cat.lon_lat[cat.lon_lat[:, 0] < 0, 0] += 360
+cat.lon_lat[cat.lon_lat[:, 0] > 360, 0] -= 360
+
+plt.scatter(*cat.lon_lat, s="1")
+
 #plt.legend()
 #plt.ylabel("Declination")
 #plt.xlabel("Right Ascension")
