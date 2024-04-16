@@ -742,7 +742,7 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="
     print(np.max(results[0]), np.max(results[1]), np.max(results[2]), np.max(results[3]))"""
     pix = np.int_(np.linspace(0, hp.nside2npix(NSIDE_internal) - 1, hp.nside2npix(NSIDE_internal)))
     points = hp.pix2ang(NSIDE_internal, pix, lonlat=True)
-    sum = mask1.lookup_point(*points) + 1j * mask2.lookup_point(*points)
+    #sum = mask1.lookup_point(*points) + 1j * mask2.lookup_point(*points)
     mask1_masked = mask1.lookup_point(*copy.deepcopy(points)) == 0.0
     mask2_masked = mask2.lookup_point(*copy.deepcopy(points)) == 0.0
     """data1 = hp.ud_grade(sum == 0.0, NSIDE)
