@@ -44,7 +44,7 @@ elif args.catalogue == "sdss_filtered":
     cat = toolkit.load_catalogue("sdss", raise_dir)
     cat.load_with_selection(filter, ["ZRED", "LAMBDA_CHISQ"], lon_lat=True)
     #print(cat.lon_lat)
-    cat.lon_lat[:, 0] -= args.lon_shift
+    cat.lon_lat[:, 0] += args.lon_shift
     cat.lon_lat[cat.lon_lat[:, 0] < 0, 0] += 360
     cat.lon_lat[cat.lon_lat[:, 0] > 360, 0] -= 360
     #print(cat.lon_lat)
@@ -152,8 +152,8 @@ else:
 
 #NSIDES = [1, 2, 4, 8, 16, 32]
 #NSIDES = [1, 2, 4, 8, 16, 32, 64]
-NSIDES = [1, 2, 4, 8, 16, 32, 64, 128]
-#NSIDES = [1]
+#NSIDES = [1, 2, 4, 8, 16, 32, 64, 128]
+NSIDES = [128]
 #NSIDES = [1, 2, 4, 8, 16, 32, 64, 128, 256]
 #NSIDES = [2, 8, 32]
 run_const = True
