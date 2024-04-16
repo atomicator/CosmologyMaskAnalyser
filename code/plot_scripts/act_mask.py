@@ -2,6 +2,20 @@ from toolkit import toolkit
 import matplotlib.pyplot as plt
 import numpy as np
 import astropy
+import argparse
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--min_z", type=float, default=0.0)
+parser.add_argument("--min_r", type=float, default=20.0)
+parser.add_argument("--max_z", type=float, default=20.0)
+parser.add_argument("--max_r", type=float, default=10000.0)
+args = parser.parse_args()
+
+
+def filter(redshift, richness):
+    global args
+    return (args.min_z < redshift < args.max_z) and (args.min_r < richness < args.max_r)
 
 
 class SquareMaskFilter:
