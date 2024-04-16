@@ -158,15 +158,20 @@ class PixellMask(__Mask):
 
 
 class HealpyMask(__Mask):
-    def __init__(self, path, nest=False, mask_using_latlon=True, **kwargs):  # Load data from fits file
+    def __init__(self, path, nest=False, mask_using_latlon=True, lon_shift=None, **kwargs):  # Load data from fits file
         self.map, header = hp.read_map(path, h=True, nest=nest, **kwargs)
         self.header = dict(header)
         self.NSIDE = int(self.header["NSIDE"])
         self.NPIX = 12 * self.NSIDE ** 2
         self.nest = nest
         self.mask_using_latlon = mask_using_latlon
+        self.lon_shift = lon_shift
 
     def lookup_point(self, lon, lat, correction_applied=False):
+        if self.lon_shift:
+            lon += self.lon_shift
+            lon[lon > 360] -= 360
+            lon[lon < 0] += 360
         if self.mask_using_latlon or correction_applied:
             pix = hp.ang2pix(self.NSIDE, lon, lat, lonlat=True, nest=self.nest)
         else:
@@ -833,7 +838,7 @@ def get_header_info(hdu_list):
         print(hdu.header)
 
 
-def load_mask(mask, raise_dir=2, nside=8, invert=False, **kwargs):
+def load_mask(mask, raise_dir=2, nside=8, invert=False, lon_shift=None, **kwargs):
     value = None
     if mask == "planck_galactic":
         # value = HealpyMask("../" * raise_dir + "data/HFI_PCCS_SZ-selfunc-union-survey_R2.08.fits", mask_using_latlon=True, hdu=1, partial=False)
@@ -845,7 +850,7 @@ def load_mask(mask, raise_dir=2, nside=8, invert=False, **kwargs):
         value = HealpyMask("../" * raise_dir + "data/planck_survey_mask.fits", partial=True, mask_using_latlon=True)
     elif mask == "sdss_mask":
         value = HealpyMask("../" * raise_dir + "data/redmapper_dr8_public_v6.3_zmask.fits", mask_using_latlon=False,
-                           hdu=1, partial=True)
+                           hdu=1, partial=True, lon_shift=lon_shift)
         value.map[value.map > 0.4] = 1.0
         value.map[value.map < 0.3] = 0
         rotator = hp.Rotator(coord=["C", "G"])
