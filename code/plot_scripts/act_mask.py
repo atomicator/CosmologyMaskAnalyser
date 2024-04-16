@@ -89,7 +89,7 @@ cat.lon_lat[:, 0] -= lon_shift
 cat.lon_lat[cat.lon_lat[:, 0] < 0, 0] += 360
 cat.lon_lat[cat.lon_lat[:, 0] > 360, 0] -= 360
 
-plt.scatter(*cat.lon_lat.transpose(), s="1")
+plt.scatter(*cat.lon_lat.transpose(), s=1)
 
 #plt.legend()
 #plt.ylabel("Declination")
