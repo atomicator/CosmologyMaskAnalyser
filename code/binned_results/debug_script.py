@@ -322,7 +322,7 @@ for mask_name in mask_names:
         print("test2")
         sdss_mask = toolkit.load_mask("sdss_mask", raise_dir, lon_shift=args.lon_shift)
         #sdss_mask = toolkit.load_mask("sdss_mask", raise_dir)
-        data_set = toolkit.gen_mask_comparison_map(sdss_mask, mask, write=False, NSIDE=256, NSIDE_internal=2048)
+        data_set = toolkit.gen_mask_comparison_map(sdss_mask, mask, write=False, NSIDE=256, NSIDE_internal=4096)
     elif data_mask == "full_sky":
         data_set = np.array((
             np.zeros(12 * 2048 ** 2),
