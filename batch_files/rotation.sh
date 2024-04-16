@@ -14,7 +14,7 @@ python3 ../code/binned_results/debug_script.py --save_path="${mask_name}_rot_-10
 ##python3 ../code/binned_results/debug_script.py --save_path="${mask_name}_rot_-25.png" --lon_shift=-25.0 --data_mask="sdss_${mask_name}" --raise_path=1 --catalogue="sdss_filtered" --min_r=20 --mask_set="point &
 #python3 ../code/binned_results/debug_script.py --save_path="${mask_name}_rot_-30.png" --lon_shift=-30.0 --data_mask="sdss_${mask_name}" --raise_path=1 --catalogue="sdss_filtered" --min_r=20 --mask_set="point" &
 #
-#wait
+wait
 #
 #python3 ../code/binned_results/debug_script.py --save_path="${mask_name}_rot_-40.png" --lon_shift=-40.0 --data_mask="sdss_${mask_name}" --raise_path=1 --catalogue="sdss_filtered" --min_r=20 --mask_set="point" &
 #python3 ../code/binned_results/debug_script.py --save_path="${mask_name}_rot_-50.png" --lon_shift=-50.0 --data_mask="sdss_${mask_name}" --raise_path=1 --catalogue="sdss_filtered" --min_r=20 --mask_set="point" &
