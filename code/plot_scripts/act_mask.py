@@ -62,7 +62,7 @@ galactic_mask = toolkit.CombinationMask(act_graph_filter, final_filter, use_and=
 #plot_mask = galactic_mask
 #plot_mask.set_fig_ax(fig, ax)
 #plot_mask.plot(cbar=False, label="Galactic", cmap="bwr", show=False, clear=False)
-lon_shift = 200
+lon_shift = -50
 # Point mask
 """galactic_mask.invert = True
 point_mask = toolkit.CombinationMask(act_mask, galactic_mask, use_and=False)"""
