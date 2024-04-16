@@ -318,6 +318,7 @@ for mask_name in mask_names:
     mask = toolkit.load_mask(mask_name, raise_dir)
     mask.set_fig_ax(fig, ax)
     if args.lon_shift != 0:
+        print("test")
         sdss_mask = toolkit.load_mask("sdss_mask", raise_dir, lon_shift=args.lon_shift)
         data_set = toolkit.gen_mask_comparison_map(sdss_mask, mask, write=False, NSIDE=256, NSIDE_internal=2048)
     elif data_mask == "full_sky":
