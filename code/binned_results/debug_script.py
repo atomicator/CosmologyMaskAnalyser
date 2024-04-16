@@ -319,8 +319,9 @@ for mask_name in mask_names:
     mask = toolkit.load_mask(mask_name, raise_dir)
     mask.set_fig_ax(fig, ax)
     if args.lon_shift != 0:
-        print("test")
-        sdss_mask = toolkit.load_mask("sdss_mask", raise_dir, lon_shift=args.lon_shift)
+        print("test2")
+        #sdss_mask = toolkit.load_mask("sdss_mask", raise_dir, lon_shift=args.lon_shift)
+        sdss_mask = toolkit.load_mask("sdss_mask", raise_dir)
         data_set = toolkit.gen_mask_comparison_map(sdss_mask, mask, write=False, NSIDE=256, NSIDE_internal=2048)
     elif data_mask == "full_sky":
         data_set = np.array((
@@ -355,7 +356,6 @@ for mask_name in mask_names:
     pool = multiprocessing.pool.Pool(processes=x_len)
     thread_objects = [None] * x_len
     index = 0
-    print("test")
     if not set_f_zero:
         f.append((1 - np.sum(mask.lookup_point(*cat.lon_lat.transpose())) / len(cat.lon_lat)) * 100)
     else:
