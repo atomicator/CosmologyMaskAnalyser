@@ -315,10 +315,7 @@ def run_nside(n):
 
 
 for mask_name in mask_names:
-    if mask_name == "act_point_lon_test":
-        mask = toolkit.load_mask("act_point", raise_dir=raise_dir, lon_shift=args.lon_shift)
-    else:
-        mask = toolkit.load_mask(mask_name, raise_dir, lon_shift=args.lon_shift)
+    mask = toolkit.load_mask(mask_name, raise_dir)
     mask.set_fig_ax(fig, ax)
     if data_mask == "full_sky":
         data_set = np.array((
@@ -328,7 +325,7 @@ for mask_name in mask_names:
             mask.map
         ))
     elif data_mask == "sdss_planck":
-        sdss_mask = toolkit.load_mask("sdss_mask", raise_dir, lon_shift=args.lon_shift)
+        sdss_mask = toolkit.load_mask("sdss_mask", raise_dir)
         temp = mask.map + 1j * sdss_mask.map
         data_set = np.float_(np.array((
             temp == 0,
