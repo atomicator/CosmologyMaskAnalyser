@@ -74,7 +74,11 @@ title = "ACT Rotation"
 
 #labels = ["$1 < s < 2$", "$2 < s < 3$", "$3 < s < 4$", "$4 < s < 5$", "$5 < s < 6$", "$6 < s < 7$", "$7 < s < 8$", "$8 < s$"]
 #labels = ["$1 < s < 3$", "$3 < s < 5$", "$5 < s < 7$", "$7 < s$"]
-point_only = True
+
+labels = ["Point", "Galactic"]
+files = ["./act_r/min/act_excess.npy"]#, "./planck_z/bin/planck_excess.npy"]
+
+point_only = False
 y_axis_label = "Excess"
 
 nside_eight_excess = []

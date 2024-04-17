@@ -17,13 +17,15 @@ def gauss_monte_carlo():
 
 #gauss_monte_carlo()
 
+color = ["xkcd:electric blue", "red"]
+error_color = ["xkcd:aqua blue", "orange"]
 toolkit.plt_use_tex()
 fig = plt.figure()
 ax = fig.add_subplot()
 
-#folders = ["./rotations/act/", "./rotations/planck/"]
-folders = ["./rotations/planck/"]
-labels = ["ACT", "Planck"]
+folders = ["./rotations/act/", "./rotations/planck/"][::-1]
+#folders = ["./rotations/planck/"]
+labels = ["ACT", "Planck"][::-1]
 
 NSIDES = np.array((1, 2, 4, 8, 16, 32, 64, 128))
 x = np.append(np.array(1/2), NSIDES)
@@ -33,19 +35,19 @@ y_std = np.zeros((len(folders), len(x)))
 
 for folder in folders:
     files = os.listdir(folder)
-    print(files)
     sigma = np.zeros((len(files), len(x)))
     for file in files:
         data = np.load(folder + file)[0]
-        print(data)
-        sigma[files.index(file)] = data[0] / data[1]
+        sigma[files.index(file)] = np.abs(data[0] / data[1])
     for i in range(len(y[0])):
         y[folders.index(folder)][i] = np.mean(sigma[:, i])
         y_std[folders.index(folder)][i] = np.std(sigma[:, i])
-print(y, y_std)
+print(y)
+print(y_std)
 
 for i in range(len(folders)):
-    plt.errorbar(x, y[i], y_std[i], label=labels[i])
+    plt.errorbar(x, y[i], y_std[i], label=labels[i], ecolor=error_color[i], color=color[i], capsize=3,
+                 capthick=1,)
 
 plt.plot((1/2, np.max(NSIDES)), (0.8, 0.8), color="k", linestyle="dashed")
 plt.plot((1/2, np.max(NSIDES)), (0.2, 0.2), color="k", linestyle="dotted")
