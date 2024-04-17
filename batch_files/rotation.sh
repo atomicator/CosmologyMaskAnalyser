@@ -8,11 +8,15 @@ mask_name=$1
 #python3 ../code/binned_results/debug_script.py --save_path="${mask_name}_rot_-4.png" --lon_shift=-4.0 --data_mask="$sdss_{mask_name}" --raise_path=1 --catalogue="sdss_filtered" --min_r=20 --mask_set="both" &
 #python3 ../code/binned_results/debug_script.py --save_path="${mask_name}_rot_-5.png" --lon_shift=-5.0 --data_mask="$sdss_{mask_name}" --raise_path=1 --catalogue="sdss_filtered" --min_r=20 --mask_set="both" &
 
+wait
+
 python3 ../code/binned_results/debug_script.py --save_path="${mask_name}_rot_-10.png" --lon_shift=-10.0 --data_mask="sdss_${mask_name}" --raise_path=1 --catalogue="sdss_filtered" --min_r=20 --mask_set="both" &
 #python3 ../code/binned_results/debug_script.py --save_path="${mask_name}_rot_-15.png" --lon_shift=-15.0 --data_mask="sdss_${mask_name}" --raise_path=1 --catalogue="sdss_filtered" --min_r=20 --mask_set="both &
 python3 ../code/binned_results/debug_script.py --save_path="${mask_name}_rot_-20.png" --lon_shift=-20.0 --data_mask="sdss_${mask_name}" --raise_path=1 --catalogue="sdss_filtered" --min_r=20 --mask_set="both" &
 #python3 ../code/binned_results/debug_script.py --save_path="${mask_name}_rot_-25.png" --lon_shift=-25.0 --data_mask="sdss_${mask_name}" --raise_path=1 --catalogue="sdss_filtered" --min_r=20 --mask_set="both &
 python3 ../code/binned_results/debug_script.py --save_path="${mask_name}_rot_-30.png" --lon_shift=-30.0 --data_mask="sdss_${mask_name}" --raise_path=1 --catalogue="sdss_filtered" --min_r=20 --mask_set="both" &
+
+wait
 
 python3 ../code/binned_results/debug_script.py --save_path="${mask_name}_rot_-40.png" --lon_shift=-40.0 --data_mask="sdss_${mask_name}" --raise_path=1 --catalogue="sdss_filtered" --min_r=20 --mask_set="both" &
 python3 ../code/binned_results/debug_script.py --save_path="${mask_name}_rot_-50.png" --lon_shift=-50.0 --data_mask="sdss_${mask_name}" --raise_path=1 --catalogue="sdss_filtered" --min_r=20 --mask_set="both" &
@@ -28,11 +32,15 @@ python3 ../code/binned_results/debug_script.py --save_path="${mask_name}_rot_-11
 python3 ../code/binned_results/debug_script.py --save_path="${mask_name}_rot_-120.png" --lon_shift=-120.0 --data_mask="sdss_${mask_name}" --raise_path=1 --catalogue="sdss_filtered" --min_r=20 --mask_set="both" &
 python3 ../code/binned_results/debug_script.py --save_path="${mask_name}_rot_-130.png" --lon_shift=-130.0 --data_mask="sdss_${mask_name}" --raise_path=1 --catalogue="sdss_filtered" --min_r=20 --mask_set="both" &
 
+wait
+
 python3 ../code/binned_results/debug_script.py --save_path="${mask_name}_rot_-140.png" --lon_shift=-140.0 --data_mask="sdss_${mask_name}" --raise_path=1 --catalogue="sdss_filtered" --min_r=20 --mask_set="both" &
 python3 ../code/binned_results/debug_script.py --save_path="${mask_name}_rot_-150.png" --lon_shift=-150.0 --data_mask="sdss_${mask_name}" --raise_path=1 --catalogue="sdss_filtered" --min_r=20 --mask_set="both" &
 python3 ../code/binned_results/debug_script.py --save_path="${mask_name}_rot_-160.png" --lon_shift=-160.0 --data_mask="sdss_${mask_name}" --raise_path=1 --catalogue="sdss_filtered" --min_r=20 --mask_set="both" &
 python3 ../code/binned_results/debug_script.py --save_path="${mask_name}_rot_-170.png" --lon_shift=-170.0 --data_mask="sdss_${mask_name}" --raise_path=1 --catalogue="sdss_filtered" --min_r=20 --mask_set="both" &
 #python3 ../code/binned_results/debug_script.py --save_path="${mask_name}_rot_-180.png" --lon_shift=-180.0 --data_mask="sdss_${mask_name}" --raise_path=1 --catalogue="sdss_filtered" --min_r=20 --mask_set="both" &
+
+wait
 
 #python3 ../code/binned_results/debug_script.py --save_path="${mask_name}_rot_1.png" --lon_shift=1.0 --data_mask="sdss_${mask_name}" --raise_path=1 --catalogue="sdss_filtered" --min_r=20 --mask_set="point" &
 #python3 ../code/binned_results/debug_script.py --save_path="${mask_name}_rot_2.png" --lon_shift=2.0 --data_mask="sdss_${mask_name}" --raise_path=1 --catalogue="sdss_filtered" --min_r=20 --mask_set="point" &
@@ -48,6 +56,8 @@ python3 ../code/binned_results/debug_script.py --save_path="${mask_name}_rot_20.
 #python3 ../code/binned_results/debug_script.py --save_path="${mask_name}_rot_25.png" --lon_shift=25.0 --data_mask="sdss_${mask_name}" --raise_path=1 --catalogue="sdss_filtered" --min_r=20 --mask_set="both" &
 python3 ../code/binned_results/debug_script.py --save_path="${mask_name}_rot_30.png" --lon_shift=30.0 --data_mask="sdss_${mask_name}" --raise_path=1 --catalogue="sdss_filtered" --min_r=20 --mask_set="both" &
 
+wait
+
 python3 ../code/binned_results/debug_script.py --save_path="${mask_name}_rot_40.png" --lon_shift=40.0 --data_mask="sdss_${mask_name}" --raise_path=1 --catalogue="sdss_filtered" --min_r=20 --mask_set="both"&
 python3 ../code/binned_results/debug_script.py --save_path="${mask_name}_rot_50.png" --lon_shift=50.0 --data_mask="sdss_${mask_name}" --raise_path=1 --catalogue="sdss_filtered" --min_r=20 --mask_set="both"&
 python3 ../code/binned_results/debug_script.py --save_path="${mask_name}_rot_60.png" --lon_shift=60.0 --data_mask="sdss_${mask_name}" --raise_path=1 --catalogue="sdss_filtered" --min_r=20 --mask_set="both"&
@@ -61,6 +71,8 @@ python3 ../code/binned_results/debug_script.py --save_path="${mask_name}_rot_100
 python3 ../code/binned_results/debug_script.py --save_path="${mask_name}_rot_110.png" --lon_shift=110.0 --data_mask="sdss_${mask_name}" --raise_path=1 --catalogue="sdss_filtered" --min_r=20 --mask_set="both"&
 python3 ../code/binned_results/debug_script.py --save_path="${mask_name}_rot_120.png" --lon_shift=120.0 --data_mask="sdss_${mask_name}" --raise_path=1 --catalogue="sdss_filtered" --min_r=20 --mask_set="both"&
 python3 ../code/binned_results/debug_script.py --save_path="${mask_name}_rot_130.png" --lon_shift=130.0 --data_mask="sdss_${mask_name}" --raise_path=1 --catalogue="sdss_filtered" --min_r=20 --mask_set="both"&
+
+wait
 
 python3 ../code/binned_results/debug_script.py --save_path="${mask_name}_rot_140.png" --lon_shift=140.0 --data_mask="sdss_${mask_name}" --raise_path=1 --catalogue="sdss_filtered" --min_r=20 --mask_set="both"&
 python3 ../code/binned_results/debug_script.py --save_path="${mask_name}_rot_150.png" --lon_shift=150.0 --data_mask="sdss_${mask_name}" --raise_path=1 --catalogue="sdss_filtered" --min_r=20 --mask_set="both"&
