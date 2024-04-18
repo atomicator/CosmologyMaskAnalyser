@@ -39,7 +39,7 @@
 wait
 
 python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered" --weight_function="excess" --save_path="./planck_r_20+.png" --min_r=20 --max_r=8000 --mask_set="point" --data_mask="sdss_planck" &
-python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered" --weight_function="excess" --save_path="./act_r_20+.png" --min_r=20 --max_r=8000 --mask_set="both" --data_mask="sdss_act" &
+python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered" --weight_function="excess" --save_path="./act_r_20+.png" --min_r=20 --max_r=8000 --mask_set="point" --data_mask="sdss_act" &
 
 python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered" --weight_function="excess" --save_path="./planck_r_5_10.png" --min_r=5 --max_r=10 --mask_set="point" --data_mask="sdss_planck" &
 python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered" --weight_function="excess" --save_path="./planck_r_10_20.png" --min_r=10 --max_r=20 --mask_set="point" --data_mask="sdss_planck" &

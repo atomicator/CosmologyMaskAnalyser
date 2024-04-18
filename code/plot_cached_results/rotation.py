@@ -30,29 +30,34 @@ labels = ["Point", "Galactic"]
 NSIDES = np.array((1, 2, 4, 8, 16, 32, 64, 128))
 x = np.append(np.array(1/2), NSIDES)
 
-y = np.zeros((len(folders), len(x)))
-y_std = np.zeros((len(folders), len(x)))
+y = np.zeros((2, len(x)))
+y_std = np.zeros((2, len(x)))
 
 use_abs = False
 
 for folder in folders:
     files = os.listdir(folder)
-    sigma = np.zeros((len(files), len(x)))
+    sigma = np.zeros((2, len(files), len(x)))
     for file in files:
-        data = np.load(folder + file)[0]
+        data = np.load(folder + file)
         if use_abs:
-            sigma[files.index(file)] = np.abs(data[0] / data[1])
+            sigma[0][files.index(file)] = np.abs(data[0][0] / data[0][1])
+            sigma[1][files.index(file)] = np.abs(data[1][0] / data[1][1])
         else:
-            sigma[files.index(file)] = data[0] / data[1]
+            sigma[0][files.index(file)] = data[0][0] / data[0][1]
+            sigma[1][files.index(file)] = data[1][0] / data[1][1]
     for i in range(len(y[0])):
-        y[folders.index(folder)][i] = np.mean(sigma[:, i])
-        y_std[folders.index(folder)][i] = np.std(sigma[:, i])
+        y[0][i] = np.mean(sigma[0][:, i])
+        y_std[0][i] = np.std(sigma[0][:, i])
+        y[1][i] = np.mean(sigma[1][:, i])
+        y_std[1][i] = np.std(sigma[1][:, i])
 print(y)
 print(y_std)
 
-for i in range(len(folders)):
-    plt.errorbar(x, y[i], y_std[i], label=labels[i], ecolor=error_color[i], color=color[i], capsize=3,
-                 capthick=1,)
+plt.errorbar(x, y[0], y_std[0], label=labels[0], ecolor=error_color[0], color=color[0], capsize=3,
+             capthick=1,)
+#plt.errorbar(x, y[1], y_std[1], label=labels[1], ecolor=error_color[1], color=color[1], capsize=3,
+#             capthick=1,)
 
 if use_abs:
     plt.plot((1/2, np.max(NSIDES)), (0.8, 0.8), color="k", linestyle="dashed")
@@ -63,9 +68,9 @@ else:
     plt.plot((1 / 2, np.max(NSIDES)), (0, 0), color="k", linestyle="dotted")
     plt.plot((1 / 2, np.max(NSIDES)), (-1, -1), color="k", linestyle="dotted")
 
-plt.title("Normalised mean detection for the rotated ACT mask")
+plt.title("Normalised mean detection for the rotated ACT masks")
 plt.xscale("log")
 plt.legend()
 ax.set_xticks(x, ["C"] + list(NSIDES))
-plt.savefig("act_rot.pdf")
+#plt.savefig("act_rot.pdf")
 plt.show()
