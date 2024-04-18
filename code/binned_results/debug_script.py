@@ -18,7 +18,7 @@ parser.add_argument("--max_z", type=float, default=20.0)
 parser.add_argument("--max_r", type=float, default=10000.0)
 parser.add_argument("--data_mask", default="sdss_act")
 parser.add_argument("--mask_set", default="both")
-parser.add_argument("--lon_shift", type=float, default=350.0)
+parser.add_argument("--lon_shift", type=float, default=0.0)
 args = parser.parse_args()
 
 def filter(redshift, richness):
