@@ -318,7 +318,7 @@ def run_nside(n):
 for mask_name in mask_names:
     mask = toolkit.load_mask(mask_name, raise_dir)
     mask.set_fig_ax(fig, ax)
-    if args.lon_shift != 0:
+    if args.lon_shift != 0.0:
         print("test2")
         sdss_mask = toolkit.load_mask("sdss_mask", raise_dir, lon_shift=args.lon_shift)
         #sdss_mask = toolkit.load_mask("sdss_mask", raise_dir)
