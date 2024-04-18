@@ -3,17 +3,18 @@ import numpy as np
 import toolkit.toolkit as toolkit
 
 toolkit.plt_use_tex()
-#error_bar_colors = ["xkcd:aqua blue", "orange", "xkcd:mint green", "xkcd:light purple", "xkcd:burnt sienna", "xkcd: pink"]
+error_bar_colors = ["xkcd:aqua blue", "orange", "xkcd:mint green", "xkcd:light purple", "xkcd:burnt sienna", "xkcd: pink"]
 #line_colors = ["xkcd:electric blue", "red", "xkcd:grass green", "purple", "xkcd:reddish brown", "xkcd:hot pink"]
 line_colors = ["xkcd:electric blue", "red", "xkcd:grass green", "purple", "xkcd:reddish brown", "xkcd:hot pink", "orange", "xkcd:aqua blue"]
-error_bar_colors = line_colors
+#error_bar_colors = line_colors
 run_const = True
 
 fig = plt.figure()
 ax = fig.add_subplot(111)
 
 NSIDES = [1, 2, 4, 8, 16, 32, 64, 128]
-save_path = "test.png"
+save_path = "act_redshift_binning.pdf"
+#save_path = "final_excess_complete.pdf"
 #title = "The excess of the ACT point mask, as a function of richness (bin)"
 #save_path = "./act_bin_richness.png"
 #files = ["./act_r/bin/act_r_bin_1.npy", "./act_r/bin/act_r_bin_2.npy", "./act_r/bin/act_r_bin_3.npy",
@@ -75,9 +76,17 @@ save_path = "test.png"
 #labels = ["$1 < s < 2$", "$2 < s < 3$", "$3 < s < 4$", "$4 < s < 5$", "$5 < s < 6$", "$6 < s < 7$", "$7 < s < 8$", "$8 < s$"]
 #labels = ["$1 < s < 3$", "$3 < s < 5$", "$5 < s < 7$", "$7 < s$"]
 
-labels = ["ACT", "Planck"]
-files = ["./act_r/min/act_excess.npy", "./planck_z/bin/planck_excess.npy"]
-title = "test"
+#labels = ["ACT", "Planck"]
+#files = ["./act_r/act_r_20+.npy", "./planck_r/planck_r_20+.npy"]
+#title = "The measured excess for the two point masks"
+
+#files = ["./act_r/act_r_5_10.npy", "./act_r/act_r_10_20.npy", "./act_r/act_r_20_40.npy", "./act_r/act_r_40_80.npy"]
+#files = ["./planck_r/planck_r_5_10.npy", "./planck_r/planck_r_10_20.npy", "./planck_r/planck_r_20_40.npy", "./planck_r/planck_r_40_80.npy"]
+files = ["./act_z/act_z_0_3.npy", "./act_z/act_z_3_45.npy", "./act_z/act_z_45_6.npy"]
+#files = ["./planck_z/planck_z_0_3.npy", "./planck_z/planck_z_3_45.npy", "./planck_z/planck_z_45_6.npy"]
+#labels = [r"$5 < \lambda < 10$", r"$10 < \lambda < 20$", r"$20 < \lambda < 40$", r"$40 < \lambda < 80$", r"$80 < \lambda$"]
+labels = [r"$0 < z < 0.3$", r"$0.3 < z < 0.45$", r"$0.45 < z < 0.6$"]
+title = "The excess of the ACT point mask as a function of redshift"
 
 point_only = True
 y_axis_label = "Excess"
