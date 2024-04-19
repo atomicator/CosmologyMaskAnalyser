@@ -40,8 +40,8 @@ save_path = "test.pdf"
 #title = "The excess of the ACT point mask, as a function of minimum redshift"
 #save_path = "./act_min_z.png"
 #save_path = "test.png"
-#files = ["./act_z/min/act_excess.npy", "./act_z/min/act_z_min_1.npy", "./act_z/min/act_z_min_2.npy",
-#         "./act_z/min/act_z_min_3.npy", "./act_z/min/act_z_min_4.npy"]
+#files = ["./act_z_fine/min/act_excess.npy", "./act_z_fine/min/act_z_min_1.npy", "./act_z_fine/min/act_z_min_2.npy",
+#         "./act_z_fine/min/act_z_min_3.npy", "./act_z_fine/min/act_z_min_4.npy"]
 #files = ["./act_r/min/act_r_min_2.npy"]
 
 #title = "The excess of the Planck point mask, as a function of minimum redshift"
@@ -83,8 +83,8 @@ save_path = "test.pdf"
 
 #files = ["./act_r/act_r_5_10.npy", "./act_r/act_r_10_20.npy", "./act_r/act_r_20_40.npy", "./act_r/act_r_40_80.npy"]
 #files = ["./planck_r/planck_r_5_10.npy", "./planck_r/planck_r_10_20.npy", "./planck_r/planck_r_20_40.npy", "./planck_r/planck_r_40_80.npy"]
-#files = ["./act_z/act_z_0_15.npy", "./act_z/act_z_15_3.npy", "./act_z/act_z_3_45.npy", "./act_z/act_z_45_6.npy"]
-files = ["./act_z/act_z_0_3.npy", "./act_z/act_z_3_45.npy", "./act_z/act_z_45_6.npy"]
+#files = ["./act_z_fine/act_z_0_15.npy", "./act_z_fine/act_z_15_3.npy", "./act_z_fine/act_z_3_45.npy", "./act_z_fine/act_z_45_6.npy"]
+files = ["./act_z_fine/act_z_0_3.npy", "./act_z_fine/act_z_3_45.npy", "./act_z_fine/act_z_45_6.npy"]
 #files = ["./planck_z/planck_z_0_3.npy", "./planck_z/planck_z_3_45.npy", "./planck_z/planck_z_45_6.npy"]
 #labels = [r"$5 < \lambda < 10$", r"$10 < \lambda < 20$", r"$20 < \lambda < 40$", r"$40 < \lambda < 80$", r"$80 < \lambda$"]
 #labels = [r"$0 < z < 0.15$", r"$0.15 < z < 0.3$", r"$0.3 < z < 0.45$", r"$0.45 < z < 0.6$"]

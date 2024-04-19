@@ -76,7 +76,8 @@ python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="s
 python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered" --weight_function="excess" --save_path="./act_z_7.png" --min_r=20 --max_r=8000 --mask_set="point" --data_mask="sdss_act" --min_z=0.3 --max_z=0.35 &
 python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered" --weight_function="excess" --save_path="./act_z_8.png" --min_r=20 --max_r=8000 --mask_set="point" --data_mask="sdss_act" --min_z=0.35 --max_z=0.4 &
 python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered" --weight_function="excess" --save_path="./act_z_9.png" --min_r=20 --max_r=8000 --mask_set="point" --data_mask="sdss_act" --min_z=0.4 --max_z=0.45 &
-python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered" --weight_function="excess" --save_path="./act_z_10.png" --min_r=20 --max_r=8000 --mask_set="point" --data_mask="sdss_act" --min_z=0.5 --max_z=0.55 &
-python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered" --weight_function="excess" --save_path="./act_z_11.png" --min_r=20 --max_r=8000 --mask_set="point" --data_mask="sdss_act" --min_z=0.55 --max_z=0.6 &
+python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered" --weight_function="excess" --save_path="./act_z_10.png" --min_r=20 --max_r=8000 --mask_set="point" --data_mask="sdss_act" --min_z=0.44 --max_z=0.5 &
+python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered" --weight_function="excess" --save_path="./act_z_11.png" --min_r=20 --max_r=8000 --mask_set="point" --data_mask="sdss_act" --min_z=0.5 --max_z=0.55 &
+python3 "./../code/binned_results/debug_script.py" --raise_path=1 --catalogue="sdss_filtered" --weight_function="excess" --save_path="./act_z_12.png" --min_r=20 --max_r=8000 --mask_set="point" --data_mask="sdss_act" --min_z=0.55 --max_z=0.6 &
 
 wait
