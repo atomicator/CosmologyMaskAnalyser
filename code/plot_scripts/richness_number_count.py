@@ -7,6 +7,9 @@ def excess(log_r):
     return 1 + (log_r - (1/50) * log_r ** 2) / 100
 
 
+def overdensity(excess):
+    return excess
+
 def log_richness(log_snr):
     alpha = 1
     beta = 2
@@ -29,7 +32,7 @@ for i in range(len(x)):
     y[i] = 0
     for j in range(steps):
         y[i] += ((bins[j+1] - bins[j]) * log_richness_dist(x[i], (bins[j+1] + bins[j]) / 2) *
-                 excess((bins[j+1] + bins[j]) / 2))
+                 overdensity(excess((bins[j+1] + bins[j]) / 2)))
 
 plt.plot(x, y)
 plt.plot(x, excess(x))

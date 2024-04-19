@@ -23,8 +23,8 @@ toolkit.plt_use_tex()
 fig = plt.figure()
 ax = fig.add_subplot()
 
-folders = ["./rotations/act/", "./rotations/planck/"][::1][0:1]
-#folders = ["./rotations/planck/"]
+#folders = ["./rotations/act/", "./rotations/planck/"][::1][0:1]
+folders = ["./rotations/planck/"]
 labels = ["Point", "Galactic"]
 
 NSIDES = np.array((1, 2, 4, 8, 16, 32, 64, 128))
@@ -56,8 +56,8 @@ print(y_std)
 
 plt.errorbar(x, y[0], y_std[0], label=labels[0], ecolor=error_color[0], color=color[0], capsize=3,
              capthick=1,)
-#plt.errorbar(x, y[1], y_std[1], label=labels[1], ecolor=error_color[1], color=color[1], capsize=3,
-#             capthick=1,)
+plt.errorbar(x, y[1], y_std[1], label=labels[1], ecolor=error_color[1], color=color[1], capsize=3,
+             capthick=1,)
 
 if use_abs:
     plt.plot((1/2, np.max(NSIDES)), (0.8, 0.8), color="k", linestyle="dashed")

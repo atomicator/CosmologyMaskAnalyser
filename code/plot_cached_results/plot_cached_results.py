@@ -13,7 +13,7 @@ fig = plt.figure()
 ax = fig.add_subplot(111)
 
 NSIDES = [1, 2, 4, 8, 16, 32, 64, 128]
-save_path = "act_redshift_binning.pdf"
+save_path = "test.pdf"
 #save_path = "final_excess_complete.pdf"
 #title = "The excess of the ACT point mask, as a function of richness (bin)"
 #save_path = "./act_bin_richness.png"
@@ -76,19 +76,22 @@ save_path = "act_redshift_binning.pdf"
 #labels = ["$1 < s < 2$", "$2 < s < 3$", "$3 < s < 4$", "$4 < s < 5$", "$5 < s < 6$", "$6 < s < 7$", "$7 < s < 8$", "$8 < s$"]
 #labels = ["$1 < s < 3$", "$3 < s < 5$", "$5 < s < 7$", "$7 < s$"]
 
-#labels = ["ACT", "Planck"]
-#files = ["./act_r/act_r_20+.npy", "./planck_r/planck_r_20+.npy"]
-#title = "The measured excess for the two point masks"
+#labels = ["Point", "Galactic"]
+#files = ["./act_r/act_r_20+.npy"]
+#files = ["./planck_r/planck_r_20+.npy"]
+#title = "The measured excess for the two ACT masks"
 
 #files = ["./act_r/act_r_5_10.npy", "./act_r/act_r_10_20.npy", "./act_r/act_r_20_40.npy", "./act_r/act_r_40_80.npy"]
 #files = ["./planck_r/planck_r_5_10.npy", "./planck_r/planck_r_10_20.npy", "./planck_r/planck_r_20_40.npy", "./planck_r/planck_r_40_80.npy"]
+#files = ["./act_z/act_z_0_15.npy", "./act_z/act_z_15_3.npy", "./act_z/act_z_3_45.npy", "./act_z/act_z_45_6.npy"]
 files = ["./act_z/act_z_0_3.npy", "./act_z/act_z_3_45.npy", "./act_z/act_z_45_6.npy"]
 #files = ["./planck_z/planck_z_0_3.npy", "./planck_z/planck_z_3_45.npy", "./planck_z/planck_z_45_6.npy"]
 #labels = [r"$5 < \lambda < 10$", r"$10 < \lambda < 20$", r"$20 < \lambda < 40$", r"$40 < \lambda < 80$", r"$80 < \lambda$"]
+#labels = [r"$0 < z < 0.15$", r"$0.15 < z < 0.3$", r"$0.3 < z < 0.45$", r"$0.45 < z < 0.6$"]
 labels = [r"$0 < z < 0.3$", r"$0.3 < z < 0.45$", r"$0.45 < z < 0.6$"]
 title = "The excess of the ACT point mask as a function of redshift"
 
-point_only = True
+point_only = False
 y_axis_label = "Excess"
 
 nside_eight_excess = []
@@ -96,12 +99,10 @@ nside_eight_error = []
 nside_eight_snr = [1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5][::-1]
 #nside_eight_snr = [2, 4, 6, 8][::-1]
 
-for file in files[::-1]:
+n = 0
+for file in files:
     result_set = np.load(file)
     print(result_set)
-    color = line_colors[files.index(file)]
-    error_bar_color = error_bar_colors[files.index(file)]
-    label = labels[files.index(file)]
     for i in range(len(result_set)):
         x = NSIDES.copy()
         if run_const:
@@ -110,9 +111,10 @@ for file in files[::-1]:
         print()
         nside_eight_excess.append(result_set[i][0][x.index(8)])
         nside_eight_error.append(result_set[i][1][x.index(8)])
-        ax.errorbar(x, result_set[i][0], result_set[i][1], marker="+", ecolor=error_bar_color,
-                    ls="none", color=color, capsize=3, capthick=1, label=label)
-        ax.plot(x, result_set[i][0], color=color)
+        ax.errorbar(x, result_set[i][0], result_set[i][1], marker="+", ecolor=error_bar_colors[n],
+                    ls="none", color=line_colors[n], capsize=3, capthick=1, label=labels[n])
+        ax.plot(x, result_set[i][0], color=line_colors[n])
+        n += 1
         if point_only:
             break
 
