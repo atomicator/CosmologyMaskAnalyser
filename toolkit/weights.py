@@ -1,3 +1,6 @@
+# This file contains various weight settings - the functions are passed as arguments to the methods in toolkit.
+# Note: we decided that excess_measurement was the best option
+
 import numpy as np
 import scipy.optimize
 import matplotlib.pyplot as plt
@@ -119,3 +122,10 @@ def ratio(_f_s, f_c, n, **_kwargs):
     mean = np.sum(f_c * weight) * 100
     variance = np.sum(1/n * weight ** 2) * 100
     return np.array((mean, np.sqrt(variance)))
+
+def overdensity(f_s, f_c, n, **_kwargs):
+    alpha = (f_c - f_s) / (f_s * (1 - f_c))
+    alpha_variance = (1 / (f_s * (1 - f_c)) + (f_c - f_s) / (f_s * (1 - f_c) ** 2)) * f_s * (1 - f_s) / n
+    mean = np.sum(alpha / alpha_variance) / alpha_variance
+    mean_error = 1 / np.sum(1 / alpha_variance)
+    return np.mean(mean, mean_error)

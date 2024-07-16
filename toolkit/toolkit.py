@@ -1,4 +1,4 @@
-import random
+# This defines all the classes used by the rest of the project
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -12,6 +12,7 @@ import copy
 import toolkit.filters as filters
 
 
+  # updates variables in the matplotlib library so that it uses LaTeX
 def plt_use_tex():
     plt.rcParams.update({
         "text.usetex": True,
@@ -21,12 +22,12 @@ def plt_use_tex():
     return None
 
 
-class __Mask(object):  # overwite this with pixell and healpy specific versions
-    # Do not use this class outside of this file
+class __Mask(object):  # A template class, used to define general methods. Seperate inherited classes are needed for
+    # each type of mask used.
     fig = None
     ax = None
 
-    def lookup_point(self, lon, lat):
+    def lookup_point(self, lon, lat):  # Needs to be overwitten when inherited
         pass
 
     def set_fig_ax(self, fig, ax):
@@ -47,7 +48,7 @@ class __Mask(object):  # overwite this with pixell and healpy specific versions
         return unmasked_points / num_points
 
 
-class PixellMask(__Mask):
+class PixellMask(__Mask):  # Defines the methods for the PixellMask classes
     def __init__(self, path, step=1, mask_using_latlon=True, invert=True, **kwargs):
         # Load data from fits file
         self.imap = pixell.enmap.read_fits(path, **kwargs)
@@ -166,6 +167,7 @@ class HealpyMask(__Mask):
         self.nest = nest
         self.mask_using_latlon = mask_using_latlon
         self.lon_shift = lon_shift
+        #super().__init__()
 
     def lookup_point(self, lon, lat, correction_applied=False):
         if self.lon_shift:
@@ -215,12 +217,6 @@ class HealpyMask(__Mask):
         # ra = c.icrs.ra.degree
         # dec = c.icrs.dec.degree
         print("converted units")
-        """for i in range(x):
-            for j in range(y):
-                # pixel_data[i, j] = self.map[hp.ang2pix(self.NSIDE, (j / y) * 360, (i / x) * 180 - 90, lonlat=True)]
-                # print(ra[j], dec[i])
-                pixel_data[i, j] = self.lookup_point(lat[i, j], lat[i, j], correction_applied=False)
-        """
         pixel_data = self.lookup_point(lat, lon, correction_applied=False)
         pixel_data[pixel_data == 1] = np.nan
         lon = np.linspace(0, 360, y + 1)
@@ -272,12 +268,11 @@ class CombinationMask(PixellMask):
 
     def lookup_point(self, lon, lat):
         if self.use_and:
-            data = np.float_(np.bitwise_and(np.bool_(self.mask1.lookup_point(lon, lat)),
+            data = np.float64(np.bitwise_and(np.bool_(self.mask1.lookup_point(lon, lat)),
                                                            np.bool_(self.mask2.lookup_point(lon, lat))))
         else:
-            data = np.float_(np.bitwise_or(np.bool_(self.mask1.lookup_point(lon, lat)),
+            data = np.float64(np.bitwise_or(np.bool_(self.mask1.lookup_point(lon, lat)),
                                             np.bool_(self.mask2.lookup_point(lon, lat))))
-        #data = 1 - self.mask1.lookup_point(lon, lat) * self.mask2.lookup_point(lon, lat)
         if self.invert:
             data = 1 - data
         return data
@@ -396,30 +391,6 @@ class StarCatalogue(object):
             plt.show()
 
     def plot_on_ax(self, ax, alpha, resolution, cmap="plasma", vmax=None):
-        """x, y = resolution
-        print(np.sum(self.heatmap))
-        pixel_data = np.zeros((x, y))
-        for i in range(x):
-            print(i)
-            for j in range(y):
-                pixel_data[i, j] = self.heatmap[hp.ang2pix(self.NSIDE, (j / y) * 360, (i / x) * 180 - 90, lonlat=True)]
-        print(f"max: {np.max(pixel_data)}")
-        lat = np.linspace(- 90, 90, x + 1)
-        lon = np.linspace(0, 360, y + 1)
-        lon, lat = np.meshgrid(lon, lat)
-        # TODO: Make NaN filter mask based
-        if not self.cat_mask:
-            pixel_data[pixel_data == 0] = np.nan
-        else:
-            for i in range(x):
-                print(i)
-                for j in range(y):
-                    if self.cat_mask.lookup_point((j / y) * 360, (i / x) * 180 - 90) == 0:
-                        pixel_data[i, j] = np.nan
-        # c = ax.pcolormesh(lon, lat, pixel_data, alpha=alpha, cmap=cmap,
-        #                  norm=matplotlib.colors.LogNorm(vmin=None, vmax=None))
-        c = ax.pcolormesh(lon, lat, pixel_data, vmin=1, alpha=alpha, cmap=cmap)
-        return c"""
         x = np.linspace(-90, 90, resolution[0])
         y = np.linspace(0, 360, resolution[1])
         x, y = np.meshgrid(x, y)
@@ -551,7 +522,7 @@ class _BinMap(object):
                         mask.lookup_point(*self.binned_sample[pixel].transpose())) / len(
                         self.binned_sample[pixel])
                 except TypeError:
-                    sample_masked_fraction[pixel] = np.NAN
+                    sample_masked_fraction[pixel] = np.nan
         else:
             sample_masked_fraction = np.array(
                 1 - np.sum(mask.lookup_point(*self.binned_sample[0].transpose())) / len(self.binned_sample[0]))
@@ -568,19 +539,6 @@ class _BinMap(object):
                 np.bitwise_or(sample_masked_fraction == 1, sdss_allowed_region == planck_masked_only),
                 np.bitwise_not(not_masked))
             mixed_bins = np.bitwise_not(np.bitwise_or(masked, not_masked))
-
-            """nan_filter = np.bitwise_or(np.isnan(sample_masked_fraction), np.isinf(sample_masked_fraction))
-            masked = np.bitwise_and(np.bitwise_or(sample_masked_fraction == 1, sdss_allowed_region == planck_masked_only),
-                                    np.bitwise_not(nan_filter))
-            not_masked = np.bitwise_and(np.bitwise_or(np.bitwise_or(nan_filter, sample_masked_fraction == 0),
-                                                      sdss_allowed_region == 0), np.bitwise_not(masked))
-            mixed_bins = np.bitwise_not(np.bitwise_or(masked, not_masked))"""
-
-            """nan_filter = np.bitwise_not(np.bitwise_or(np.isnan(sample_masked_fraction), np.isinf(sample_masked_fraction)))
-            masked = sample_masked_fraction == 1
-            not_masked = sample_masked_fraction == 0
-            mixed_bins = (np.bitwise_not(np.bitwise_or(masked, np.bitwise_not(nan_filter))) * np.bitwise_not(not_masked) *
-                          np.bitwise_not(np.bitwise_or(planck_masked_only == 0, planck_masked_only == sdss_allowed_region)))"""
 
         elif filter_set == "n_only":
             not_masked = np.bitwise_or(np.bitwise_or(nan_filter, self.map == 0), sdss_allowed_region == 0)
@@ -709,51 +667,16 @@ class HealpixBinMap(_BinMap):
 
 
 def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="", write=True):
-    """pix = np.linspace(0, NSIDE_internal - 1, NSIDE_internal)
-    print(mask1.NSIDE, mask2.NSIDE)
-    sum = mask1.map + 1j * mask2.map
-    data1 = hp.ud_grade(sum == 0.0, NSIDE)
-    data2 = hp.ud_grade(sum == 1.0, NSIDE)
-    data3 = hp.ud_grade(sum == 1j, NSIDE)
-    data4 = hp.ud_grade(sum == 1 + 1j, NSIDE)
-    results = np.float_(np.array([data1, data2, data3, data4]))"""
-    """x = np.linspace(-180, 180, 2 * res)
-    y = np.linspace(-90, 90, res)
-    x, y = np.meshgrid(x, y)
-    data1 = mask1.lookup_point(x, y)
-    data2 = mask2.lookup_point(x, y)
-    data1[data1 > 0] = 1.0
-    data2[data2 > 0] = 1.0
-    data = data1 + 1j * data2
-    map = np.zeros((5, hp.nside2npix(NSIDE)))
-    bins = hp.ang2pix(NSIDE, x, y, lonlat=True)
-    for pixel in range(len(map[0])):
-        points = bins == pixel
-        print(pixel / len(map[0]))
-        reduced_data = data[points]
-        temp = y[points] * np.pi / 180
-        map[0, pixel] += np.sum(np.cos(temp))
-        map[1, pixel] += np.sum(np.cos(temp[reduced_data == 0.0]))
-        map[2, pixel] += np.sum(np.cos(temp[reduced_data == 1.0]))
-        map[3, pixel] += np.sum(np.cos(temp[reduced_data == 1j]))
-        map[4, pixel] += np.sum(np.cos(temp[reduced_data == 1.0 + 1j]))
-    print(map)
-    results = map[1:] / (map[0] + 1e-100)
-    print(np.max(results[0]), np.max(results[1]), np.max(results[2]), np.max(results[3]))"""
+
     pix = np.int_(np.linspace(0, hp.nside2npix(NSIDE_internal) - 1, hp.nside2npix(NSIDE_internal)))
     points = hp.pix2ang(NSIDE_internal, pix, lonlat=True)
-    #sum = mask1.lookup_point(*points) + 1j * mask2.lookup_point(*points)
     mask1_masked = mask1.lookup_point(*copy.deepcopy(points)) == 0.0
     mask2_masked = mask2.lookup_point(*copy.deepcopy(points)) == 0.0
-    """data1 = hp.ud_grade(sum == 0.0, NSIDE)
-    data2 = hp.ud_grade(sum == 1.0, NSIDE)
-    data3 = hp.ud_grade(sum == 1j, NSIDE)
-    data4 = hp.ud_grade(sum == 1 + 1j, NSIDE)"""
-    data1 = hp.ud_grade(np.float_(np.bitwise_and(mask1_masked, mask2_masked)), NSIDE)
-    data2 = hp.ud_grade(np.float_(np.bitwise_and(np.bitwise_not(mask1_masked), mask2_masked)), NSIDE)
-    data3 = hp.ud_grade(np.float_(np.bitwise_and(mask1_masked, np.bitwise_not(mask2_masked))), NSIDE)
-    data4 = hp.ud_grade(np.float_(np.bitwise_and(np.bitwise_not(mask1_masked), np.bitwise_not(mask2_masked))), NSIDE)
-    results = np.float_(np.array([data1, data2, data3, data4]))
+    data1 = hp.ud_grade(np.float64(np.bitwise_and(mask1_masked, mask2_masked)), NSIDE)
+    data2 = hp.ud_grade(np.float64(np.bitwise_and(np.bitwise_not(mask1_masked), mask2_masked)), NSIDE)
+    data3 = hp.ud_grade(np.float64(np.bitwise_and(mask1_masked, np.bitwise_not(mask2_masked))), NSIDE)
+    data4 = hp.ud_grade(np.float64(np.bitwise_and(np.bitwise_not(mask1_masked), np.bitwise_not(mask2_masked))), NSIDE)
+    results = np.float64(np.array([data1, data2, data3, data4]))
     if write:
         hp.fitsfunc.write_map(f"./{name}_{NSIDE}_1.fits", results[0], overwrite=True)
         hp.fitsfunc.write_map(f"./{name}_{NSIDE}_2.fits", results[1], overwrite=True)
@@ -841,7 +764,6 @@ def get_header_info(hdu_list):
 def load_mask(mask, raise_dir=2, nside=8, invert=False, lon_shift=None, **kwargs):
     value = None
     if mask == "planck_galactic":
-        # value = HealpyMask("../" * raise_dir + "data/HFI_PCCS_SZ-selfunc-union-survey_R2.08.fits", mask_using_latlon=True, hdu=1, partial=False)
         value = HealpyMask("../" * raise_dir + "data/planck_galactic_mask.fits", partial=True, mask_using_latlon=True)
     elif mask == "planck_point" or mask == "planck_modified_total":
         value = HealpyMask("../" * raise_dir + "data/HFI_PCCS_SZ-selfunc-inter-cosmo_2.02.fits", partial=False,
@@ -865,14 +787,14 @@ def load_mask(mask, raise_dir=2, nside=8, invert=False, lon_shift=None, **kwargs
         compound_map = load_mask("planck_point", raise_dir=raise_dir)
         value = load_mask("planck_point", raise_dir=raise_dir)
         compound_map.map = 2 * point_mask.map + galactic_mask.map
-        value.map = np.float_(np.bitwise_not(compound_map.map == 0))
+        value.map = np.float64(np.bitwise_not(compound_map.map == 0))
     elif mask == "planck_modified_point":
         point_mask = load_mask("planck_point", raise_dir=raise_dir)
         galactic_mask = load_mask("planck_galactic", raise_dir=raise_dir)
         compound_map = load_mask("planck_point", raise_dir=raise_dir)
         value = load_mask("planck_point", raise_dir=raise_dir)
         compound_map.map = 2 * point_mask.map + galactic_mask.map
-        value.map = np.float_(np.bitwise_not(compound_map.map == 1))
+        value.map = np.float64(np.bitwise_not(compound_map.map == 1))
     elif mask == "comparison_sdss_planck_galactic":
         # masked by
         planck_only = HealpyMask("../../data/cached_results/sdss_mask_planck_point_32_2.fits")
@@ -970,12 +892,11 @@ def fraction_masked_pair(mask1, mask2, n=int(1e3), ram_limited=False, weight_map
             data2 = mask2.lookup_point(x * 180 / np.pi, (theta * 180 / np.pi) - 90)
             weight = weight_map.lookup_weighted_point(x * 180 / np.pi, ((theta * 180 / np.pi) - 90) * np.ones(len(x)))
             data = np.array(data1 + 1j * data2)
-            # data = np.array(data1 + 1j * data2)
             sums[0] += np.sum(np.ones(n) * weight) * s
-            sums[1] += np.sum(np.float_(data == 1) * weight) * s
-            sums[2] += np.sum(np.float_(data == 1j) * weight) * s
-            sums[3] += np.sum(np.float_(data == 1 + 1j) * weight) * s
-            sums[4] += np.sum(np.float_(data == 0) * weight) * s
+            sums[1] += np.sum(np.float64(data == 1) * weight) * s
+            sums[2] += np.sum(np.float64(data == 1j) * weight) * s
+            sums[3] += np.sum(np.float64(data == 1 + 1j) * weight) * s
+            sums[4] += np.sum(np.float64(data == 0) * weight) * s
         results = sums[1:] / sums[0]
     return results
 
@@ -1049,6 +970,3 @@ def ra_dec_to_lon_lat(ra, dec, reverse=False):
 __cdict_bw = [(0, 0, 0), (1, 1, 1)]
 bw_heatmap = matplotlib.colors.LinearSegmentedColormap.from_list("black and white", __cdict_bw, N=2)
 rb_heatmap = matplotlib.colors.LinearSegmentedColormap.from_list("rb", [(1, 0, 0), (0, 0, 1)])
-
-# To Do
-"""Minimum richness, larger data set, binning data (z plus richness), then start ACT"""
