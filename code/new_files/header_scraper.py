@@ -26,7 +26,7 @@ toolkit.get_header_info(mask)
 
 #mask = astropy.io.fits.open("../binned_results/test.fits")
 
-#cat = toolkit.StarCatalogue("../binned_results/test.fits", hdu=1)
+#cat = toolkit.ClusterCatalogue("../binned_results/test.fits", hdu=1)
 #cat.load_lon_lat()
 
 #print(np.shape(cat.lon_lat))

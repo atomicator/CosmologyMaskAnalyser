@@ -120,12 +120,44 @@ def scatter(f_s, f_c, _n, **_kwargs):
 def ratio(_f_s, f_c, n, **_kwargs):
     weight = n / np.sum(n)
     mean = np.sum(f_c * weight) * 100
-    variance = np.sum(1/n * weight ** 2) * 100
+    variance = np.sum(1 / n * weight ** 2) * 100
     return np.array((mean, np.sqrt(variance)))
 
+
 def overdensity(f_s, f_c, n, **_kwargs):
+    try:
+        valid = np.bitwise_and(np.bitwise_and(n > 1, f_c > 0), f_c < 1)
+        n = n[valid]
+        f_s = f_s[valid]
+        f_c = f_c[valid]
+    except IndexError:  # catches the case where n is not an array
+        n = np.array((n,))
+        f_s = np.array((f_s,))
+        f_c = np.array((f_c,))
+
+    swap = f_s < 1 / 2
+    f_s[swap], f_c[swap] = 1 - f_c[swap], 1 - f_s[swap]
+    plt.scatter(f_s, f_c, 1 + np.int_(n / 10), "r", "+")
+    plt.xlabel(r"$f_{s}$")
+    plt.ylabel(r"$f_{c}$")
+    plt.plot([np.min((np.min(f_s), np.min(f_c))), np.max((np.max(f_s), np.max(f_c)))],
+             [np.min((np.min(f_s), np.min(f_c))), np.max((np.max(f_s), np.max(f_c)))], linestyle='--')
+    plt.show()
+    f_c_error = np.sqrt(f_s * (1 - f_s) / n)
+    #  f_c_error = np.sqrt(1 / n)
+    if len(n) > 1:
+        print("check used")
+        valid = np.bitwise_and((f_c + f_c_error) < 1, (f_c - f_c_error) > 0)
+        f_s = f_s[valid]
+        f_c = f_c[valid]
+        f_c_error = f_c_error[valid]
     alpha = (f_c - f_s) / (f_s * (1 - f_c))
-    alpha_variance = (1 / (f_s * (1 - f_c)) + (f_c - f_s) / (f_s * (1 - f_c) ** 2)) * f_s * (1 - f_s) / n
-    mean = np.sum(alpha / alpha_variance) / alpha_variance
-    mean_error = 1 / np.sum(1 / alpha_variance)
-    return np.mean(mean, mean_error)
+    print(f"alpha min / max: {np.min(alpha)} / {np.max(alpha)}")
+    # alpha_variance = np.abs((1 / (f_s * (1 - f_s)) + (f_s - f_s) / (f_s * (1 - f_s) ** 2)) ** 2 * f_s * (1 - f_s) / n)
+    alpha_variance = np.square((((f_s + f_c_error - f_s) / (f_s * (1 - f_s - f_c_error))) -
+                                ((f_s - f_c_error - f_s) / (f_s * (1 - f_s + f_c_error)))) / 2)
+
+    weight = (1 / alpha_variance) / np.sum(1 / alpha_variance)
+    mean = np.sum(alpha * weight)
+    mean_error = np.sqrt(np.sum(alpha_variance * weight ** 2))
+    return np.array((mean, mean_error))

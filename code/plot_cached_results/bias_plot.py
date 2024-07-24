@@ -5,15 +5,15 @@ from toolkit import toolkit
 toolkit.plt_use_tex()
 
 step = 5
-start = 2
+start = 4
 stop = 5
 
 files = ["bias_data_01/normal_bias_act_10k.npy", "bias_data/normal_bias_act_10k.npy", "bias_data/random_act_10k.npy",
          "bias_data/invert_bias_act_10k.npy", "bias_data_01/invert_bias_act_10k.npy"][start:stop:step]
 #files = ["bias_data_01/normal_bias_act_400k.npy", "bias_data/normal_bias_act_400k.npy", "bias_data/random_act_400k.npy",
 #         "bias_data/invert_bias_act_400k.npy", "bias_data_01/invert_bias_act_400k.npy"][start:stop:step]
-files = ["bias_data_01/normal_bias_planck_10k.npy", "bias_data/normal_bias_planck_10k.npy", "bias_data/random_planck_10k.npy",
-         "bias_data/invert_bias_planck_10k.npy", "bias_data_01/invert_bias_planck_10k.npy"][start:stop:step]
+#files = ["bias_data_01/normal_bias_planck_10k.npy", "bias_data/normal_bias_planck_10k.npy", "bias_data/random_planck_10k.npy",
+#         "bias_data/invert_bias_planck_10k.npy", "bias_data_01/invert_bias_planck_10k.npy"][start:stop:step]
 #files = ["bias_data_01/normal_bias_planck_400k.npy", "bias_data/normal_bias_planck_400k.npy", "bias_data/random_planck_400k.npy",
 #         "bias_data/invert_bias_planck_400k.npy", "bias_data_01/invert_bias_planck_400k.npy"][start:stop:step]
 alpha = [0.1, 0.05, 0, 1/19, 1/9][start:stop:step]
@@ -85,8 +85,10 @@ ax.set_title(f"A comparison of the errors for 100 realisations of 10,000 "
              f"clusters (Planck point)")
 #ax.set_title(f"The ACT point mask, analysed with biased samples of 10,000"
 #             f" clusters")
-plt.savefig("planck_random_10k.pdf")
+#plt.savefig("planck_random_10k.pdf")
 plt.show()
+
+print(np.mean(np.sqrt(variance) / mean_error))
 
 # To do:
 # Regenerate random catalogue

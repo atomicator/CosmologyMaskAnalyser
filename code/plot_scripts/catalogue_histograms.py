@@ -72,7 +72,7 @@ for i in range(len(bins) - 1):
     sdss_height[i] = np.sum(np.float_(np.bitwise_and(sdss_data > bins[i], sdss_data < bins[i + 1]))) / (len(sdss_data) / 100)
 #plt.stairs(sdss_height, bins, label="SDSS")
 
-#sdss_cat = toolkit.StarCatalogue("../../data/DR5_cluster-catalog_v1.1.fits", hdu=1, table=True)
+#sdss_cat = toolkit.ClusterCatalogue("../../data/DR5_cluster-catalog_v1.1.fits", hdu=1, table=True)
 #sdss_data = []
 #sdss_cat.load_with_selection(test, ("RM_LAMBDA", "RMDESY3_LAMBDA_CHISQ", "CAMIRA_N_mem"), True)
 #sdss_data = np.array(sdss_data)
@@ -152,7 +152,7 @@ plt.ylabel("Percentage")
 plt.xlabel("SNR")
 
 """
-act_cat = toolkit.StarCatalogue("../../data/DR5_cluster-catalog_v1.1.fits", hdu=1, table=True)
+act_cat = toolkit.ClusterCatalogue("../../data/DR5_cluster-catalog_v1.1.fits", hdu=1, table=True)
 sdss_richness = []
 sdss_snr = []
 sdss_redshift = []

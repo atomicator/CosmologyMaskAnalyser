@@ -190,7 +190,6 @@ plt.show()
 
 print(np.mean(sigma), np.std(sigma))
 print(np.min(richness))
-exit()
 
 plt.clf()
 #plt.scatter(richness, snr, color="r", marker="+")
@@ -211,7 +210,7 @@ snr = snr[snr > 5]
 for i in range(len(bins) - 1):
     sdss_height[i] = np.sum(np.float_(np.bitwise_and(snr > bins[i], snr < bins[i + 1])))
 sdss_height = 100 * sdss_height / np.sum(sdss_height)
-plt.stairs(sdss_height, bins, label=rf"ACT, SNR $>$ 5 $(N = {len(snr)})$")
+#plt.stairs(sdss_height, bins, label=rf"ACT, SNR $>$ 5 $(N = {len(snr)})$")
 print(np.sum(sdss_height))
 
 min_richness = 0
@@ -257,7 +256,7 @@ sdss_height = np.zeros(len(bins) - 1)
 for i in range(len(bins) - 1):
     sdss_height[i] = np.sum(np.float_(np.bitwise_and(snr > bins[i], snr < bins[i + 1])))
 sdss_height = 100 * sdss_height / np.sum(sdss_height)
-plt.stairs(sdss_height, bins, label=fr"SDSS, $f(\lambda) > {min_snr}$ " + f"$(N = {len(snr)})$")
+plt.stairs(sdss_height, bins, label=fr"SDSS, SNR$(\lambda) > {min_snr}$ " + f"$(N = {len(snr)})$")
 
 min_richness = 20
 print(f"min richness: {min_richness}")

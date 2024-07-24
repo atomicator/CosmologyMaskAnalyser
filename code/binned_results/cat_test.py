@@ -11,7 +11,7 @@ import astropy
 
 results = []
 #cat = toolkit.load_catalogue("sdss")
-#cat = toolkit.StarCatalogue("../../data/dr8_run_redmapper_v5.10_lgt5_catalog.fit", hdu=1)
+#cat = toolkit.ClusterCatalogue("../../data/dr8_run_redmapper_v5.10_lgt5_catalog.fit", hdu=1)
 
 
 max_z = 0.5
@@ -21,7 +21,7 @@ cat = astropy.io.fits.open("../../data/dr8_run_redmapper_v5.10_lgt5_catalog.fit"
 
 print(cat[1].columns)"""
 """
-cat = toolkit.StarCatalogue("../../data/dr8_run_redmapper_v5.10_lgt5_catalog.fit", hdu=1)
+cat = toolkit.ClusterCatalogue("../../data/dr8_run_redmapper_v5.10_lgt5_catalog.fit", hdu=1)
 #cat.load_with_selection(filter, ["Z_LAMBDA"], lon_lat=True)
 #cat.load_with_selection(filter, ["ZRED"], lon_lat=True)
 cat.load_with_selection(filter, ["LAMBDA_CHISQ"], lon_lat=True)

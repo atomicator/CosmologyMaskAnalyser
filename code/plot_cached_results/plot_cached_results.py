@@ -76,20 +76,20 @@ save_path = "test.pdf"
 #labels = ["$1 < s < 2$", "$2 < s < 3$", "$3 < s < 4$", "$4 < s < 5$", "$5 < s < 6$", "$6 < s < 7$", "$7 < s < 8$", "$8 < s$"]
 #labels = ["$1 < s < 3$", "$3 < s < 5$", "$5 < s < 7$", "$7 < s$"]
 
-#labels = ["Point", "Galactic"]
-#files = ["./act_r/act_r_20+.npy"]
+labels = ["Point", "Galactic"]
+files = ["./act_r/act_r_20+.npy"]
 #files = ["./planck_r/planck_r_20+.npy"]
-#title = "The measured excess for the two ACT masks"
+title = "The measured excess for the two ACT masks"
 
 #files = ["./act_r/act_r_5_10.npy", "./act_r/act_r_10_20.npy", "./act_r/act_r_20_40.npy", "./act_r/act_r_40_80.npy"]
 #files = ["./planck_r/planck_r_5_10.npy", "./planck_r/planck_r_10_20.npy", "./planck_r/planck_r_20_40.npy", "./planck_r/planck_r_40_80.npy"]
 #files = ["./act_z_fine/act_z_0_15.npy", "./act_z_fine/act_z_15_3.npy", "./act_z_fine/act_z_3_45.npy", "./act_z_fine/act_z_45_6.npy"]
-files = ["./act_z_fine/act_z_0_3.npy", "./act_z_fine/act_z_3_45.npy", "./act_z_fine/act_z_45_6.npy"]
+#files = ["./act_z_fine/act_z_0_3.npy", "./act_z_fine/act_z_3_45.npy", "./act_z_fine/act_z_45_6.npy"]
 #files = ["./planck_z/planck_z_0_3.npy", "./planck_z/planck_z_3_45.npy", "./planck_z/planck_z_45_6.npy"]
 #labels = [r"$5 < \lambda < 10$", r"$10 < \lambda < 20$", r"$20 < \lambda < 40$", r"$40 < \lambda < 80$", r"$80 < \lambda$"]
 #labels = [r"$0 < z < 0.15$", r"$0.15 < z < 0.3$", r"$0.3 < z < 0.45$", r"$0.45 < z < 0.6$"]
-labels = [r"$0 < z < 0.3$", r"$0.3 < z < 0.45$", r"$0.45 < z < 0.6$"]
-title = "The excess of the ACT point mask as a function of redshift"
+#labels = [r"$0 < z < 0.3$", r"$0.3 < z < 0.45$", r"$0.45 < z < 0.6$"]
+#title = "The excess of the ACT point mask as a function of redshift"
 
 point_only = False
 y_axis_label = "Excess"

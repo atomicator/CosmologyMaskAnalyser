@@ -2,6 +2,7 @@ from toolkit import toolkit
 import numpy as np
 import matplotlib.pyplot as plt
 
+toolkit.plt_use_tex()
 
 def excess(log_r):
     return 1 + (log_r - (1/50) * log_r ** 2) / 100

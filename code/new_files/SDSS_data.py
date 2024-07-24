@@ -7,7 +7,7 @@ fig = plt.figure()
 ax = fig.add_subplot(111)
 
 # load the catalogue
-#cat = toolkit.StarCatalogue("../../data/DR5_cluster-catalog_v1.1.fits", hdu=1)
+#cat = toolkit.ClusterCatalogue("../../data/DR5_cluster-catalog_v1.1.fits", hdu=1)
 cat = toolkit.StarCatalogue("../binned_results/test.fits", hdu=1, table=True)
 cat.load_lon_lat()
 data = np.load("../../data/random_catalogue_400k_inigo.npy")
@@ -45,7 +45,7 @@ print(cat.lon_lat)
 #plt.title("SDSS mask in GLAT-GLON")
 #plt.savefig("../../graphs/SDSS_mask.png", dpi=1e3)
 #plt.show()
-#sdss_mask = toolkit.StarCatalogue("../../data/redmapper_dr8_public_v6.3_zmask.fits", hdu=1)
+#sdss_mask = toolkit.ClusterCatalogue("../../data/redmapper_dr8_public_v6.3_zmask.fits", hdu=1)
 
 #print(sdss_mask.data.field("HPIX"))
 

@@ -12,8 +12,7 @@ import copy
 import toolkit.filters as filters
 
 
-  # updates variables in the matplotlib library so that it uses LaTeX
-def plt_use_tex():
+def plt_use_tex():  # updates variables in the matplotlib library so that it uses LaTeX
     plt.rcParams.update({
         "text.usetex": True,
         "font.family": "serif",
@@ -967,6 +966,6 @@ def ra_dec_to_lon_lat(ra, dec, reverse=False):
 
 
 #  Define a black and white heatmap
-__cdict_bw = [(0, 0, 0), (1, 1, 1)]
+__cdict_bw = np.array(((0, 0, 0), (1, 1, 1)))
 bw_heatmap = matplotlib.colors.LinearSegmentedColormap.from_list("black and white", __cdict_bw, N=2)
-rb_heatmap = matplotlib.colors.LinearSegmentedColormap.from_list("rb", [(1, 0, 0), (0, 0, 1)])
+rb_heatmap = matplotlib.colors.LinearSegmentedColormap.from_list("rb", np.array([(1, 0, 0), (0, 0, 1)]), N=2)

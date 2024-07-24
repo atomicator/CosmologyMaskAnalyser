@@ -11,7 +11,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--catalogue", default="sdss_filtered")
 parser.add_argument("--save_path", default="test.png")
 parser.add_argument("--raise_path", type=int, default=2)
-parser.add_argument("--weight_function", default="excess")
+parser.add_argument("--weight_function", default="overdensity")
 parser.add_argument("--min_z", type=float, default=0.0)
 parser.add_argument("--min_r", type=float, default=20.0)
 parser.add_argument("--max_z", type=float, default=20.0)
@@ -146,7 +146,7 @@ else:
 
 
 NSIDES = [1, 2, 4, 8, 16, 32, 64, 128]
-# NSIDES = [128]
+#NSIDES = [8]
 run_const = True
 x_len = len(NSIDES)
 if run_const:
@@ -214,7 +214,8 @@ def run_nside(n):
 for mask_name in mask_names:
     mask = toolkit.load_mask(mask_name, raise_dir)
     mask.set_fig_ax(fig, ax)
-    if args.lon_shift != 0.0:
+    #if args.lon_shift != 0.0:
+    if True:
         print("test2")
         sdss_mask = toolkit.load_mask("sdss_mask", raise_dir, lon_shift=args.lon_shift)
         data_set = toolkit.gen_mask_comparison_map(sdss_mask, mask, write=False, NSIDE=256, NSIDE_internal=4096)
@@ -270,6 +271,7 @@ for mask_name in mask_names:
     print("all running")
 
     for i in range(x_len):
+        print(f"i: {i}")
         results[i] = thread_objects[i].get()
         print(results[i])
 

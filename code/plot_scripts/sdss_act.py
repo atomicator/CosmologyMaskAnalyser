@@ -11,16 +11,17 @@ def planck_cat_selection_func(snr, pipe_det, cosmo, min_snr, pipe_det_val):
     return (snr > min_snr) and (pipe_det == pipe_det_val) and cosmo
 
 
-#cat = toolkit.load_catalogue("sdss")
-#cat = toolkit.StarCatalogue("../binned_results/sdss_random_400k.fits", table=True)
-#cat = toolkit.StarCatalogue("../../data/DR5_cluster-catalog_v1.1.fits", hdu=1)
-cat = toolkit.StarCatalogue("../../data/HFI_PCCS_SZ-union_R2.08.fits", hdu=1)
+cat = toolkit.load_catalogue("sdss")
+#cat = toolkit.ClusterCatalogue("../binned_results/sdss_random_400k.fits", table=True)
+#cat = toolkit.ClusterCatalogue("../../data/DR5_cluster-catalog_v1.1.fits", hdu=1)
+#cat = toolkit.ClusterCatalogue("../../data/HFI_PCCS_SZ-union_R2.08.fits", hdu=1)
 #cat.load_lon_lat()
-min_snr = 6
-pipe_det_value = 111
-cat.load_with_selection(planck_cat_selection_func, ["SNR", "PIPE_DET", "COSMO"], True, min_snr, pipe_det_value)
+#min_snr = 6
+#pipe_det_value = 111
+#cat.load_with_selection(planck_cat_selection_func, ["SNR", "PIPE_DET", "COSMO"], True, min_snr, pipe_det_value)
 cat.set_fig_ax(fig, ax)
-
+print(len(cat.lon_lat))
+exit()
 #act_mask = toolkit.load_mask("act_point")
 #act_mask = toolkit.load_mask("sdss_mask")
 #act_mask = toolkit .load_mask("act")

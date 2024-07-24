@@ -72,7 +72,7 @@ cat.load_with_selection(planck_cat_selection_func, ["SNR", "PIPE_DET", "COSMO", 
 sdss_height = np.zeros(len(bins) - 1)
 for i in range(len(bins) - 1):
     sdss_height[i] = (np.sum(np.float_(np.bitwise_and(sdss_redshift > bins[i], sdss_redshift < bins[i + 1]))) / (len(sdss_redshift) / 100))
-plt.stairs(sdss_height, bins, label=r"Planck" + f" $(N = {len(sdss_richness)})$")
+plt.stairs(sdss_height, bins, label=r"Planck" + f" $(N = {len(sdss_redshift)})$")
 
 plt.legend()
 plt.title("The cluster count of the catalogues, as a function of redshift")
