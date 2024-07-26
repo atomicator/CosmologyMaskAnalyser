@@ -145,12 +145,12 @@ def overdensity(f_s, f_c, n, **_kwargs):
     plt.show()
     f_c_error = np.sqrt(f_s * (1 - f_s) / n)
     #  f_c_error = np.sqrt(1 / n)
-    if len(n) > 1:
-        print("check used")
-        valid = np.bitwise_and((f_c + f_c_error) < 1, (f_c - f_c_error) > 0)
-        f_s = f_s[valid]
-        f_c = f_c[valid]
-        f_c_error = f_c_error[valid]
+    #if len(n) > 1:
+    #    print("check used")
+    #    valid = np.bitwise_and((f_c + f_c_error) < 1, (f_c - f_c_error) > 0)
+    #    f_s = f_s[valid]
+    #    f_c = f_c[valid]
+    #    f_c_error = f_c_error[valid]
     alpha = (f_c - f_s) / (f_s * (1 - f_c))
     print(f"alpha min / max: {np.min(alpha)} / {np.max(alpha)}")
     # alpha_variance = np.abs((1 / (f_s * (1 - f_s)) + (f_s - f_s) / (f_s * (1 - f_s) ** 2)) ** 2 * f_s * (1 - f_s) / n)
