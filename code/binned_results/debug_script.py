@@ -1,10 +1,9 @@
-from toolkit import toolkit, weights
+from toolkit import toolkit_new as toolkit, weights, data
 import matplotlib.pyplot as plt
 import numpy as np
 import healpy as hp
 import argparse
 import multiprocessing.pool
-
 
 parser = argparse.ArgumentParser()
 
@@ -29,52 +28,51 @@ def data_filter(redshift, richness):
 
 raise_dir = args.raise_path
 if args.catalogue == "full_sky":
-    cat = toolkit.StarCatalogue("./" + raise_dir * "../" + "code/binned_results/random_full_sky.fits", table=True)
+    cat = toolkit.ClusterCatalogue("./" + raise_dir * "../" + "code/binned_results/random_full_sky.fits", table=True)
     data_name = "random full sky"
-    cat.load_lon_lat()
+    cat.load_data()
 elif args.catalogue == "sdss_random":
-    cat = toolkit.StarCatalogue("./" + raise_dir * "../" + "code/binned_results/test.fits", table=True)
-    cat.load_lon_lat()
+    cat = toolkit.ClusterCatalogue("./" + raise_dir * "../" + "code/binned_results/test.fits", table=True)
+    cat.load_data()
     data_name = "sdss random 400k"
 elif args.catalogue == "sdss":
-    cat = toolkit.load_catalogue("sdss", raise_dir)
+    cat = data.load_catalogue("sdss", raise_dir)
     data_name = "sdss actual"
     data_mask = "sdss"
 elif args.catalogue == "sdss_filtered":
-    cat = toolkit.load_catalogue("sdss", raise_dir)
+    cat = data.load_catalogue("sdss", raise_dir)
     cat.load_with_selection(data_filter, ["ZRED", "LAMBDA_CHISQ"], lon_lat=True)
     cat.lon_lat[:, 0] -= args.lon_shift
     cat.lon_lat[cat.lon_lat[:, 0] < 0, 0] += 360
     cat.lon_lat[cat.lon_lat[:, 0] > 360, 0] -= 360
     data_name = "\n" + rf"Filtered: ${args.min_z} < z < {args.max_z}$, ${args.min_r} < r < {args.max_r}$"
 elif args.catalogue in ("10m", "400k", "80k"):
-    cat = toolkit.StarCatalogue("./" + raise_dir * "../" + f"code/binned_results/random_sdss_{args.catalogue}.fits",
-                                table=True)
-    cat.load_lon_lat()
+    cat = toolkit.ClusterCatalogue("./" + raise_dir * "../" + f"code/binned_results/random_sdss_{args.catalogue}.fits",
+                                   table=True)
+    cat.load_data()
     data_name = f"sdss random {args.catalogue}"
 elif args.catalogue == "planck_point_biased":
-    cat = toolkit.StarCatalogue("./" + raise_dir * "../" + "code/binned_results/bias.fits", table=True)
-    cat.load_lon_lat()
-    cat1 = toolkit.StarCatalogue("./" + raise_dir * "../" + "code/binned_results/test.fits", table=True)
-    cat1.load_lon_lat()
+    cat = toolkit.ClusterCatalogue("./" + raise_dir * "../" + "code/binned_results/bias.fits", table=True)
+    cat.load_data()
+    cat1 = toolkit.ClusterCatalogue("./" + raise_dir * "../" + "code/binned_results/test.fits", table=True)
+    cat1.load_data()
     cat.lon_lat = np.append(cat1.lon_lat, cat.lon_lat, axis=0)
     data_name = "sdss biased"
 elif args.catalogue == "full_sky_inigo":
-    cat = toolkit.StarCatalogue("../binned_results/test.fits", hdu=1, table=True)
-    cat.load_lon_lat()
+    cat = toolkit.ClusterCatalogue("../binned_results/test.fits", hdu=1, table=True)
+    cat.load_data()
     data = np.load("../../data/random_catalogue_400k_inigo.npy")
     cat.lon_lat = np.array([data[0] * 180 / np.pi, 90 - data[1] * 180 / np.pi]).transpose()
     data_name = "full sky 400k from Inigo"
 elif args.catalogue == "act_bias":
-    cat = toolkit.StarCatalogue("./" + raise_dir * "../" + "code/binned_results/random_sdss_400k.fits", table=True)
-    cat.load_lon_lat()
-    cat1 = toolkit.StarCatalogue("./" + raise_dir * "../" + "code/binned_results/act_bias2.fits", table=True)
-    cat1.load_lon_lat()
+    cat = toolkit.ClusterCatalogue("./" + raise_dir * "../" + "code/binned_results/random_sdss_400k.fits", table=True)
+    cat.load_data()
+    cat1 = toolkit.ClusterCatalogue("./" + raise_dir * "../" + "code/binned_results/act_bias2.fits", table=True)
+    cat1.load_data()
     cat.lon_lat = np.append(cat1.lon_lat[0:259 - 61], cat.lon_lat, axis=0)
     data_name = "sdss biased"
 else:
     raise ValueError
-
 
 data_mask = args.data_mask
 
@@ -144,7 +142,6 @@ elif data_mask == "sdss_planck_lon_shift":
 else:
     raise ValueError
 
-
 NSIDES = [1, 2, 4, 8, 16, 32, 64, 128]
 #NSIDES = [8]
 run_const = True
@@ -164,16 +161,17 @@ ax = fig.add_subplot(111)
 
 def run_const():  # Note: These don't work if variables are passed as parameters, I don't know why
     data = np.array((
-        np.mean(data_set[0]),
-        np.mean(data_set[1]),
-        np.mean(data_set[2]),
-        np.mean(data_set[3])
+        (np.mean(data_set[0]),),
+        (np.mean(data_set[1]),),
+        (np.mean(data_set[2]),),
+        (np.mean(data_set[3]),),
     ))
-    print(data)
-    binmap = toolkit.ConstantMap()
+    binmap = toolkit.ConstantBinMap()
+    binmap.set_mask(mask)
     binmap.bin_catalogue(cat)
-    binmap.load_catalogue(cat)
-    output = binmap.divide_sample(mask, data, True, filter_set, a)
+    #binmap.load_catalogue(cat)
+    #output = binmap.divide_sample(mask, data, True, filter_set, a)
+    output = binmap.divide_sample(mask, data)
     mixed = weight_function(*output[1:], skip_n_filter=True)
     print(f"Mixed C: {mixed[0]} +/- {mixed[1]}")
     if convert_to_mask_frac:
@@ -194,9 +192,11 @@ def run_nside(n):
             hp.ud_grade(data_set[3], n)
         ))
         binmap = toolkit.HealpixBinMap(n)
+        binmap.set_mask(mask)
         binmap.bin_catalogue(cat)
-        binmap.load_catalogue(cat)
-        output = binmap.divide_sample(mask, data, False, filter_set, a)
+        #binmap.load_catalogue(cat)
+        #output = binmap.divide_sample(mask, data, False, filter_set, a)
+        output = binmap.divide_sample(mask, data)
         mixed = weight_function(*output[1:])
         print(f"Mixed {n}: {mixed[0]} +/- {mixed[1]}")
         print(output[0])
@@ -212,12 +212,12 @@ def run_nside(n):
 
 
 for mask_name in mask_names:
-    mask = toolkit.load_mask(mask_name, raise_dir)
+    mask = data.load_mask(mask_name, raise_dir)
     mask.set_fig_ax(fig, ax)
-    #if args.lon_shift != 0.0:
-    if True:
+    if args.lon_shift != 0.0:
+        #if args.lon_shift  :
         print("test2")
-        sdss_mask = toolkit.load_mask("sdss_mask", raise_dir, lon_shift=args.lon_shift)
+        sdss_mask = data.load_mask("sdss_mask", raise_dir, lon_shift=args.lon_shift)
         data_set = toolkit.gen_mask_comparison_map(sdss_mask, mask, write=False, NSIDE=256, NSIDE_internal=4096)
     elif data_mask == "full_sky":
         data_set = np.array((
@@ -227,7 +227,7 @@ for mask_name in mask_names:
             mask.map
         ))
     elif data_mask == "sdss_planck":
-        sdss_mask = toolkit.load_mask("sdss_mask", raise_dir)
+        sdss_mask = data.load_mask("sdss_mask", raise_dir)
         temp = mask.map + 1j * sdss_mask.map
         data_set = np.float64(np.array((
             temp == 0,
@@ -243,14 +243,14 @@ for mask_name in mask_names:
             toolkit.HealpyMask("../" * raise_dir + f"code/binned_results/sdss_mask_{mask_name}_256_4.fits").map
         )))
     elif data_mask == "sdss_act_lon_shift" or "sdss_planck_lon_shift":
-        sdss_mask = toolkit.load_mask("sdss_mask", raise_dir)
+        sdss_mask = data.load_mask("sdss_mask", raise_dir)
         data_set = toolkit.gen_mask_comparison_map(sdss_mask, mask, write=False, NSIDE=128, NSIDE_internal=1024)
     else:
         raise ValueError
 
     results = np.zeros((x_len, 2))
     pool = multiprocessing.pool.Pool(processes=x_len)
-    thread_objects = [None] * x_len
+    thread_objects = [[] for i in range(x_len)]
     index = 0
     if not set_f_zero:
         f.append((1 - np.sum(mask.lookup_point(*cat.lon_lat.transpose())) / len(cat.lon_lat)) * 100)
@@ -258,14 +258,18 @@ for mask_name in mask_names:
         f.append(0)
     print("running const")
     if run_const:
-        thread_objects[index] = pool.apply_async(run_const)
+        #thread_objects[index] = pool.apply_async(run_const)
+        thread_objects[index] = pool.apply_async(toolkit.run_const, (data_set, mask, cat, weight_function,
+                                                                     convert_to_mask_frac))
         index += 1
 
     print("running everything else")
 
     for n in NSIDES:
         print(n)
-        thread_objects[index] = pool.apply_async(run_nside, (n,))
+        #thread_objects[index] = pool.apply_async(run_nside, (n,))
+        thread_objects[index] = pool.apply_async(toolkit.run_nside, (n, data_set, mask, cat, weight_function,
+                                                                     convert_to_mask_frac))
         index += 1
 
     print("all running")
@@ -293,9 +297,9 @@ for i in range(len(result_set)):
     ax.plot(x, result_set[i][0] - f[i], color=line_colors[i])
 
 ax.set_xscale("log", base=2)
-ax.set_xlim(1/2 * np.sqrt(1/2), NSIDES[-1] * np.sqrt(2))
+ax.set_xlim(1 / 2 * np.sqrt(1 / 2), NSIDES[-1] * np.sqrt(2))
 
-ax.plot([1/2, NSIDES[-1]], np.zeros(2), color="k")
+ax.plot([1 / 2, NSIDES[-1]], np.zeros(2), color="k")
 ax.set_xticks([0.5] + NSIDES, ["C"] + NSIDES)
 
 ax.legend()

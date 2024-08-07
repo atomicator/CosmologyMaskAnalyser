@@ -2,7 +2,8 @@ from toolkit import toolkit, weights
 import numpy as np
 import astropy
 
-
+print(np.array((0,)) / 2)
+exit()
 """def filter(redshift):
     global results
     results.append(redshift)

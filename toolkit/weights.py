@@ -134,9 +134,6 @@ def overdensity(f_s, f_c, n, **_kwargs):
         n = np.array((n,))
         f_s = np.array((f_s,))
         f_c = np.array((f_c,))
-
-    swap = f_s < 1 / 2
-    f_s[swap], f_c[swap] = 1 - f_c[swap], 1 - f_s[swap]
     plt.scatter(f_s, f_c, 1 + np.int_(n / 10), "r", "+")
     plt.xlabel(r"$f_{s}$")
     plt.ylabel(r"$f_{c}$")
@@ -156,8 +153,17 @@ def overdensity(f_s, f_c, n, **_kwargs):
     # alpha_variance = np.abs((1 / (f_s * (1 - f_s)) + (f_s - f_s) / (f_s * (1 - f_s) ** 2)) ** 2 * f_s * (1 - f_s) / n)
     alpha_variance = np.square((((f_s + f_c_error - f_s) / (f_s * (1 - f_s - f_c_error))) -
                                 ((f_s - f_c_error - f_s) / (f_s * (1 - f_s + f_c_error)))) / 2)
-
     weight = (1 / alpha_variance) / np.sum(1 / alpha_variance)
     mean = np.sum(alpha * weight)
     mean_error = np.sqrt(np.sum(alpha_variance * weight ** 2))
     return np.array((mean, mean_error))
+
+
+def overdensity_manual(f_s, f_c, n, **kwargs):
+    f_c_error = np.sqrt(f_s * (1 - f_s) / n)
+    alpha = np.linspace(-1, 1, 1000)
+    chi_squared = []
+    for a in alpha:
+        chi_squared.append(np.sum(((f_c - (((1 + a) * f_s) / (1 + a * f_s))) / f_c_error) ** 2))
+    plt.plot(alpha, chi_squared)
+    return np.array((0, 0))
