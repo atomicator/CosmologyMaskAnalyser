@@ -1,5 +1,5 @@
 # A bunch of hardcoded data files - adjust as necessary
-from toolkit.toolkit import HealpyMask, PixellMask, CombinationMask, StarCatalogue
+from toolkit.toolkit_backup import HealpyMask, PixellMask, CombinationMask, StarCatalogue
 import numpy as np
 import healpy as hp
 import toolkit.filters as filters
