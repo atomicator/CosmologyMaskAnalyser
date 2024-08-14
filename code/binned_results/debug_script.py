@@ -1,4 +1,4 @@
-from toolkit import toolkit_old, weights, data
+from toolkit import toolkit, weights, data
 import matplotlib.pyplot as plt
 import numpy as np
 import healpy as hp
