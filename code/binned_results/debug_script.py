@@ -107,7 +107,7 @@ elif args.weight_function == "ratio":
     filter_set = "n_only"
 elif args.weight_function == "overdensity":
     y_axis_label = r"Overdensity"
-    weight_function = weights.overdensity
+    weight_function = weights.overdensity_manual
     set_f_zero = True
     convert_to_mask_frac = False
     filter_set = "n_only"
