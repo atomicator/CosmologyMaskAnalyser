@@ -41,7 +41,7 @@ elif args.catalogue == "sdss":
     data_mask = "sdss"
 elif args.catalogue == "sdss_filtered":
     cat = data.load_catalogue("sdss", raise_dir)
-    cat.load_with_selection(data_filter, ["ZRED", "LAMBDA_CHISQ"], lon_lat=True)
+    cat.load_data(selection_function=data_filter, requested_fields=["ZRED", "LAMBDA_CHISQ"], lon_lat=True)
     cat.lon_lat[:, 0] -= args.lon_shift
     cat.lon_lat[cat.lon_lat[:, 0] < 0, 0] += 360
     cat.lon_lat[cat.lon_lat[:, 0] > 360, 0] -= 360

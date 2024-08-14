@@ -1,5 +1,5 @@
 # A bunch of hardcoded data files - adjust as necessary
-from toolkit.toolkit_backup import HealpyMask, PixellMask, CombinationMask, StarCatalogue
+from toolkit.toolkit import HealpyMask, PixellMask, CombinationMask, ClusterCatalogue
 import numpy as np
 import healpy as hp
 import toolkit.filters as filters
@@ -76,8 +76,8 @@ def load_mask(mask, raise_dir=2, nside=8, invert=False, lon_shift=None):
 
 def load_catalogue(cat, raise_dir=2):
     if cat == "sdss":
-        data = StarCatalogue(raise_dir * "../" + "data/sdss_catalogue.fits", hdu=1)
-        data.load_lon_lat()
+        data = ClusterCatalogue(raise_dir * "../" + "data/sdss_catalogue.fits", hdu=1)
+        data.load_data()
     else:
         raise ValueError(f"{cat} is not a recognised catalogue")
     return data
