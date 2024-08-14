@@ -171,4 +171,4 @@ def overdensity_manual(f_s, f_c, n, **kwargs):
             pass
     plt.plot(alpha, chi_squared)
     plt.show()
-    return np.array((0, 0))
+    return np.array((alpha[chi_squared.index(min(chi_squared))], 0))
