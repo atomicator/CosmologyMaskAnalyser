@@ -164,11 +164,14 @@ def overdensity_manual(f_s, f_c, n, **kwargs):
     alpha = np.linspace(-1, 1, 1000)
     chi_squared = []
     for a in alpha:
-        try:
-            temp = ((f_c - (((1 + a) * f_s) / (1 + a * f_s))) / f_c_error) ** 2
-            chi_squared.append(temp)
-        except ZeroDivisionError:
-            pass
+        total = 0
+        for i in range(len(f_s)):
+            try:
+                temp = ((f_c - (((1 + a) * f_s) / (1 + a * f_s))) / f_c_error) ** 2
+                total += temp
+            except ZeroDivisionError:
+                pass
+        chi_squared.append(total)
     plt.plot(alpha, chi_squared)
     plt.show()
     return np.array((alpha[chi_squared.index(min(chi_squared))], 0))
