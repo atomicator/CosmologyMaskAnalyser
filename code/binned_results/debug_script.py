@@ -259,7 +259,7 @@ for mask_name in mask_names:
     print("running const")
     if run_const:
         #thread_objects[index] = pool.apply_async(run_const)
-        thread_objects[index] = pool.apply_async(toolkit.run_const, (data_set, mask, cat, weight_function,
+        thread_objects[index] = pool.apply_async(run_const, (data_set, mask, cat, weight_function,
                                                                      convert_to_mask_frac))
         index += 1
 
@@ -268,7 +268,7 @@ for mask_name in mask_names:
     for n in NSIDES:
         print(n)
         #thread_objects[index] = pool.apply_async(run_nside, (n,))
-        thread_objects[index] = pool.apply_async(toolkit.run_nside, (n, data_set, mask, cat, weight_function,
+        thread_objects[index] = pool.apply_async(run_nside, (n, data_set, mask, cat, weight_function,
                                                                      convert_to_mask_frac))
         index += 1
 
