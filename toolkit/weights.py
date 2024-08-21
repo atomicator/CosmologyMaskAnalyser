@@ -183,6 +183,9 @@ def overdensity_manual(f_s, f_c, n, **kwargs):
         elif f5 < f2:
             x1, f1 = x2, f2
             x2, f2 = x5, f5
+        else:
+            x1, f1 = x4, f4
+            x3, f3 = x5, f5
         if x3 - x1 < error_tolerance:
             break
     alpha = x2
