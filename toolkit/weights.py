@@ -161,22 +161,54 @@ def overdensity(f_s, f_c, n, **_kwargs):
 
 def overdensity_manual(f_s, f_c, n, **kwargs):
     f_c_error = np.sqrt(f_s * (1 - f_s) / n)
-    alpha = np.linspace(-1, 1, 1000)
-    chi_squared = []
     valid = f_c_error > 0
     f_s = f_s[valid]
     f_c = f_c[valid]
     f_c_error = f_c_error[valid]
-    for a in alpha:
-        #total = 0
-        #for i in range(len(f_s)):
-        #    try:
-        #        temp = ((f_c - (((1 + a) * f_s) / (1 + a * f_s))) / f_c_error) ** 2
-        #        total += temp
-        #    except ZeroDivisionError:
-        #        pass
-        total = np.sum(((f_c - (((1 + a) * f_s) / (1 + a * f_s))) / f_c_error) ** 2)
-        chi_squared.append(total)
-    plt.plot(alpha, chi_squared)
-    plt.show()
-    return np.array((alpha[chi_squared.index(min(chi_squared))], 0))
+    error_tolerance = 1e-5
+    chi_square_increase_error = len(f_c)
+    # This is assuming golden section search will work - assume only one minimum exists
+
+    def calc_chi_square(a):
+        return np.sum(((f_c - (((1 + a) * f_s) / (1 + a * f_s))) / f_c_error) ** 2)
+
+    x1, x2, x3 = -10, 0, 10
+    f1, f2, f3 = calc_chi_square(x1), calc_chi_square(x2), calc_chi_square(x3)
+    while True:
+        x4, x5 = (x1 + x2) / 2, (x2 + x3) / 2
+        f4, f5 = calc_chi_square(x4), calc_chi_square(x5)
+        if f4 < f2:
+            x2, f2 = x4, f4
+            x3, f3 = x2, f2
+        elif f5 < f2:
+            x1, f1 = x2, f2
+            x2, f2 = x5, f5
+        if x3 - x1 < error_tolerance:
+            break
+    alpha = x2
+    chi_square_min = f2
+    chi_square_target = chi_square_min + chi_square_increase_error
+    max_error = 10
+    lower1 = alpha - max_error
+    lower2 = alpha
+    upper1 = alpha
+    upper2 = alpha + max_error
+    (fl1, fl2, fu1, fu2) = (calc_chi_square(lower1), calc_chi_square(lower2), calc_chi_square(upper1),
+                            calc_chi_square(upper2))
+    while True:
+        m1 = (lower1 + upper1) / 2
+        m2 = (lower2 + upper2) / 2
+        fm1, fm2 = calc_chi_square(m1), calc_chi_square(m2)
+        if fm1 > chi_square_target:
+            upper1, fu1 = m1, fm1
+        else:
+            lower1, fl1 = m1, fm1
+
+        if fm2 > chi_square_target:
+            upper2, fu2 = m1, fm1
+        else:
+            lower2, fl2 = m1, fm1
+
+        if (upper1 - lower1) < error_tolerance and (upper2 - lower2) < error_tolerance:
+            break
+    return np.array((alpha, (m1 + m2) / 2))
