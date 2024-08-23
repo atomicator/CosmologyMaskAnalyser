@@ -166,7 +166,7 @@ def overdensity_manual(f_s, f_c, n, **kwargs):
     f_c = f_c[valid]
     f_c_error = f_c_error[valid]
     error_tolerance = 1e-5
-    chi_square_increase_error = len(f_c)
+    chi_square_increase_error = len(f_c) / 1000
     # This is assuming golden section search will work - assume only one minimum exists
 
     def calc_chi_square(a):
