@@ -191,7 +191,7 @@ def overdensity_manual(f_s, f_c, n, **kwargs):
     alpha = x2
     chi_square_min = f2
     chi_square_target = chi_square_min + chi_square_increase_error
-    max_error = 10
+    max_error = 1
     lower1 = alpha - max_error
     lower2 = alpha
     upper1 = alpha
