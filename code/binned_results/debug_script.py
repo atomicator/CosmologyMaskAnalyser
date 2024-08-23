@@ -111,7 +111,6 @@ elif args.weight_function == "overdensity":
     set_f_zero = True
     convert_to_mask_frac = False
     filter_set = "n_only"
-    print("Overdensity")
 else:
     raise ValueError
 
