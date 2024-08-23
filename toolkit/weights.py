@@ -202,16 +202,16 @@ def overdensity_manual(f_s, f_c, n, **kwargs):
         m1 = (lower1 + upper1) / 2
         m2 = (lower2 + upper2) / 2
         fm1, fm2 = calc_chi_square(m1), calc_chi_square(m2)
-        if fm1 > chi_square_target:
+        if fm1 < chi_square_target:
             upper1, fu1 = m1, fm1
         else:
             lower1, fl1 = m1, fm1
 
-        if fm2 > chi_square_target:
+        if fm2 < chi_square_target:
             upper2, fu2 = m2, fm2
         else:
             lower2, fl2 = m2, fm2
 
         if (upper1 - lower1) < error_tolerance and (upper2 - lower2) < error_tolerance:
             break
-    return np.array((alpha, (m1 + m2) / 2))
+    return np.array((alpha, (m1 - m2) / 2))
