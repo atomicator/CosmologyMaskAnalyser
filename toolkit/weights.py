@@ -198,20 +198,36 @@ def overdensity_manual(f_s, f_c, n, **kwargs):
     upper2 = alpha + max_error
     #(fl1, fl2, fu1, fu2) = (calc_chi_square(lower1), calc_chi_square(lower2), calc_chi_square(upper1),
     #                        calc_chi_square(upper2))
+    #while True:
+    #    m1 = (lower1 + upper1) / 2
+    #    m2 = (lower2 + upper2) / 2
+    #    fm1, fm2 = calc_chi_square(m1), calc_chi_square(m2)
+    #    if fm1 < chi_square_target:
+    #        upper1, fu1 = m1, fm1
+    #    else:
+    #        lower1, fl1 = m1, fm1
+
+    #    if fm2 < chi_square_target:
+    #        upper2, fu2 = m2, fm2
+    #    else:
+    #        lower2, fl2 = m2, fm2
+
+    #    if (upper1 - lower1) < error_tolerance and (upper2 - lower2) < error_tolerance:
+    #        break
+
     while True:
-        m1 = (lower1 + upper1) / 2
-        m2 = (lower2 + upper2) / 2
-        fm1, fm2 = calc_chi_square(m1), calc_chi_square(m2)
-        if fm1 < chi_square_target:
-            upper1, fu1 = m1, fm1
+        midpoint1 = (lower1 + upper1) / 2
+        midpoint2 = (lower2 + upper2) / 2
+        chi_square1 = calc_chi_square(midpoint1)
+        chi_square2 = calc_chi_square(midpoint2)
+        if chi_square1 < chi_square_target:
+            upper1 = midpoint1
         else:
-            lower1, fl1 = m1, fm1
-
-        if fm2 < chi_square_target:
-            upper2, fu2 = m2, fm2
+            lower1 = midpoint1
+        if chi_square2 < chi_square_target:
+            upper2 = midpoint2
         else:
-            lower2, fl2 = m2, fm2
-
-        if (upper1 - lower1) < error_tolerance and (upper2 - lower2) < error_tolerance:
+            lower2 = midpoint2
+        if np.abs(upper1 - lower1) + np.abs(upper2 - lower2) < error_tolerance:
             break
-    return np.array((alpha, (m1 - m2) / 2))
+    return np.array((alpha, np.abs(midpoint1 - midpoint2) / 2))
