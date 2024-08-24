@@ -166,7 +166,7 @@ def overdensity_manual(f_s, f_c, n, **kwargs):
     f_c = f_c[valid]
     f_c_error = f_c_error[valid]
     error_tolerance = 1e-5
-    chi_square_increase_error = np.sqrt(len(f_c))
+    chi_square_increase_error = 1 #np.sqrt(len(f_c))
     # This is assuming golden section search will work - assume only one minimum exists
 
     def calc_chi_square(a):
@@ -229,11 +229,11 @@ def overdensity_manual(f_s, f_c, n, **kwargs):
         midpoint2 = (lower2 + upper2) / 2
         chi_square1 = calc_chi_square(midpoint1)
         chi_square2 = calc_chi_square(midpoint2)
-        if chi_square1 < chi_square_target:
+        if chi_square1 < chi_square_target:  # bc monotonic decrease
             upper1 = midpoint1
         else:
             lower1 = midpoint1
-        if chi_square2 < chi_square_target:
+        if chi_square2 > chi_square_target:  # bc monotonic increase
             upper2 = midpoint2
         else:
             lower2 = midpoint2
