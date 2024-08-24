@@ -191,7 +191,7 @@ def overdensity_manual(f_s, f_c, n, **kwargs):
     alpha = x2
     chi_square_min = f2
     chi_square_target = chi_square_min + chi_square_increase_error
-    max_error = 1
+    max_error = 10
     lower1 = alpha - max_error
     upper1 = alpha
     lower2 = alpha
@@ -238,7 +238,8 @@ def overdensity_manual(f_s, f_c, n, **kwargs):
         else:
             lower2 = midpoint2
         #if np.abs(upper1 - lower1) + np.abs(upper2 - lower2) < error_tolerance:
-        if i > 10:
+        if i > 100:
             break
     print(alpha, midpoint1, midpoint2)
-    return np.array((alpha, np.abs(midpoint1 - midpoint2) / 2))
+    return np.array((alpha, np.abs(midpoint1 - alpha)))
+    #return np.array((alpha, np.abs(midpoint1 - midpoint2) / 2))
