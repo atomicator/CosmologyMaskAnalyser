@@ -166,7 +166,7 @@ def overdensity_manual(f_s, f_c, n, **kwargs):
     f_c = f_c[valid]
     f_c_error = f_c_error[valid]
     error_tolerance = 1e-5
-    chi_square_increase_error = len(f_c) / 1000
+    chi_square_increase_error = np.sqrt(len(f_c))
     # This is assuming golden section search will work - assume only one minimum exists
 
     def calc_chi_square(a):
@@ -196,6 +196,13 @@ def overdensity_manual(f_s, f_c, n, **kwargs):
     lower2 = alpha
     upper1 = alpha
     upper2 = alpha + max_error
+    x = np.linspace(-1, 1, 1000)
+    y = []
+    for data_point in x:
+        y.append(calc_chi_square(data_point))
+    plt.plot(x, y)
+    plt.plot((-1, 1), (chi_square_target, chi_square_target), linestyle='--')
+    plt.show()
     #(fl1, fl2, fu1, fu2) = (calc_chi_square(lower1), calc_chi_square(lower2), calc_chi_square(upper1),
     #                        calc_chi_square(upper2))
     #while True:
@@ -215,7 +222,9 @@ def overdensity_manual(f_s, f_c, n, **kwargs):
     #    if (upper1 - lower1) < error_tolerance and (upper2 - lower2) < error_tolerance:
     #        break
 
+    i = 0
     while True:
+        i += 1
         midpoint1 = (lower1 + upper1) / 2
         midpoint2 = (lower2 + upper2) / 2
         chi_square1 = calc_chi_square(midpoint1)
@@ -228,6 +237,7 @@ def overdensity_manual(f_s, f_c, n, **kwargs):
             upper2 = midpoint2
         else:
             lower2 = midpoint2
-        if np.abs(upper1 - lower1) + np.abs(upper2 - lower2) < error_tolerance:
+        #if np.abs(upper1 - lower1) + np.abs(upper2 - lower2) < error_tolerance:
+        if i > 10:
             break
     return np.array((alpha, np.abs(midpoint1 - midpoint2) / 2))
