@@ -40,7 +40,8 @@ class __Mask(object):  # A template class, used to define general methods. Separ
 
     def lookup_point(self, lon, lat):  # A wrapper around _lookup_point, which handles the mask file itself
         if self.lon_shift:  # If the co-ords are shifted
-            lon = lon.clone()
+            #lon = lon.clone()
+            lon = np.copy(lon)
             lon += self.lon_shift
             lon[lon > 360] -= 360
             lon[lon < 0] += 360
