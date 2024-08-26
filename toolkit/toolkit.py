@@ -203,14 +203,19 @@ class NoFigAx(TypeError):
 class ClusterCatalogue(object):
     def __init__(self, path=None, hdu=0, table=False, **kwargs):  # Path is the path to the file. HDU is the hdu of the
         # file to load. Table stores if the data is stored in an ordinary fits file.
-        if not table:
-            self.fits = astropy.io.fits.open(path, **kwargs)  # load the data
-            self.h = dict(self.fits[hdu].header)
-            self.data = self.fits[hdu].data
-        if table:
-            self.fits = astropy.table.Table.read(path)  # load the table
-            self.data = self.fits
+        if path:
+            if not table:
+                self.fits = astropy.io.fits.open(path, **kwargs)  # load the data
+                self.h = dict(self.fits[hdu].header)
+                self.data = self.fits[hdu].data
+            if table:
+                self.fits = astropy.table.Table.read(path)  # load the table
+                self.data = self.fits
+                self.h = None
+        else:
+            self.fits = None
             self.h = None
+            self.data = None
 
         self.lon_lat = None  # stores the lon / lat co-ords of the
         self.heatmap = None  # stores data of the heatmap
