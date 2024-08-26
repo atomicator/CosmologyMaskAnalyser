@@ -241,5 +241,5 @@ def overdensity_manual(f_s, f_c, n, **kwargs):
         if i > 100:
             break
     print(alpha, midpoint1, midpoint2)
-    return np.array((alpha, np.abs(midpoint1 - alpha)))
-    #return np.array((alpha, np.abs(midpoint1 - midpoint2) / 2))
+    #return np.array((alpha, np.abs(midpoint1 - alpha)))
+    return np.array((alpha, np.abs(midpoint1 - midpoint2) / 2))
