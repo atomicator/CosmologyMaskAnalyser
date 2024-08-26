@@ -1,5 +1,4 @@
-import matplotlib.pyplot as plt
-from toolkit import toolkit, weights
+from toolkit import toolkit, weights, data
 import argparse
 import multiprocessing.pool
 import numpy as np
@@ -37,7 +36,7 @@ def test_function(const_only=args.const_only, overdensity=args.overdensity):
     else:
         bias_points = bias_points[point_mask.lookup_point(*bias_points.transpose()) != 0]
     print(len(bias_points))
-    cat = toolkit.StarCatalogue()
+    cat = toolkit.ClusterCatalogue()
     #cat.lon_lat = np.append(random_points, bias_points[:int(len(random_points) * overdensity * sky_mask_frac)], axis=0)
     cat.lon_lat = np.append(random_points, bias_points, axis=0)
     temp = []
@@ -47,10 +46,9 @@ def test_function(const_only=args.const_only, overdensity=args.overdensity):
         np.mean(data_set[2]),
         np.mean(data_set[3])
     ))
-    binmap = toolkit.ConstantMap()
+    binmap = toolkit.ConstantBinMap()
     binmap.bin_catalogue(cat)
-    binmap.load_catalogue(cat)
-    output = binmap.divide_sample(point_mask, data, True, filter_set, 0)
+    output = binmap.divide_sample(point_mask, data)
     mixed = weights.excess_measurement(*output[1:], skip_n_filter=True)
     print(f"Mixed C: {mixed[0]} +/- {mixed[1]}")
     final = np.array(mixed)
@@ -67,15 +65,14 @@ def test_function(const_only=args.const_only, overdensity=args.overdensity):
                 ))
                 binmap = toolkit.HealpixBinMap(n)
                 binmap.bin_catalogue(cat)
-                binmap.load_catalogue(cat)
-                output = binmap.divide_sample(point_mask, data, False, filter_set, 0)
+                output = binmap.divide_sample(point_mask, data)
                 mixed = weights.excess_measurement(*output[1:])
                 print(f"Mixed {n}: {mixed[0]} +/- {mixed[1]}")
                 print(output[0])
                 final = np.array(mixed)
                 print(f"Final {n}: {final[0]} +/- {final[1]}")
             except ValueError:
-                final = np.array([np.NaN, np.NaN])
+                final = np.array([np.nan, np.nan])
             finally:
                 temp.append(final)
     temp = np.array(temp)
@@ -84,19 +81,19 @@ def test_function(const_only=args.const_only, overdensity=args.overdensity):
 
 
 if args.catalogue == "sdss":
-    random_mask = toolkit.load_mask("sdss_mask", raise_dir=args.raise_dir)
+    random_mask = data.load_mask("sdss_mask", raise_dir=args.raise_dir)
 else:
     raise ValueError
 
 if args.data_mask == "sdss_act":
-    point_mask = toolkit.load_mask("act_point", raise_dir=args.raise_dir)
-    temp1 = toolkit.load_mask("sdss_mask", raise_dir=args.raise_dir)
+    point_mask = data.load_mask("act_point", raise_dir=args.raise_dir)
+    temp1 = data.load_mask("sdss_mask", raise_dir=args.raise_dir)
     temp1.map = np.int_(temp1.map)
-    #temp2 = toolkit.load_mask("act_point", raise_dir=args.raise_dir)
+    #temp2 = data.load_mask("act_point", raise_dir=args.raise_dir)
     temp1.map = 1 - temp1.map
     overdensity_mask = toolkit.CombinationMask(temp1, point_mask, invert=True, use_and=False)
     sky_mask_frac = 0.009859934289099422
-    data_set = np.float_(np.array((
+    data_set = np.float64(np.array((
         toolkit.HealpyMask("../" * args.raise_dir + f"code/binned_results/sdss_mask_act_point_256_1.fits").map,
         toolkit.HealpyMask("../" * args.raise_dir + f"code/binned_results/sdss_mask_act_point_256_2.fits").map,
         toolkit.HealpyMask("../" * args.raise_dir + f"code/binned_results/sdss_mask_act_point_256_3.fits").map,
@@ -104,16 +101,16 @@ if args.data_mask == "sdss_act":
     )))
     filter_set = "n_only"
 elif args.data_mask == "sdss_planck":
-    point_mask = toolkit.load_mask("planck_modified_point", raise_dir=args.raise_dir)
-    temp1 = toolkit.load_mask("sdss_mask", raise_dir=args.raise_dir)
+    point_mask = data.load_mask("planck_modified_point", raise_dir=args.raise_dir)
+    temp1 = data.load_mask("sdss_mask", raise_dir=args.raise_dir)
     temp1.map = np.int_(temp1.map)
-    # temp2 = toolkit.load_mask("act_point", raise_dir=args.raise_dir)
+    # temp2 = data.load_mask("act_point", raise_dir=args.raise_dir)
     temp1.map = 1 - temp1.map
     overdensity_mask = toolkit.CombinationMask(temp1, point_mask, invert=True, use_and=False)
     sky_mask_frac = 0.0138443493342983
-    sdss_mask = toolkit.load_mask("sdss_mask", args.raise_dir)
+    sdss_mask = data.load_mask("sdss_mask", args.raise_dir)
     temp = point_mask.map + 1j * sdss_mask.map
-    data_set = np.float_(np.array((
+    data_set = np.float64(np.array((
         temp == 0,
         temp == 1j,
         temp == 1,
