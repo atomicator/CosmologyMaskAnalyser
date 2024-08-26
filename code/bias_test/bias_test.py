@@ -41,10 +41,10 @@ def test_function(const_only=args.const_only, overdensity=args.overdensity):
     cat.lon_lat = np.append(random_points, bias_points, axis=0)
     temp = []
     data = np.array((
-        np.mean(data_set[0]),
-        np.mean(data_set[1]),
-        np.mean(data_set[2]),
-        np.mean(data_set[3]),
+        (np.mean(data_set[0]),),
+        (np.mean(data_set[1]),),
+        (np.mean(data_set[2]),),
+        (np.mean(data_set[3]),),
     ),)
     binmap = toolkit.ConstantBinMap()
     binmap.set_mask(point_mask)
