@@ -16,8 +16,8 @@ parser.add_argument("--min_r", type=float, default=20.0)
 parser.add_argument("--max_z", type=float, default=20.0)
 parser.add_argument("--max_r", type=float, default=10000.0)
 parser.add_argument("--data_mask", default="sdss_act")
-parser.add_argument("--mask_set", default="both")
-parser.add_argument("--lon_shift", type=float, default=180.0)
+parser.add_argument("--mask_set", default="point")
+parser.add_argument("--lon_shift", type=float, default=0.0)
 args = parser.parse_args()
 
 
@@ -142,7 +142,7 @@ elif data_mask == "sdss_planck_lon_shift":
 else:
     raise ValueError
 
-NSIDES = [1, 2, 4, 8, 16, 32, 64, 128]
+NSIDES = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024]
 #NSIDES = [8]
 run_const = True
 x_len = len(NSIDES)

@@ -190,7 +190,7 @@ def overdensity_manual(f_s, f_c, n, **kwargs):
             break
     alpha = x2
     chi_square_min = f2
-    chi_square_target = chi_square_min + chi_square_increase_error
+    chi_square_target = chi_square_min + chi_square_increase_error #+ (chi_square_min / len(f_s))
     max_error = 10
     lower1 = alpha - max_error
     upper1 = alpha
@@ -200,9 +200,9 @@ def overdensity_manual(f_s, f_c, n, **kwargs):
     y = []
     for data_point in x:
         y.append(calc_chi_square(data_point))
-    plt.plot(x, y)
-    plt.plot((-1, 1), (chi_square_target, chi_square_target), linestyle='--')
-    plt.show()
+    #plt.plot(x, y)
+    #plt.plot((-1, 1), (chi_square_target, chi_square_target), linestyle='--')
+    #plt.show()
     #(fl1, fl2, fu1, fu2) = (calc_chi_square(lower1), calc_chi_square(lower2), calc_chi_square(upper1),
     #                        calc_chi_square(upper2))
     #while True:
