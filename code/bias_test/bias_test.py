@@ -47,6 +47,7 @@ def test_function(const_only=args.const_only, overdensity=args.overdensity):
         np.mean(data_set[3])
     ))
     binmap = toolkit.ConstantBinMap()
+    binmap.set_mask(point_mask)
     binmap.bin_catalogue(cat)
     output = binmap.divide_sample(point_mask, data)
     mixed = weights.excess_measurement(*output[1:], skip_n_filter=True)
