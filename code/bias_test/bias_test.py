@@ -44,8 +44,8 @@ def test_function(const_only=args.const_only, overdensity=args.overdensity):
         np.mean(data_set[0]),
         np.mean(data_set[1]),
         np.mean(data_set[2]),
-        np.mean(data_set[3])
-    ))
+        np.mean(data_set[3]),
+    ),)
     binmap = toolkit.ConstantBinMap()
     binmap.set_mask(point_mask)
     binmap.bin_catalogue(cat)
