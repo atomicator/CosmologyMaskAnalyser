@@ -65,6 +65,7 @@ def test_function(const_only=args.const_only, overdensity=args.overdensity):
                     hp.ud_grade(data_set[3], n)
                 ))
                 binmap = toolkit.HealpixBinMap(n)
+                binmap.set_mask(point_mask)
                 binmap.bin_catalogue(cat)
                 output = binmap.divide_sample(point_mask, data)
                 mixed = weights.excess_measurement(*output[1:])
