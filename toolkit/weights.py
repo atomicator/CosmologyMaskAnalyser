@@ -174,18 +174,22 @@ def overdensity_manual(f_s, f_c, n, **kwargs):
 
     x1, x2, x3 = -10, 0, 10
     f1, f2, f3 = calc_chi_square(x1), calc_chi_square(x2), calc_chi_square(x3)
-    while True:
+    i = 0
+    while True:  # x1 - x4 - x2 - x5 - x3
+        i += 1
         x4, x5 = (x1 + x2) / 2, (x2 + x3) / 2
         f4, f5 = calc_chi_square(x4), calc_chi_square(x5)
-        if f4 < f2:
-            x2, f2 = x4, f4
+        if f4 < f2 and f4 < f1:
             x3, f3 = x2, f2
-        elif f5 < f2:
+            x2, f2 = x4, f4
+        elif f5 < f2 and f5 < f3:
             x1, f1 = x2, f2
             x2, f2 = x5, f5
-        else:
+        elif f2 < f4 and f2 < f5:
             x1, f1 = x4, f4
             x3, f3 = x5, f5
+        else:
+            raise ValueError
         if x3 - x1 < error_tolerance:
             break
     alpha = x2
@@ -196,13 +200,14 @@ def overdensity_manual(f_s, f_c, n, **kwargs):
     upper1 = alpha
     lower2 = alpha
     upper2 = alpha + max_error
-    x = np.linspace(-1, 1, 1000)
+    x = np.linspace(0.1, 0.2, 1000)
     y = []
     for data_point in x:
         y.append(calc_chi_square(data_point))
-    #plt.plot(x, y)
-    #plt.plot((-1, 1), (chi_square_target, chi_square_target), linestyle='--')
-    #plt.show()
+    plt.plot(x, np.array(y) / len(f_s))
+    plt.plot((x[0], x[-1]), (chi_square_target / len(f_s), chi_square_target / len(f_s)), linestyle='--')
+    plt.plot((x[0], x[-1]), (chi_square_min / len(f_s), chi_square_min / len(f_s)), linestyle=':')
+    plt.show()
     #(fl1, fl2, fu1, fu2) = (calc_chi_square(lower1), calc_chi_square(lower2), calc_chi_square(upper1),
     #                        calc_chi_square(upper2))
     #while True:
@@ -240,6 +245,6 @@ def overdensity_manual(f_s, f_c, n, **kwargs):
         #if np.abs(upper1 - lower1) + np.abs(upper2 - lower2) < error_tolerance:
         if i > 100:
             break
-    print(alpha, midpoint1, midpoint2)
+    print(alpha, midpoint1, midpoint2, chi_square_min)
     #return np.array((alpha, np.abs(midpoint1 - alpha)))
     return np.array((alpha, np.abs(midpoint1 - midpoint2) / 2))
