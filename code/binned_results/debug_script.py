@@ -142,8 +142,8 @@ elif data_mask == "sdss_planck_lon_shift":
 else:
     raise ValueError
 
-NSIDES = [1, 2, 4, 8, 16, 32, 64, 128, 256]
-#NSIDES = [1]
+#NSIDES = [1, 2, 4, 8, 16, 32, 64, 128, 256]
+NSIDES = [8]
 run_const = True
 x_len = len(NSIDES)
 if run_const:

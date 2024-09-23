@@ -11,7 +11,6 @@ import astropy.io.fits
 import astropy.table
 import astropy.wcs.utils
 import copy
-from toolkit import filters
 
 
 def plt_use_tex():  # updates variables in the matplotlib library so that it uses LaTeX
@@ -19,6 +18,7 @@ def plt_use_tex():  # updates variables in the matplotlib library so that it use
         "text.usetex": True,
         "font.family": "serif",
         'text.latex.preamble': r'\usepackage{csquotes}'
+                               r'\usepackage{amsmath}'
     })
     return None
 
@@ -352,6 +352,7 @@ class _BinMap(object):
     sky_masked_fraction = []
     cluster_masked_fraction = []
     mask = None
+    final_filter = None
 
     def lookup_pix(self, lon, lat):
         raise NotImplementedError
@@ -377,7 +378,7 @@ class _BinMap(object):
                 self.cluster_masked_fraction[pixel] = np.nan
         self.cluster_masked_fraction = np.array(self.cluster_masked_fraction)
 
-    def divide_sample(self, mask, area_masked_fraction):
+    def divide_sample(self, mask, area_masked_fraction, filter_fully_masked=True, filter_empty=True):
         #  Cat allowed region - the fraction of (total) sky in which the clusters could have been detected in.
         #  Survey masked only - the fraction of the (total) sky in which the clusters could have spawned and is masked
         #                       by the survey mask
@@ -388,8 +389,11 @@ class _BinMap(object):
             self.sky_masked_fraction = np.array(survey_masked_only / cat_allowed_region)
 
         # Filter pixels that have no clusters, or are fully / not masked
-        nan_filter = np.bitwise_or(np.bitwise_or(np.isnan(self.sky_masked_fraction), np.isinf(self.sky_masked_fraction))
-                                   , self.n == 0)
+        nan_filter = np.bitwise_or(np.isnan(self.sky_masked_fraction), np.isinf(self.sky_masked_fraction))
+        if filter_empty:
+            nan_filter = np.bitwise_or(nan_filter, self.n == 0)
+        else:
+            self.cluster_masked_fraction[self.n == 0] = 0
         fully_masked_filter = self.sky_masked_fraction == 1.
         not_masked_filter = self.sky_masked_fraction == 0.
 
@@ -400,10 +404,16 @@ class _BinMap(object):
         not_masked_sky_fraction = np.sum(cat_allowed_region[not_masked_filter]) / np.sum(cat_allowed_region)
 
         # Sky fractions ignore the no clusters filter - add this as a separate value?
-        final_filter = np.bitwise_not(np.bitwise_or(nan_filter, np.bitwise_or(fully_masked_filter, not_masked_filter)))
-        sky_fraction = self.sky_masked_fraction[final_filter]
-        cluster_fraction = self.cluster_masked_fraction[final_filter]
-        n = self.n[final_filter]
+        if filter_fully_masked:
+            self.final_filter = np.bitwise_not(np.bitwise_or(nan_filter, np.bitwise_or(fully_masked_filter, not_masked_filter)))
+        else:
+            self.final_filter = np.bitwise_not(nan_filter)
+        sky_fraction = self.sky_masked_fraction[self.final_filter]
+        cluster_fraction = self.cluster_masked_fraction[self.final_filter]
+        n = self.n[self.final_filter]
+
+        #print("test")
+        #print(f"{len(self.n)}: {n[survey_masked_only[final_filter] < 0.05]}")
 
         return [[fully_masked_cluster_fraction, not_masked_cluster_fraction, fully_masked_sky_fraction,
                  not_masked_sky_fraction], sky_fraction, cluster_fraction, n]
