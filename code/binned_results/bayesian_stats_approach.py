@@ -15,11 +15,11 @@ for NSIDE in NSIDEs:
 
     #overdensity_min = [0.0, 0.0, 0.0][param_set]
     #overdensity_max = [0.3, 0.3, 0.3][param_set]
-    overdensity_min = -0.0  # 0.0
-    overdensity_max = -0.4  # 0.4
+    overdensity_min = -0.4  # 0.0
+    overdensity_max = 0.4  # 0.4
     overdensity_steps = 1000
-    density_min = 8.0e4  # 8e4
-    density_max = 8.2e4  # 8.2e4
+    density_min = 4.0e4  # 8e4
+    density_max = 2.0e5  # 8.2e4
     #density_min = [8.0e4, 8.1e4, 8.2e4][param_set]
     #density_max = [8.3e4, 8.4e4, 8.5e4][param_set]
     density_steps = 1000
