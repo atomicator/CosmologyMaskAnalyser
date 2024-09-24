@@ -30,6 +30,7 @@ overdensity_min = -1
 overdensity_max = 1
 overdensity_steps = 1000
 
+
 def test_function(const_only=args.const_only, overdensity=args.overdensity):
     global data_set
     random_points = toolkit.gen_random_coords(args.target, random_mask)[::-1].transpose()
@@ -91,7 +92,9 @@ def test_function(const_only=args.const_only, overdensity=args.overdensity):
         results = results - np.max(results)
         results = np.exp(results)
         results = ((results / np.sum(results)) / ((overdensity_max - overdensity_min) * (density_max - density_min) /
-                                                  (overdensity_steps * density_steps)))
+                                                  (overdensity_steps * density_steps), sky_masked_fraction,
+                                                  sky_surveyed_fraction, masked_clusters,
+                                                  unmasked_clusters))
         x = np.linspace(overdensity_min, overdensity_max, overdensity_steps)
         y = np.sum(results, axis=1)
         y = y * (density_max - density_min) / density_steps
@@ -116,7 +119,6 @@ def test_function(const_only=args.const_only, overdensity=args.overdensity):
         print(temp)
 
 
-
 def func(density, overdensity, a, b, NSIDE, sky_masked_fraction, sky_surveyed_fraction, masked_clusters,
          unmasked_clusters):
     if NSIDE != 0:
@@ -124,7 +126,7 @@ def func(density, overdensity, a, b, NSIDE, sky_masked_fraction, sky_surveyed_fr
     else:
         pixel_area = (4 / 3) * np.pi
     masked_cluster_expectation = (1 + overdensity) * sky_masked_fraction * density * sky_surveyed_fraction * \
-                                  pixel_area
+                                 pixel_area
     unmasked_cluster_expectation = (1 - sky_masked_fraction) * density * sky_surveyed_fraction * pixel_area
     ln_masked_prob = np.zeros(np.shape(masked_cluster_expectation))
     ln_unmasked_prob = np.zeros(np.shape(unmasked_cluster_expectation))
