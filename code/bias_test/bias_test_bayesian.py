@@ -81,20 +81,24 @@ def test_function(const_only=args.const_only, overdensity=args.overdensity):
         for i in range(overdensity_steps):
             thread_objects.append([])
             for j in range(density_steps):
-                thread_objects[-1].append(pool.apply_async(func, args=(density_min + ((j + 0.5) / density_steps) *
-                                                                       (density_max - density_min), overdensity_min +
-                                                                       ((i + 0.5) / overdensity_steps) *
-                                                                       (overdensity_max - overdensity_min), i, j)))
-        for i in range(overdensity_steps):
-            for j in range(density_steps):
-                results[i][j] = thread_objects[i][j].get()
+                #thread_objects[-1].append(pool.apply_async(func, args=(density_min + ((j + 0.5) / density_steps) *
+                #                                                       (density_max - density_min), overdensity_min +
+                #                                                       ((i + 0.5) / overdensity_steps) *
+                #                                                       (overdensity_max - overdensity_min), i, j)))
+                results[i, j] = func(density_min + ((j + 0.5) / density_steps) *
+                                     (density_max - density_min), overdensity_min +
+                                     ((i + 0.5) / overdensity_steps) *
+                                     (overdensity_max - overdensity_min), i, j, sky_masked_fraction,
+                                                  sky_surveyed_fraction, masked_clusters,
+                                                  unmasked_clusters)
+        #for i in range(overdensity_steps):
+        #    for j in range(density_steps):
+        #        results[i][j] = thread_objects[i][j].get()
 
         results = results - np.max(results)
         results = np.exp(results)
         results = ((results / np.sum(results)) / ((overdensity_max - overdensity_min) * (density_max - density_min) /
-                                                  (overdensity_steps * density_steps), sky_masked_fraction,
-                                                  sky_surveyed_fraction, masked_clusters,
-                                                  unmasked_clusters))
+                                                  (overdensity_steps * density_steps)))
         x = np.linspace(overdensity_min, overdensity_max, overdensity_steps)
         y = np.sum(results, axis=1)
         y = y * (density_max - density_min) / density_steps
