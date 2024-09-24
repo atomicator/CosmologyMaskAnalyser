@@ -5,26 +5,27 @@ import numpy as np
 import healpy as hp
 
 #NSIDEs = [4, 8, 16, 32]
-NSIDEs = [8]
+NSIDEs = [0]
 
 for NSIDE in NSIDEs:
     raise_dir = 2
     cat_name = "sdss"
     mask_name = "act_point"
-    lon_shift = 180
+    lon_shift = 0
 
     #overdensity_min = [0.0, 0.0, 0.0][param_set]
     #overdensity_max = [0.3, 0.3, 0.3][param_set]
-    overdensity_min = -0.4  # 0.0
+    overdensity_min = -0.0  # 0.0
     overdensity_max = 0.4  # 0.4
     overdensity_steps = 1000
-    density_min = 4.0e4  # 8e4
-    density_max = 2.0e5  # 8.2e4
+    density_min = 8.0e4  # 8e4
+    density_max = 8.2e4  # 8.2e4
     #density_min = [8.0e4, 8.1e4, 8.2e4][param_set]
     #density_max = [8.3e4, 8.4e4, 8.5e4][param_set]
     density_steps = 1000
 
     toolkit.plt_use_tex()
+
 
     def data_filter(z, r):
         return (z > 0) and (r > 20)
@@ -41,19 +42,19 @@ for NSIDE in NSIDEs:
         data_set = toolkit.gen_mask_comparison_map(sdss_mask, mask, write=False, NSIDE=256, NSIDE_internal=4096)
     else:
         data_set = np.float64(np.array((
-                toolkit.HealpyMask("../" * raise_dir + f"code/binned_results/sdss_mask_{mask_name}_256_1.fits").map,
-                toolkit.HealpyMask("../" * raise_dir + f"code/binned_results/sdss_mask_{mask_name}_256_2.fits").map,
-                toolkit.HealpyMask("../" * raise_dir + f"code/binned_results/sdss_mask_{mask_name}_256_3.fits").map,
-                toolkit.HealpyMask("../" * raise_dir + f"code/binned_results/sdss_mask_{mask_name}_256_4.fits").map
-            )))
+            toolkit.HealpyMask("../" * raise_dir + f"code/binned_results/sdss_mask_{mask_name}_256_1.fits").map,
+            toolkit.HealpyMask("../" * raise_dir + f"code/binned_results/sdss_mask_{mask_name}_256_2.fits").map,
+            toolkit.HealpyMask("../" * raise_dir + f"code/binned_results/sdss_mask_{mask_name}_256_3.fits").map,
+            toolkit.HealpyMask("../" * raise_dir + f"code/binned_results/sdss_mask_{mask_name}_256_4.fits").map
+        )))
 
     if NSIDE != 0:
         data_array = np.array((
-                    hp.ud_grade(data_set[0], NSIDE),
-                    hp.ud_grade(data_set[1], NSIDE),
-                    hp.ud_grade(data_set[2], NSIDE),
-                    hp.ud_grade(data_set[3], NSIDE)
-                ))
+            hp.ud_grade(data_set[0], NSIDE),
+            hp.ud_grade(data_set[1], NSIDE),
+            hp.ud_grade(data_set[2], NSIDE),
+            hp.ud_grade(data_set[3], NSIDE)
+        ))
         binmap = toolkit.HealpixBinMap(NSIDE)
     else:
         data_array = np.array((
@@ -87,7 +88,7 @@ for NSIDE in NSIDEs:
         else:
             pixel_area = (4 / 3) * np.pi
         masked_cluster_expectation = (1 + overdensity) * sky_masked_fraction * density * sky_surveyed_fraction * \
-                                                 pixel_area
+                                     pixel_area
         unmasked_cluster_expectation = (1 - sky_masked_fraction) * density * sky_surveyed_fraction * pixel_area
         ln_masked_prob = np.zeros(np.shape(masked_cluster_expectation))
         ln_unmasked_prob = np.zeros(np.shape(unmasked_cluster_expectation))
@@ -100,16 +101,16 @@ for NSIDE in NSIDEs:
                                    unmasked_cluster_expectation[valid])
         ln_prob = np.sum(ln_masked_prob) + np.sum(ln_unmasked_prob)
         results[a][b] = ln_prob
-        #print(f"""DEBUG DATA")
-        #density: {density}, overdensity: {overdensity}
-        #sky masked fraction: {sky_masked_fraction}
-        #sky surveyed fraction: {sky_surveyed_fraction}
-        #masked_cluster_expectation: {masked_cluster_expectation}
-        #masked_clusters: {masked_clusters}
-        #unmasked_cluster_expectation: {unmasked_cluster_expectation}
-        #unmasked_clusters: {unmasked_clusters}
-        #ln_prob: {ln_prob}
-        #END""")
+        # print(f"""DEBUG DATA")
+        # density: {density}, overdensity: {overdensity}
+        # sky masked fraction: {sky_masked_fraction}
+        # sky surveyed fraction: {sky_surveyed_fraction}
+        # masked_cluster_expectation: {masked_cluster_expectation}
+        # masked_clusters: {masked_clusters}
+        # unmasked_cluster_expectation: {unmasked_cluster_expectation}
+        # unmasked_clusters: {unmasked_clusters}
+        # ln_prob: {ln_prob}
+        # END""")
         return ln_prob
 
 
@@ -132,7 +133,7 @@ for NSIDE in NSIDEs:
     print(results)
     results = np.exp(results)
     results = ((results / np.sum(results)) / ((overdensity_max - overdensity_min) * (density_max - density_min) /
-               (overdensity_steps * density_steps)))
+                                              (overdensity_steps * density_steps)))
     #print(results)
     x, y = np.meshgrid(np.linspace(density_min, density_max, density_steps + 1),
                        np.linspace(overdensity_min, overdensity_max, overdensity_steps + 1))
