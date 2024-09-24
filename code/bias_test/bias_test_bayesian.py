@@ -120,7 +120,7 @@ def test_function(const_only=args.const_only, overdensity=args.overdensity):
                     break
 
         temp.append([x_vals[1], (x_vals[2] - x_vals[0]) / 2])
-        print(temp)
+    print(temp)
 
 
 def func(density, overdensity, _a, _b, NSIDE, sky_masked_fraction, sky_surveyed_fraction, masked_clusters,
@@ -190,7 +190,8 @@ threads = []
 
 for i in range(args.iterations):
     threads.append(pool.apply_async(test_function))
-
+pool.close()
+pool.join()
 results = []
 for thread in threads:
     results.append(thread.get())
