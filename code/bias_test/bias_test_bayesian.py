@@ -88,7 +88,7 @@ def test_function(const_only=args.const_only, overdensity=args.overdensity):
                 results[i, j] = func(density_min + ((j + 0.5) / density_steps) *
                                      (density_max - density_min), overdensity_min +
                                      ((i + 0.5) / overdensity_steps) *
-                                     (overdensity_max - overdensity_min), i, j, sky_masked_fraction,
+                                     (overdensity_max - overdensity_min), i, j, NSIDE, sky_masked_fraction,
                                                   sky_surveyed_fraction, masked_clusters,
                                                   unmasked_clusters)
         #for i in range(overdensity_steps):
@@ -123,7 +123,7 @@ def test_function(const_only=args.const_only, overdensity=args.overdensity):
         print(temp)
 
 
-def func(density, overdensity, a, b, NSIDE, sky_masked_fraction, sky_surveyed_fraction, masked_clusters,
+def func(density, overdensity, _a, _b, NSIDE, sky_masked_fraction, sky_surveyed_fraction, masked_clusters,
          unmasked_clusters):
     if NSIDE != 0:
         pixel_area = (4 / 3) * np.pi / (12 * NSIDE ** 2)
@@ -142,7 +142,6 @@ def func(density, overdensity, a, b, NSIDE, sky_masked_fraction, sky_surveyed_fr
     ln_unmasked_prob[valid] = (np.log(unmasked_cluster_expectation[valid]) * unmasked_clusters[valid] -
                                unmasked_cluster_expectation[valid])
     ln_prob = np.sum(ln_masked_prob) + np.sum(ln_unmasked_prob)
-    results[a][b] = ln_prob
     return ln_prob
 
 
