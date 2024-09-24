@@ -76,7 +76,7 @@ def test_function(const_only=args.const_only, overdensity=args.overdensity):
         unmasked_clusters = np.int_(np.round(n * (1 - cluster_masked_fraction)))
         results = np.zeros((overdensity_steps, density_steps))
 
-        pool = multiprocessing.pool.Pool()
+        #pool = multiprocessing.pool.Pool()
         thread_objects = []
         for i in range(overdensity_steps):
             thread_objects.append([])
