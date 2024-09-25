@@ -1,6 +1,6 @@
 #!/bin/bash
 
-file=bias_test
+file=bias_test_bayesian
 
 python3 ../code/bias_test/$file.py --save_path="random_act_400k.npy" --raise_dir=1  \
 --threads=100 --iterations=100 --target=400000 --overdensity=0.0 --invert_bias=False --data_mask="sdss_act"
