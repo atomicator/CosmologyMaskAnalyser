@@ -20,7 +20,7 @@ parser.add_argument("--const_only", default=False, type=lambda x: (str(x).lower(
 parser.add_argument("--invert_bias", default=False, type=lambda x: (str(x).lower() == 'true'))
 args = parser.parse_args()
 
-NSIDES = [0, 1, 2, 4, 8, 16, 32, 64, 256]
+NSIDES = [0, 1, 2, 4, 8, 16, 32, 64]
 
 density_min = 0
 density_max = 2 * args.target
