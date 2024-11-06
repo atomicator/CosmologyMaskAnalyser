@@ -44,7 +44,7 @@ cat.lon_lat = random_points[::-1].transpose()
 
 Lock = multiprocessing.Lock()
 to_write = []
-for j in range(args.realizations):
+for j in range(args.realizations): # Test adding threads here
     for NSIDE in NSIDES:
         results = np.zeros(overdensity_steps)  # replace with mutex
         if lon_shift != 0.0:
