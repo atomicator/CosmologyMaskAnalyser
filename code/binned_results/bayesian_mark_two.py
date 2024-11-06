@@ -199,6 +199,6 @@ for j in range(args.realizations): # Test adding threads here
                              label=labels[i])
                     break
         to_write.append(x_vals)
-
+        print(f"NSIDE {NSIDE}: {x_vals[4]} +/- {x_vals[6] / 2 - x_vals[2] / 2}")
 to_write = np.array(to_write)
 np.save(args.path, to_write)
