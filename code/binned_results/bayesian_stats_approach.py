@@ -15,11 +15,11 @@ for NSIDE in NSIDEs:
 
     #overdensity_min = [0.0, 0.0, 0.0][param_set]
     #overdensity_max = [0.3, 0.3, 0.3][param_set]
-    overdensity_min = -0.0  # 0.0
+    overdensity_min = -0.4  # 0.0
     overdensity_max = 0.4  # 0.4
     overdensity_steps = 1000
-    density_min = 8.0e4  # 8e4
-    density_max = 8.2e4  # 8.2e4
+    density_min = 0.0e4  # 8e4
+    density_max = 8.0e4  # 8.2e4
     #density_min = [8.0e4, 8.1e4, 8.2e4][param_set]
     #density_max = [8.3e4, 8.4e4, 8.5e4][param_set]
     density_steps = 1000
@@ -31,13 +31,16 @@ for NSIDE in NSIDEs:
         return (z > 0) and (r > 20)
 
 
-    cat = data.load_catalogue(cat_name, raise_dir)
-    cat.load_data(selection_function=data_filter, requested_fields=["ZRED", "LAMBDA_CHISQ"], lon_lat=True)
-    cat.lon_lat[:, 0] -= lon_shift
-    cat.lon_lat[cat.lon_lat[:, 0] < 0, 0] += 360
-    cat.lon_lat[cat.lon_lat[:, 0] > 360, 0] -= 360
     mask = data.load_mask(mask_name, raise_dir)
     sdss_mask = data.load_mask("sdss_mask", raise_dir, lon_shift=lon_shift)
+    #cat = data.load_catalogue(cat_name, raise_dir)
+    #cat.load_data(selection_function=data_filter, requested_fields=["ZRED", "LAMBDA_CHISQ"], lon_lat=True)
+    #cat.lon_lat[:, 0] -= lon_shift
+    #cat.lon_lat[cat.lon_lat[:, 0] < 0, 0] += 360
+    #cat.lon_lat[cat.lon_lat[:, 0] > 360, 0] -= 360
+    cat = toolkit.ClusterCatalogue()
+    random_points = toolkit.gen_random_coords(80000, sdss_mask)
+    cat.lon_lat = random_points[::-1].transpose()
     if lon_shift != 0.0:
         data_set = toolkit.gen_mask_comparison_map(sdss_mask, mask, write=False, NSIDE=256, NSIDE_internal=4096)
     else:
@@ -101,16 +104,6 @@ for NSIDE in NSIDEs:
                                    unmasked_cluster_expectation[valid])
         ln_prob = np.sum(ln_masked_prob) + np.sum(ln_unmasked_prob)
         results[a][b] = ln_prob
-        # print(f"""DEBUG DATA")
-        # density: {density}, overdensity: {overdensity}
-        # sky masked fraction: {sky_masked_fraction}
-        # sky surveyed fraction: {sky_surveyed_fraction}
-        # masked_cluster_expectation: {masked_cluster_expectation}
-        # masked_clusters: {masked_clusters}
-        # unmasked_cluster_expectation: {unmasked_cluster_expectation}
-        # unmasked_clusters: {unmasked_clusters}
-        # ln_prob: {ln_prob}
-        # END""")
         return ln_prob
 
 
