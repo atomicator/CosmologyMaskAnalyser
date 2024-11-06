@@ -149,7 +149,7 @@ for j in range(args.realizations):
             return ln_prob
 
 
-        pool = multiprocessing.pool.Pool(1)
+        pool = multiprocessing.pool.Pool(args.threads)
         thread_objects = []
         print("Initiating threads")
         for pixel_num in range(len(masked_clusters)):
