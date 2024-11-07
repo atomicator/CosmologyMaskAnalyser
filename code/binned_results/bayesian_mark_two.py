@@ -39,6 +39,34 @@ sdss_mask = data.load_mask("sdss_mask", raise_dir)
 mask = data.load_mask(mask_name, raise_dir)
 Lock = multiprocessing.Lock()
 to_write = []
+hashmap_cache = {}
+if lon_shift != 0.0:
+    print("Generating rotated mask")
+    data_set = toolkit.gen_mask_comparison_map(sdss_mask, mask, write=False, NSIDE=256, NSIDE_internal=4096)
+else:
+    print("Loading masked fractions")
+    data_set = np.float64(np.array((
+        toolkit.HealpyMask("../" * raise_dir + f"code/binned_results/sdss_mask_{mask_name}_256_1.fits").map,
+        toolkit.HealpyMask("../" * raise_dir + f"code/binned_results/sdss_mask_{mask_name}_256_2.fits").map,
+        toolkit.HealpyMask("../" * raise_dir + f"code/binned_results/sdss_mask_{mask_name}_256_3.fits").map,
+        toolkit.HealpyMask("../" * raise_dir + f"code/binned_results/sdss_mask_{mask_name}_256_4.fits").map
+    )))
+for NSIDE in NSIDES:
+    if NSIDE != 0:
+        data_array = np.array((
+            hp.ud_grade(data_set[0], NSIDE),
+            hp.ud_grade(data_set[1], NSIDE),
+            hp.ud_grade(data_set[2], NSIDE),
+            hp.ud_grade(data_set[3], NSIDE)
+        ))
+    else:
+        data_array = np.array((
+            (np.mean(data_set[0]),),
+            (np.mean(data_set[1]),),
+            (np.mean(data_set[2]),),
+            (np.mean(data_set[3]),),
+        ))
+    hashmap_cache[NSIDE] = data_array
 for j in range(args.realizations): # Test adding threads here
     print("Generating catalogue")
     cat = toolkit.ClusterCatalogue()
@@ -46,33 +74,11 @@ for j in range(args.realizations): # Test adding threads here
     cat.lon_lat = random_points[::-1].transpose()
     for NSIDE in NSIDES:
         results = np.zeros(overdensity_steps)  # replace with mutex
-        if lon_shift != 0.0:
-            print("Generating rotated mask")
-            data_set = toolkit.gen_mask_comparison_map(sdss_mask, mask, write=False, NSIDE=256, NSIDE_internal=4096)
-        else:
-            print("Loading masked fractions")
-            data_set = np.float64(np.array((
-                toolkit.HealpyMask("../" * raise_dir + f"code/binned_results/sdss_mask_{mask_name}_256_1.fits").map,
-                toolkit.HealpyMask("../" * raise_dir + f"code/binned_results/sdss_mask_{mask_name}_256_2.fits").map,
-                toolkit.HealpyMask("../" * raise_dir + f"code/binned_results/sdss_mask_{mask_name}_256_3.fits").map,
-                toolkit.HealpyMask("../" * raise_dir + f"code/binned_results/sdss_mask_{mask_name}_256_4.fits").map
-            )))
         print("Resizing sky fractions")
+        data_array = hashmap_cache[NSIDE]
         if NSIDE != 0:
-            data_array = np.array((
-                hp.ud_grade(data_set[0], NSIDE),
-                hp.ud_grade(data_set[1], NSIDE),
-                hp.ud_grade(data_set[2], NSIDE),
-                hp.ud_grade(data_set[3], NSIDE)
-            ))
             binmap = toolkit.HealpixBinMap(NSIDE)
         else:
-            data_array = np.array((
-                (np.mean(data_set[0]),),
-                (np.mean(data_set[1]),),
-                (np.mean(data_set[2]),),
-                (np.mean(data_set[3]),),
-            ))
             binmap = toolkit.ConstantBinMap()
         binmap.set_mask(mask)
         binmap.bin_catalogue(cat)
