@@ -80,8 +80,10 @@ for j in range(args.realizations): # Test adding threads here
             binmap = toolkit.HealpixBinMap(NSIDE)
         else:
             binmap = toolkit.ConstantBinMap()
+        print("Creating binmap")
         binmap.set_mask(mask)
         binmap.bin_catalogue(cat)
+        print("Dividing catalogue")
         output = binmap.divide_sample(mask, data_array, filter_fully_masked=False, filter_empty=False)
 
         #cat = toolkit.ClusterCatalogue()
