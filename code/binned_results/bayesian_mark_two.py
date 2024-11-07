@@ -13,8 +13,8 @@ parser.add_argument("-t", "--threads", type=int, help="Number of threads", defau
 parser.add_argument("-r", "--realizations", type=int, help="Number of realizations", default=2)
 args = parser.parse_args()
 
-#NSIDES = [0, 1, 2, 4, 8, 16, 32, 64]
-NSIDES = [0]
+NSIDES = [0, 1, 2, 4, 8, 16, 32, 64]
+#NSIDES = [0]
 
 raise_dir = 2
 cat_name = "sdss"
@@ -37,14 +37,13 @@ def data_filter(z, r):
 print("Loading mask")
 sdss_mask = data.load_mask("sdss_mask", raise_dir)
 mask = data.load_mask(mask_name, raise_dir)
-print("Generating catalogue")
-cat = toolkit.ClusterCatalogue()
-random_points = toolkit.gen_random_coords(80000, sdss_mask)
-cat.lon_lat = random_points[::-1].transpose()
-
 Lock = multiprocessing.Lock()
 to_write = []
 for j in range(args.realizations): # Test adding threads here
+    print("Generating catalogue")
+    cat = toolkit.ClusterCatalogue()
+    random_points = toolkit.gen_random_coords(80000, sdss_mask)
+    cat.lon_lat = random_points[::-1].transpose()
     for NSIDE in NSIDES:
         results = np.zeros(overdensity_steps)  # replace with mutex
         if lon_shift != 0.0:
