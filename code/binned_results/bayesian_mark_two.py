@@ -10,11 +10,11 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-o", "--overdensity", type=float, help="Overdensity", default=0.0)
 parser.add_argument("-p", "--path", type=str, help="Output path", default="./")
 parser.add_argument("-t", "--threads", type=int, help="Number of threads", default=1)
-parser.add_argument("-r", "--realizations", type=int, help="Number of realizations", default=1)
+parser.add_argument("-r", "--realizations", type=int, help="Number of realizations", default=2)
 args = parser.parse_args()
 
-NSIDES = [0, 1, 2, 4, 8, 16, 32, 64]
-#NSIDES = [0]
+#NSIDES = [0, 1, 2, 4, 8, 16, 32, 64]
+NSIDES = [0]
 
 raise_dir = 2
 cat_name = "sdss"
@@ -76,11 +76,10 @@ for j in range(args.realizations): # Test adding threads here
             ))
             binmap = toolkit.ConstantBinMap()
         binmap.set_mask(mask)
-        cat.lon_lat = random_points[::-1].transpose()
         binmap.bin_catalogue(cat)
         output = binmap.divide_sample(mask, data_array, filter_fully_masked=False, filter_empty=False)
 
-        cat = toolkit.ClusterCatalogue()
+        #cat = toolkit.ClusterCatalogue()
         #cat.lon_lat = np.append(random_points, bias_points[:int(len(random_points) * overdensity * sky_mask_frac)], axis=0)
         #print(output)
 
@@ -198,7 +197,8 @@ for j in range(args.realizations): # Test adding threads here
                     plt.plot((overdensity[lower], overdensity[lower]), (0, results[lower]), color=colours[i],
                              label=labels[i])
                     break
-        to_write.append(x_vals)
+        to_write.append([NSIDE, *x_vals])
         print(f"NSIDE {NSIDE}: {x_vals[4]} +/- {x_vals[6] / 2 - x_vals[2] / 2}")
+        del binmap
 to_write = np.array(to_write)
 np.save(args.path, to_write)

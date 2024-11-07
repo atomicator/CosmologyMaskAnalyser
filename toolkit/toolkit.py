@@ -361,6 +361,7 @@ class _BinMap(object):
         self.mask = mask
 
     def bin_catalogue(self, catalogue):
+        print(self.binned_sample)
         for cluster in catalogue.lon_lat:
             self.binned_sample[self.lookup_pix(*cluster)].append(cluster)
         for i in range(len(self.binned_sample)):
@@ -439,9 +440,10 @@ class BinaryBinMap(_BinMap):
 
 
 class ConstantBinMap(_BinMap):
-    n = np.zeros(1)
-    cluster_masked_fraction = np.zeros(1)
-    binned_sample = [[],]
+    def __init__(self):
+        self.n = np.zeros(1)
+        self.cluster_masked_fraction = np.zeros(1)
+        self.binned_sample = [[],]
 
     def lookup_pix(self, _lon, _lat):
         if np.shape(_lon) != np.shape(_lat):
