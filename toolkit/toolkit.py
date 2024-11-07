@@ -361,7 +361,6 @@ class _BinMap(object):
         self.mask = mask
 
     def bin_catalogue(self, catalogue):
-        print(self.binned_sample)
         for cluster in catalogue.lon_lat:
             self.binned_sample[self.lookup_pix(*cluster)].append(cluster)
         for i in range(len(self.binned_sample)):
