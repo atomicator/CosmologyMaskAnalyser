@@ -371,11 +371,13 @@ class _BinMap(object):
     def calc_masked_fraction(self):
         print("Calculating masked fraction")
         for pixel in range(len(self.binned_sample)):
-            try:
+            #try:
+            if len(self.binned_sample[pixel]) > 0:
                 temp = np.array(self.binned_sample[pixel])
                 self.cluster_masked_fraction[pixel] = 1 - np.sum(self.mask.lookup_point(*temp.transpose())) \
                                                     / len(self.binned_sample[pixel])
-            except TypeError:  # runs if there's no clusters in the pixel
+            #except TypeError:  # runs if there's no clusters in the pixel
+            else:
                 self.cluster_masked_fraction[pixel] = np.nan
         self.cluster_masked_fraction = np.array(self.cluster_masked_fraction)
 
