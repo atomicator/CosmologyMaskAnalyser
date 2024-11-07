@@ -369,6 +369,7 @@ class _BinMap(object):
         self.calc_masked_fraction()
 
     def calc_masked_fraction(self):
+        print("Calculating masked fraction")
         for pixel in range(len(self.binned_sample)):
             try:
                 temp = np.array(self.binned_sample[pixel])
