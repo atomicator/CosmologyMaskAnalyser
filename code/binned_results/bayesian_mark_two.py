@@ -1,4 +1,6 @@
 import multiprocessing, multiprocessing.pool
+from concurrent.futures.process import ProcessPoolExecutor
+
 import matplotlib.pyplot as plt
 from toolkit import toolkit, data
 import numpy as np
@@ -229,13 +231,14 @@ class NestablePool(multiprocessing.pool.Pool):
         kwargs['context'] = NoDaemonContext()
         super(NestablePool, self).__init__(*args, **kwargs)
 
-globalPool = NestablePool(args.threads)
-globalPool.daemon = False
+#globalPool = NestablePool(args.threads)
+#globalPool.daemon = False
+globalPool = ProcessPoolExecutor(max_workers=args.threads)
 globalThreadObjects = []
 for j in range(args.realisations):
-    globalThreadObjects.append(globalPool.apply_async(to_thread))
+    globalThreadObjects.append(globalPool.submit(to_thread))
 for thread in globalThreadObjects:
-    to_write.append(thread.get())
+    to_write.append(thread.result())
 
 to_write = np.array(to_write)
 np.save(args.path, to_write)
