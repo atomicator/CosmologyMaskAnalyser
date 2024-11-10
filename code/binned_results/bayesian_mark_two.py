@@ -9,7 +9,7 @@ import healpy as hp
 import warnings
 import argparse
 import time
-import SharedArray
+#import SharedArray
 parser = argparse.ArgumentParser()
 parser.add_argument("-o", "--overdensity", type=float, help="Overdensity", default=0.0)
 parser.add_argument("-p", "--path", type=str, help="Output path", default="./")
