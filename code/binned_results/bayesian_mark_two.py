@@ -162,61 +162,61 @@ def to_thread(index):
             return ln_prob
 
 
-        pool = multiprocessing.Pool(args.threads)
-        pool.daemon = False
-        thread_objects = []
-        print("Initiating threads")
-        for pixel_num in range(len(masked_clusters)):
-            #TODO: Thread this
-            thread_objects.append(pool.apply_async(func, args=(pixel_num,)))
-            # TODO: Constrain range of density - calculate density of unmasked regions
-            # This is a problem when no unmasked clusters exist - introduce a prior on density?
+    pool = multiprocessing.Pool(args.threads)
+    pool.daemon = False
+    thread_objects = []
+    print("Initiating threads")
+    for pixel_num in range(len(masked_clusters)):
+        #TODO: Thread this
+        thread_objects.append(pool.apply_async(func, args=(pixel_num,)))
+        # TODO: Constrain range of density - calculate density of unmasked regions
+        # This is a problem when no unmasked clusters exist - introduce a prior on density?
 
-        for i in range(len(masked_clusters)):
-            #results += thread_objects[i].get()
-            #print(thread_objects[i])
-            #print(f"r: {np.shape(results)}")
-            #print(f"t: {np.shape(thread_objects[i].get())}")
-            results += thread_objects[i].get()
-            #print(thread_objects[i].get())
+    for i in range(len(masked_clusters)):
+        #results += thread_objects[i].get()
+        #print(thread_objects[i])
+        #print(f"r: {np.shape(results)}")
+        #print(f"t: {np.shape(thread_objects[i].get())}")
+        results += thread_objects[i].get()
+        #print(thread_objects[i].get())
 
-        #print(results)
-        results = results - np.max(results)
-        #print(results)
-        results = np.exp(results)
-        results = (results / np.sum(results))
-        # print(np.shape(results))
-        # print(np.shape(x))
-        # print(np.sum(y) * (overdensity_max - overdensity_min) / overdensity_steps)
-        # Percentiles - need 68-95-99.7
-        y_cum = np.cumsum(results) * 100  # convert to percentiles
-        # print(y_cum)
+    #print(results)
+    results = results - np.max(results)
+    #print(results)
+    results = np.exp(results)
+    results = (results / np.sum(results))
+    # print(np.shape(results))
+    # print(np.shape(x))
+    # print(np.sum(y) * (overdensity_max - overdensity_min) / overdensity_steps)
+    # Percentiles - need 68-95-99.7
+    y_cum = np.cumsum(results) * 100  # convert to percentiles
+    # print(y_cum)
 
-        search_percentiles = [0.15, 2.5, 16, 25, 50, 75, 84, 97.5, 99.85]
-        colours = ["m", "c", "g", "b", "r", "b", "g", "c", "m"]
-        labels = [r"$3 \sigma$", r"$2 \sigma$", r"$1 \sigma$", r"$25 \%$", "Median", None, None, None, None]
-        x_vals = []
+    search_percentiles = [0.15, 2.5, 16, 25, 50, 75, 84, 97.5, 99.85]
+    colours = ["m", "c", "g", "b", "r", "b", "g", "c", "m"]
+    labels = [r"$3 \sigma$", r"$2 \sigma$", r"$1 \sigma$", r"$25 \%$", "Median", None, None, None, None]
+    x_vals = []
 
-        for percentile in search_percentiles:
-            lower = 0
-            upper = len(y_cum) - 1
-            while True:
-                # print(lower, upper)
-                if y_cum[int((upper + lower) / 2)] < percentile:
-                    lower = int((upper + lower) / 2)
-                else:
-                    upper = int((upper + lower) / 2)
-                if (upper - lower) in (0, 1):
-                    x_vals.append(overdensity[lower])
-                    i = search_percentiles.index(percentile)
-                    plt.plot((overdensity[lower], overdensity[lower]), (0, results[lower]), color=colours[i],
-                             label=labels[i])
-                    break
-        #to_write.append([NSIDE, *x_vals])
-        print(f"NSIDE {NSIDE}: {x_vals[4]} +/- {x_vals[6] / 2 - x_vals[2] / 2}")
-        finished[index] = 1
-        return [NSIDE, *x_vals]
-        #print(f"NSIDE {NSIDE}: {x_vals[4]} +/- {x_vals[6] / 2 - x_vals[2] / 2}")
+    for percentile in search_percentiles:
+        lower = 0
+        upper = len(y_cum) - 1
+        while True:
+            # print(lower, upper)
+            if y_cum[int((upper + lower) / 2)] < percentile:
+                lower = int((upper + lower) / 2)
+            else:
+                upper = int((upper + lower) / 2)
+            if (upper - lower) in (0, 1):
+                x_vals.append(overdensity[lower])
+                i = search_percentiles.index(percentile)
+                plt.plot((overdensity[lower], overdensity[lower]), (0, results[lower]), color=colours[i],
+                         label=labels[i])
+                break
+    #to_write.append([NSIDE, *x_vals])
+    print(f"NSIDE {NSIDE}: {x_vals[4]} +/- {x_vals[6] / 2 - x_vals[2] / 2}")
+    finished[index] = 1
+    return [NSIDE, *x_vals]
+    #print(f"NSIDE {NSIDE}: {x_vals[4]} +/- {x_vals[6] / 2 - x_vals[2] / 2}")
 
 class NoDaemonProcess(multiprocessing.Process):
     @property
