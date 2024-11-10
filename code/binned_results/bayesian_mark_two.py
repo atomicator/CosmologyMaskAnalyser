@@ -1,4 +1,4 @@
-import multiprocessing
+import multiprocessing, multiprocessing.pool
 import matplotlib.pyplot as plt
 from toolkit import toolkit, data
 import numpy as np
@@ -222,7 +222,7 @@ class NonDaemonicProcess(multiprocessing.Process):
 
     daemon = property(_get_daemon, _set_daemon)
 
-class NonDaemonicPool(multiprocessing.BasePool):
+class NonDaemonicPool(multiprocessing.pool.BasePool):
     Process = NonDaemonicProcess
 
 globalPool = NonDaemonicPool(args.threads)
