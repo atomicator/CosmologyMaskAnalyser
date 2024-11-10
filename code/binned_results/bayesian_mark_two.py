@@ -51,6 +51,7 @@ else:
         toolkit.HealpyMask("../" * raise_dir + f"code/binned_results/sdss_mask_{mask_name}_256_3.fits").map,
         toolkit.HealpyMask("../" * raise_dir + f"code/binned_results/sdss_mask_{mask_name}_256_4.fits").map
     )))
+
 for NSIDE in NSIDES:
     if NSIDE != 0:
         data_array = np.array((
@@ -66,8 +67,10 @@ for NSIDE in NSIDES:
             (np.mean(data_set[2]),),
             (np.mean(data_set[3]),),
         ))
-    hashmap_cache[NSIDE] = data_array
-for j in range(args.realizations): # Test adding threads here
+        hashmap_cache[NSIDE] = data_array
+
+def to_thread():
+    np.random.seed()
     print("Generating catalogue")
     cat = toolkit.ClusterCatalogue()
     random_points = toolkit.gen_random_coords(80000, sdss_mask)
@@ -204,8 +207,17 @@ for j in range(args.realizations): # Test adding threads here
                     plt.plot((overdensity[lower], overdensity[lower]), (0, results[lower]), color=colours[i],
                              label=labels[i])
                     break
-        to_write.append([NSIDE, *x_vals])
+        #to_write.append([NSIDE, *x_vals])
         print(f"NSIDE {NSIDE}: {x_vals[4]} +/- {x_vals[6] / 2 - x_vals[2] / 2}")
-        del binmap
+        return [NSIDE, *x_vals]
+        #print(f"NSIDE {NSIDE}: {x_vals[4]} +/- {x_vals[6] / 2 - x_vals[2] / 2}")
+
+globalPool = multiprocessing.Pool(args.threads)
+globalThreadObjects = []
+for j in range(args.realisations):
+    globalThreadObjects.append(globalPool.apply_async(to_thread))
+for thread in globalThreadObjects:
+    to_write.append(thread.get())
+
 to_write = np.array(to_write)
 np.save(args.path, to_write)
