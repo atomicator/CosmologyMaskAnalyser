@@ -157,7 +157,8 @@ def to_thread():
             return ln_prob
 
 
-        pool = globalPool #multiprocessing.pool.Pool(args.threads)
+        pool = multiprocessing.Pool(args.threads)
+        pool.daemon = False
         thread_objects = []
         print("Initiating threads")
         for pixel_num in range(len(masked_clusters)):
