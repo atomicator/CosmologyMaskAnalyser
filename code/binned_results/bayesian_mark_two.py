@@ -1,7 +1,7 @@
 import multiprocessing, multiprocessing.pool
 from concurrent.futures.process import ProcessPoolExecutor
 from multiprocessing import shared_memory
-
+import ctypes
 import matplotlib.pyplot as plt
 from toolkit import toolkit, data
 import numpy as np
@@ -237,10 +237,11 @@ class NestablePool(multiprocessing.pool.Pool):
 
 #globalPool = NestablePool(args.threads)
 #globalPool.daemon = False
-finished_template = np.zeros(args.realisations)
-shm = multiprocessing.shared_memory.SharedMemory(create=True, size=finished_template.size)
-finished = np.ndarray(finished_template.shape, dtype=finished_template.dtype, buffer=shm.buf)
-finished[:] = finished_template[:]
+#finished_template = np.ndarray(np.zeros(args.realisations))
+#shm = multiprocessing.shared_memory.SharedMemory(create=True, size=finished_template.size)
+#finished = np.ndarray(finished_template.shape, dtype=finished_template.dtype, buffer=shm.buf)
+#finished[:] = finished_template[:]
+finished = multiprocessing.Array(ctypes.c_int, [0] * args.realisations)
 globalPool = ProcessPoolExecutor(max_workers=args.threads)
 globalThreadObjects = []
 for j in range(args.realisations):
