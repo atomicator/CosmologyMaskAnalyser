@@ -222,7 +222,7 @@ class NonDaemonicProcess(multiprocessing.Process):
 
     daemon = property(_get_daemon, _set_daemon)
 
-class NonDaemonicPool(multiprocessing.pool.BasePool):
+class NonDaemonicPool(multiprocessing.Pool):
     Process = NonDaemonicProcess
 
 globalPool = NonDaemonicPool(args.threads)
