@@ -1,5 +1,6 @@
 import multiprocessing, multiprocessing.pool
 from concurrent.futures.process import ProcessPoolExecutor
+from multiprocessing import shared_memory
 
 import matplotlib.pyplot as plt
 from toolkit import toolkit, data
@@ -8,6 +9,7 @@ import healpy as hp
 import warnings
 import argparse
 import time
+import SharedArray
 parser = argparse.ArgumentParser()
 parser.add_argument("-o", "--overdensity", type=float, help="Overdensity", default=0.0)
 parser.add_argument("-p", "--path", type=str, help="Output path", default="./")
@@ -71,7 +73,7 @@ for NSIDE in NSIDES:
         ))
         hashmap_cache[NSIDE] = data_array
 
-def to_thread():
+def to_thread(index):
     np.random.seed()
     print("Generating catalogue")
     cat = toolkit.ClusterCatalogue()
@@ -212,6 +214,7 @@ def to_thread():
                     break
         #to_write.append([NSIDE, *x_vals])
         print(f"NSIDE {NSIDE}: {x_vals[4]} +/- {x_vals[6] / 2 - x_vals[2] / 2}")
+        finished[index] = 1
         return [NSIDE, *x_vals]
         #print(f"NSIDE {NSIDE}: {x_vals[4]} +/- {x_vals[6] / 2 - x_vals[2] / 2}")
 
@@ -234,14 +237,20 @@ class NestablePool(multiprocessing.pool.Pool):
 
 #globalPool = NestablePool(args.threads)
 #globalPool.daemon = False
+finished_template = np.zeros(args.realisations)
+shm = multiprocessing.shared_memory.SharedMemory(create=True, size=finished_template.size)
+finished = np.ndarray(finished_template.shape, dtype=finished_template.dtype, buffer=shm.buf)
+finished[:] = finished_template[:]
 globalPool = ProcessPoolExecutor(max_workers=args.threads)
 globalThreadObjects = []
 for j in range(args.realisations):
-    globalThreadObjects.append(globalPool.submit(to_thread))
-for thread in globalThreadObjects:
+    globalThreadObjects.append(globalPool.submit(to_thread, (j,)))
+for j in range(args.realisations):
     while True:
-        if thread.done():
-            to_write.append(thread.result())
+        if finished[j] == 1:
+            time.sleep(1)
+            to_write.append(globalThreadObjects[j].result())
+            print(f"To write: {to_write[-1]}")
             break
         else:
             time.sleep(1)
