@@ -248,7 +248,8 @@ for j in range(args.realisations):
     globalThreadObjects.append(globalPool.submit(to_thread, (j,)))
 for j in range(args.realisations):
     while True:
-        if finished[j] == 1:
+        #if finished[j] == 1:
+        if globalThreadObjects[j].finished():
             time.sleep(1)
             to_write.append(globalThreadObjects[j].result())
             print(f"To write: {to_write[-1]}")
