@@ -213,17 +213,23 @@ def to_thread():
         #print(f"NSIDE {NSIDE}: {x_vals[4]} +/- {x_vals[6] / 2 - x_vals[2] / 2}")
 
 class NoDaemonProcess(multiprocessing.Process):
-    # make 'daemon' attribute always return False
-    def _get_daemon(self):
+    @property
+    def daemon(self):
         return False
-    def _set_daemon(self, value):
-        pass
-    daemon = property(_get_daemon, _set_daemon)
 
-class NonDaemonicPool(multiprocessing.pool.Pool):
+    @daemon.setter
+    def daemon(self, value):
+        pass
+
+class NoDaemonContext(type(multiprocessing.get_context())):
     Process = NoDaemonProcess
 
-globalPool = NonDaemonicPool(args.threads)
+class NestablePool(multiprocessing.pool.Pool):
+    def __init__(self, *args, **kwargs):
+        kwargs['context'] = NoDaemonContext()
+        super(NestablePool, self).__init__(*args, **kwargs)
+
+globalPool = NestablePool(args.threads)
 globalPool.daemon = False
 globalThreadObjects = []
 for j in range(args.realisations):
