@@ -220,7 +220,7 @@ class NonDaemonicProcess(multiprocessing.Process):
     def _set_daemon(self, value):
         pass
 
-    daemon = property(_get_daemon, _set_daemonic)
+    daemon = property(_get_daemon, _set_daemon)
 
 class NonDaemonicPool(multiprocessing.BasePool):
     Process = NonDaemonicProcess
