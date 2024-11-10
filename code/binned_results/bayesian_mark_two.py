@@ -7,6 +7,7 @@ import numpy as np
 import healpy as hp
 import warnings
 import argparse
+import time
 parser = argparse.ArgumentParser()
 parser.add_argument("-o", "--overdensity", type=float, help="Overdensity", default=0.0)
 parser.add_argument("-p", "--path", type=str, help="Output path", default="./")
@@ -238,7 +239,12 @@ globalThreadObjects = []
 for j in range(args.realisations):
     globalThreadObjects.append(globalPool.submit(to_thread))
 for thread in globalThreadObjects:
-    to_write.append(thread.result())
+    while True:
+        if thread.done():
+            to_write.append(thread.result())
+            break
+        else:
+            time.sleep(1)
 
 to_write = np.array(to_write)
 np.save(args.path, to_write)
