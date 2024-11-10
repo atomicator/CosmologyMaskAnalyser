@@ -1,6 +1,5 @@
-import multiprocessing.pool, multiprocessing
+import multiprocessing
 import matplotlib.pyplot as plt
-
 from toolkit import toolkit, data
 import numpy as np
 import healpy as hp
@@ -212,7 +211,8 @@ def to_thread():
         return [NSIDE, *x_vals]
         #print(f"NSIDE {NSIDE}: {x_vals[4]} +/- {x_vals[6] / 2 - x_vals[2] / 2}")
 
-globalPool = multiprocessing.Pool(args.threads, daemon=False)
+globalPool = multiprocessing.Pool(args.threads)
+globalPool.daemon = False
 globalThreadObjects = []
 for j in range(args.realisations):
     globalThreadObjects.append(globalPool.apply_async(to_thread))
