@@ -72,6 +72,7 @@ for NSIDE in NSIDES:
 
 def to_thread():
     np.random.seed()
+    array_to_return = []
     print("Generating catalogue")
     cat = toolkit.ClusterCatalogue()
     random_points = toolkit.gen_random_coords(80000, sdss_mask)
@@ -210,8 +211,9 @@ def to_thread():
                     break
         #to_write.append([NSIDE, *x_vals])
         print(f"NSIDE {NSIDE}: {x_vals[4]} +/- {x_vals[6] / 2 - x_vals[2] / 2}")
-        return [NSIDE, *x_vals]
+        array_to_return.append([NSIDE, *x_vals])
         #print(f"NSIDE {NSIDE}: {x_vals[4]} +/- {x_vals[6] / 2 - x_vals[2] / 2}")
+    return array_to_return
 
 globalPool = multiprocessing.Pool(args.processes)
 globalThreadObjects = []
