@@ -1,20 +1,17 @@
-import multiprocessing, multiprocessing.pool
-from concurrent.futures.process import ProcessPoolExecutor
-from multiprocessing import shared_memory
-import ctypes
+import multiprocessing.pool, multiprocessing
 import matplotlib.pyplot as plt
+
 from toolkit import toolkit, data
 import numpy as np
 import healpy as hp
 import warnings
 import argparse
-import time
-#import SharedArray
 parser = argparse.ArgumentParser()
 parser.add_argument("-o", "--overdensity", type=float, help="Overdensity", default=0.0)
 parser.add_argument("-p", "--path", type=str, help="Output path", default="./")
 parser.add_argument("-t", "--threads", type=int, help="Number of threads", default=1)
-parser.add_argument("-r", "--realisations", type=int, help="Number of realisations", default=2)
+parser.add_argument("-p", "--processes", type=int, help="Number of processes", default=1)
+parser.add_argument("-r", "--realizations", type=int, help="Number of realizations", default=2)
 args = parser.parse_args()
 
 NSIDES = [0, 1, 2, 4, 8, 16, 32, 64]
@@ -73,9 +70,8 @@ for NSIDE in NSIDES:
         ))
         hashmap_cache[NSIDE] = data_array
 
-def to_thread(index):
+def to_thread():
     np.random.seed()
-    array_to_return = []
     print("Generating catalogue")
     cat = toolkit.ClusterCatalogue()
     random_points = toolkit.gen_random_coords(80000, sdss_mask)
@@ -163,8 +159,7 @@ def to_thread(index):
             return ln_prob
 
 
-        """pool = multiprocessing.Pool(args.threads)
-        pool.daemon = False
+        pool = multiprocessing.pool.ThreadPool(args.threads)
         thread_objects = []
         print("Initiating threads")
         for pixel_num in range(len(masked_clusters)):
@@ -179,9 +174,7 @@ def to_thread(index):
             #print(f"r: {np.shape(results)}")
             #print(f"t: {np.shape(thread_objects[i].get())}")
             results += thread_objects[i].get()
-            #print(thread_objects[i].get())"""
-        for i in range(len(masked_clusters)):
-            results += func(i)
+            #print(thread_objects[i].get())
 
         #print(results)
         results = results - np.max(results)
@@ -217,49 +210,15 @@ def to_thread(index):
                     break
         #to_write.append([NSIDE, *x_vals])
         print(f"NSIDE {NSIDE}: {x_vals[4]} +/- {x_vals[6] / 2 - x_vals[2] / 2}")
-        array_to_return.append([NSIDE, *x_vals])
+        return [NSIDE, *x_vals]
         #print(f"NSIDE {NSIDE}: {x_vals[4]} +/- {x_vals[6] / 2 - x_vals[2] / 2}")
-    finished[index] = 1
-    return array_to_return
 
-class NoDaemonProcess(multiprocessing.Process):
-    @property
-    def daemon(self):
-        return False
-
-    @daemon.setter
-    def daemon(self, value):
-        pass
-
-class NoDaemonContext(type(multiprocessing.get_context())):
-    Process = NoDaemonProcess
-
-class NestablePool(multiprocessing.pool.Pool):
-    def __init__(self, *args, **kwargs):
-        kwargs['context'] = NoDaemonContext()
-        super(NestablePool, self).__init__(*args, **kwargs)
-
-#globalPool = NestablePool(args.threads)
-#globalPool.daemon = False
-#finished_template = np.ndarray(np.zeros(args.realisations))
-#shm = multiprocessing.shared_memory.SharedMemory(create=True, size=finished_template.size)
-#finished = np.ndarray(finished_template.shape, dtype=finished_template.dtype, buffer=shm.buf)
-#finished[:] = finished_template[:]
-finished = multiprocessing.Array(ctypes.c_int, [0] * args.realisations)
-globalPool = ProcessPoolExecutor(max_workers=args.threads)
+globalPool = multiprocessing.Pool(args.processes)
 globalThreadObjects = []
 for j in range(args.realisations):
-    globalThreadObjects.append(globalPool.submit(to_thread, (j,)))
-for j in range(args.realisations):
-    while True:
-        if finished[j] == 1:
-        #if globalThreadObjects[j].finished():
-            time.sleep(1)
-            to_write.append(globalThreadObjects[j].result())
-            print(f"To write: {to_write[-1]}")
-            break
-        else:
-            time.sleep(1)
+    globalThreadObjects.append(globalPool.apply_async(to_thread))
+for thread in globalThreadObjects:
+    to_write.append(thread.get())
 
 to_write = np.array(to_write)
 np.save(args.path, to_write)
