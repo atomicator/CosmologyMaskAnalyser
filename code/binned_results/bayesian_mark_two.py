@@ -10,7 +10,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-o", "--overdensity", type=float, help="Overdensity", default=0.0)
 parser.add_argument("-p", "--path", type=str, help="Output path", default="./")
 parser.add_argument("-t", "--threads", type=int, help="Number of threads", default=1)
-parser.add_argument("-p", "--processes", type=int, help="Number of processes", default=1)
+parser.add_argument("-n", "--processes", type=int, help="Number of processes", default=1)
 parser.add_argument("-r", "--realizations", type=int, help="Number of realizations", default=2)
 args = parser.parse_args()
 
