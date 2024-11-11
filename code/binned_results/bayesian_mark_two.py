@@ -162,7 +162,7 @@ def to_thread(index):
             return ln_prob
 
 
-        pool = multiprocessing.Pool(args.threads)
+        """pool = multiprocessing.Pool(args.threads)
         pool.daemon = False
         thread_objects = []
         print("Initiating threads")
@@ -178,7 +178,9 @@ def to_thread(index):
             #print(f"r: {np.shape(results)}")
             #print(f"t: {np.shape(thread_objects[i].get())}")
             results += thread_objects[i].get()
-            #print(thread_objects[i].get())
+            #print(thread_objects[i].get())"""
+        for i in range(len(masked_clusters)):
+            results += func(i)
 
         #print(results)
         results = results - np.max(results)
