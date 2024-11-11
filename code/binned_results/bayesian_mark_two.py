@@ -68,7 +68,7 @@ for NSIDE in NSIDES:
             (np.mean(data_set[2]),),
             (np.mean(data_set[3]),),
         ))
-        hashmap_cache[NSIDE] = data_array
+    hashmap_cache[NSIDE] = data_array
 
 def to_thread():
     np.random.seed()
