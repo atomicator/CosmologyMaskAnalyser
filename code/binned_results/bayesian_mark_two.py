@@ -122,7 +122,7 @@ def to_thread():
             #density_min = density_mid * max(0, 1 - 10/np.sqrt(unmasked_clusters[i]))
             #density_max = density_mid * max(0, 1 + 10/np.sqrt(unmasked_clusters[i]))
             #print(density_min, density_max)
-            density_min = 1e3
+            density_min = 1e4
             density_max = 1e5
             density = np.outer(np.linspace(density_min, density_max, density_steps), np.ones(np.shape(overdensity)))
             alpha = np.outer(np.ones(np.shape(density[:, 0])), overdensity)
@@ -145,7 +145,7 @@ def to_thread():
                     temp = ((np.log(masked_cluster_expectation) * masked_clusters[i] - masked_cluster_expectation)
                                      + (np.log(unmasked_cluster_expectation) * unmasked_clusters[i] -
                                         unmasked_cluster_expectation))
-                    temp_min = np.nanmin(temp)
+                    temp_min = np.min(temp)
                     if np.isnan(temp_min):
                         return 0
             temp[np.isnan(temp)] = temp_min
