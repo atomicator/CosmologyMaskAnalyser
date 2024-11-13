@@ -110,7 +110,7 @@ def to_thread():
             pixel_area = 4 * np.pi
 
         def func(i):
-            expectation_cutoff = 0.1
+            expectation_cutoff = 1
             if (unmasked_clusters[i] + masked_clusters[i] < 5 or
                     (unmasked_clusters[i] + masked_clusters[i]) * min(sky_surveyed_fraction[i], 1 - sky_surveyed_fraction[i])
                                                                                                 < expectation_cutoff):
