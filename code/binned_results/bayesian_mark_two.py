@@ -78,7 +78,7 @@ def to_thread():
     print("Generating catalogue")
     cat = toolkit.ClusterCatalogue()
     random_points = toolkit.gen_random_coords(args.target, sdss_mask)
-    bias_points = toolkit.gen_random_coords(args.target * overdensity, sdss_mask)[::-1].transpose()
+    bias_points = toolkit.gen_random_coords(args.target * args.overdensity, sdss_mask)[::-1].transpose()
     if not args.invert_bias:
         bias_points = bias_points[sdss_mask.lookup_point(*bias_points.transpose()) == 0]
     else:
