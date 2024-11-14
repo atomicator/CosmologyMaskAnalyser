@@ -20,8 +20,8 @@ NSIDES = [0, 1, 2, 4, 8, 16, 32, 64]
 raise_dir = 2
 cat_name = "sdss"
 mask_name = "act_point"
-overdensity_min = -0.5
-overdensity_max = 0.5
+overdensity_min = -0.8
+overdensity_max = 0.8
 overdensity_steps = 1001
 overdensity = np.linspace(overdensity_min, overdensity_max, overdensity_steps)
 density_steps = 10000
@@ -118,13 +118,17 @@ def to_thread():
             #if unmasked_clusters[i] < 1:
             #    return 0  # quicker than applying a NaN filter later
             #ln_prob = np.zeros(overdensity_steps)
-            #density_mid = unmasked_clusters[i] / (pixel_area * (1 - sky_masked_fraction[i]) * sky_surveyed_fraction[i])
+            density_mid = (unmasked_clusters[i] + masked_clusters[i]) / (pixel_area * sky_surveyed_fraction[i])
             #density_min = density_mid * max(0, 1 - 10/np.sqrt(unmasked_clusters[i]))
             #density_max = density_mid * max(0, 1 + 10/np.sqrt(unmasked_clusters[i]))
             #print(density_min, density_max)
             density_min = 1e4
+            density_delta = min(density_mid - density_min, density_mid * 5 /
+                               np.sqrt((unmasked_clusters[i] + masked_clusters[i])))
             density_max = 1e5
-            density = np.outer(np.linspace(density_min, density_max, density_steps), np.ones(np.shape(overdensity)))
+            #density = np.outer(np.linspace(density_min, density_max, density_steps), np.ones(np.shape(overdensity)))
+            density = np.outer(np.linspace(density_mid - density_delta, density_mid + density_delta, density_steps)
+                               , np.ones(np.shape(overdensity)))
             alpha = np.outer(np.ones(np.shape(density[:, 0])), overdensity)
             masked_cluster_expectation = (1 + alpha) * sky_masked_fraction[i] * density * sky_surveyed_fraction[i] * \
                                         pixel_area
