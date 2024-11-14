@@ -84,6 +84,8 @@ def to_thread():
     else:
         bias_points = bias_points[sdss_mask.lookup_point(*bias_points.transpose()) != 0]
     cat.lon_lat = np.append(random_points, bias_points)
+    print(cat.lon_lat.shape)
+    exit()
     for NSIDE in NSIDES:
         results = np.zeros(overdensity_steps)  # replace with mutex
         print("Resizing sky fractions")
