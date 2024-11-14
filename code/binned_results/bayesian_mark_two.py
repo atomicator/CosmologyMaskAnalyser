@@ -1,17 +1,19 @@
 import multiprocessing.pool, multiprocessing
 import matplotlib.pyplot as plt
-
 from toolkit import toolkit, data
 import numpy as np
 import healpy as hp
 import warnings
 import argparse
+
 parser = argparse.ArgumentParser()
 parser.add_argument("-o", "--overdensity", type=float, help="Overdensity", default=0.0)
 parser.add_argument("-p", "--path", type=str, help="Output path", default="./")
 parser.add_argument("-t", "--threads", type=int, help="Number of threads", default=1)
 parser.add_argument("-n", "--processes", type=int, help="Number of processes", default=1)
 parser.add_argument("-r", "--realisations", type=int, help="Number of realisations", default=2)
+parser.add_argument("-a", "--target", type=int, default=400000)
+parser.add_argument("-i", "--invert_bias", default=False, type=lambda x: (str(x).lower() == 'true'))
 args = parser.parse_args()
 
 NSIDES = [0, 1, 2, 4, 8, 16, 32, 64]
@@ -75,8 +77,13 @@ def to_thread():
     array_to_return = []
     print("Generating catalogue")
     cat = toolkit.ClusterCatalogue()
-    random_points = toolkit.gen_random_coords(80000, sdss_mask)
-    cat.lon_lat = random_points[::-1].transpose()
+    random_points = toolkit.gen_random_coords(args.target, sdss_mask)
+    bias_points = toolkit.gen_random_coords(args.target * overdensity, sdss_mask)[::-1].transpose()
+    if not args.invert_bias:
+        bias_points = bias_points[sdss_mask.lookup_point(*bias_points.transpose()) == 0]
+    else:
+        bias_points = bias_points[sdss_mask.lookup_point(*bias_points.transpose()) != 0]
+    cat.lon_lat = np.append(random_points, bias_points)[::-1].transpose()
     for NSIDE in NSIDES:
         results = np.zeros(overdensity_steps)  # replace with mutex
         print("Resizing sky fractions")
