@@ -77,13 +77,13 @@ def to_thread():
     array_to_return = []
     print("Generating catalogue")
     cat = toolkit.ClusterCatalogue()
-    random_points = toolkit.gen_random_coords(args.target, sdss_mask)
+    random_points = toolkit.gen_random_coords(args.target, sdss_mask)[::-1].transpose()
     bias_points = toolkit.gen_random_coords(args.target * args.overdensity, sdss_mask)[::-1].transpose()
     if not args.invert_bias:
         bias_points = bias_points[sdss_mask.lookup_point(*bias_points.transpose()) == 0]
     else:
         bias_points = bias_points[sdss_mask.lookup_point(*bias_points.transpose()) != 0]
-    cat.lon_lat = np.append(random_points, bias_points)[::-1].transpose()
+    cat.lon_lat = np.append(random_points, bias_points)
     for NSIDE in NSIDES:
         results = np.zeros(overdensity_steps)  # replace with mutex
         print("Resizing sky fractions")
