@@ -80,9 +80,9 @@ def to_thread():
     random_points = toolkit.gen_random_coords(args.target, sdss_mask)[::-1].transpose()
     bias_points = toolkit.gen_random_coords(args.target * args.overdensity, sdss_mask)[::-1].transpose()
     if not args.invert_bias:
-        bias_points = bias_points[sdss_mask.lookup_point(*bias_points.transpose()) == 0]
+        bias_points = bias_points[sdss_mask.lookup_point(*bias_points.transpose()) == 0.0]
     else:
-        bias_points = bias_points[sdss_mask.lookup_point(*bias_points.transpose()) != 0]
+        bias_points = bias_points[sdss_mask.lookup_point(*bias_points.transpose()) != 0.0]
     cat.lon_lat = np.append(arr=random_points, values=bias_points, axis=0)
     print(len(cat.lon_lat), len(random_points), len(bias_points))
     exit()
