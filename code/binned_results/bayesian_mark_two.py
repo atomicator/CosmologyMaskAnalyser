@@ -82,9 +82,9 @@ def to_thread():
     print(np.min(sdss_mask.lookup_point(*bias_points.transpose())),
           np.max(sdss_mask.lookup_point(*bias_points.transpose())))
     if not args.invert_bias:
-        bias_points = bias_points[point_mask.lookup_point(*bias_points.transpose()) == 0.0]
+        bias_points = bias_points[mask.lookup_point(*bias_points.transpose()) == 0.0]
     else:
-        bias_points = bias_points[point_mask.lookup_point(*bias_points.transpose()) != 0.0]
+        bias_points = bias_points[mask.lookup_point(*bias_points.transpose()) != 0.0]
     cat.lon_lat = np.append(arr=random_points, values=bias_points, axis=0)
     print(len(cat.lon_lat), len(random_points), len(bias_points))
     exit()
