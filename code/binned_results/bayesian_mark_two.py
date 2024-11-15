@@ -79,6 +79,8 @@ def to_thread():
     cat = toolkit.ClusterCatalogue()
     random_points = toolkit.gen_random_coords(args.target, sdss_mask)[::-1].transpose()
     bias_points = toolkit.gen_random_coords(args.target * args.overdensity, sdss_mask)[::-1].transpose()
+    print(np.min(sdss_mask.lookup_point(*bias_points.transpose())),
+          np.max(sdss_mask.lookup_point(*bias_points.transpose())))
     if not args.invert_bias:
         bias_points = bias_points[sdss_mask.lookup_point(*bias_points.transpose()) == 0.0]
     else:
