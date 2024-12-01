@@ -7,13 +7,15 @@ import warnings
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-o", "--overdensity", type=float, help="Overdensity", default=0.0)
+parser.add_argument("-o", "--overdensity", type=float, help="Overdensity", default=0.2)
 parser.add_argument("-p", "--path", type=str, help="Output path", default="./")
-parser.add_argument("-t", "--threads", type=int, help="Number of threads", default=1)
-parser.add_argument("-n", "--processes", type=int, help="Number of processes", default=1)
-parser.add_argument("-r", "--realisations", type=int, help="Number of realisations", default=2)
+parser.add_argument("-t", "--threads", type=int, help="Number of threads", default=10)
+parser.add_argument("-n", "--processes", type=int, help="Number of processes", default=10)
+parser.add_argument("-r", "--realisations", type=int, help="Number of realisations", default=1)
 parser.add_argument("-a", "--target", type=int, default=400000)
-parser.add_argument("-i", "--invert_bias", default=False, type=lambda x: (str(x).lower() == 'true'))
+parser.add_argument("-i", "--invert_bias", default=True, type=lambda x: (str(x).lower() == 'true'))
+parser.add_argument("-d", "--debug", type=float, help="Debug", default=10.0)
+
 args = parser.parse_args()
 
 NSIDES = [0, 1, 2, 4, 8, 16, 32, 64]
@@ -80,8 +82,6 @@ def to_thread():
     random_points = toolkit.gen_random_coords(args.target, sdss_mask)[::-1].transpose()
     if args.overdensity != 0.0:
         bias_points = toolkit.gen_random_coords(args.target * args.overdensity, sdss_mask)[::-1].transpose()
-        print(np.min(sdss_mask.lookup_point(*bias_points.transpose())),
-            np.max(sdss_mask.lookup_point(*bias_points.transpose())))
         if not args.invert_bias:
             bias_points = bias_points[mask.lookup_point(*bias_points.transpose()) == 0.0]
         else:
@@ -122,7 +122,8 @@ def to_thread():
             pixel_area = 4 * np.pi
 
         def func(i):
-            expectation_cutoff = 1
+            #expectation_cutoff = 1
+            expectation_cutoff = args.debug
             if (unmasked_clusters[i] + masked_clusters[i] < 5 or
                     (unmasked_clusters[i] + masked_clusters[i]) * min(sky_surveyed_fraction[i], 1 - sky_surveyed_fraction[i])
                                                                                                 < expectation_cutoff):
