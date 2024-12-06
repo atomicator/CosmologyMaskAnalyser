@@ -228,7 +228,8 @@ def to_thread():
                     break
         #to_write.append([NSIDE, *x_vals])
         print(f"NSIDE {NSIDE}: {x_vals[4]} +/- {x_vals[6] / 2 - x_vals[2] / 2}")
-        array_to_return.append([NSIDE, *x_vals])
+        #array_to_return.append([NSIDE, *x_vals])
+        array_to_return.append([NSIDE, *y_cum])
         #print(f"NSIDE {NSIDE}: {x_vals[4]} +/- {x_vals[6] / 2 - x_vals[2] / 2}")
     return array_to_return
 
