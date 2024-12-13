@@ -40,7 +40,7 @@ def map_to_overdensity(prior):
     final[temp] = -1 * prior[temp] / (prior[temp] - 1)
     return final
 
-prior_max = 2
+prior_max = 5
 prior_min = - prior_max
 overdensity_steps = 1001
 prior = np.linspace(prior_min, prior_max, overdensity_steps)
