@@ -7,7 +7,7 @@ import warnings
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-o", "--overdensity", type=float, help="Overdensity", default=0.0)
+parser.add_argument("-o", "--overdensity", type=float, help="Overdensity", default=0.2)
 parser.add_argument("-p", "--path", type=str, help="Output path", default="./")
 parser.add_argument("-t", "--threads", type=int, help="Number of threads", default=10)
 parser.add_argument("-n", "--processes", type=int, help="Number of processes", default=10)
