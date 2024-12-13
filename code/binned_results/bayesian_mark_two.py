@@ -27,13 +27,26 @@ NSIDES = [32]
 raise_dir = 2
 cat_name = "sdss"
 mask_name = "act_point"
-overdensity_min = -0.95
-overdensity_max = 1 / (1 + overdensity_min)
+#overdensity_min = -0.95
+#overdensity_max = 1 / (1 + overdensity_min)
+#overdensity_steps = 1001
+#overdensity = np.linspace(overdensity_min, overdensity_max, overdensity_steps)
+
+def map_to_overdensity(prior):
+    final = np.zeros(prior.shape)
+    temp = prior >= 0
+    final[temp] = prior[temp]
+    temp = np.bitwise_not(temp)
+    final[temp] = -1 * prior[temp] / (prior[temp] - 1)
+    return final
+
+prior_max = 2
+prior_min = - prior_max
 overdensity_steps = 1001
-overdensity = np.linspace(overdensity_min, overdensity_max, overdensity_steps)
+prior = np.linspace(prior_min, prior_max, overdensity_steps)
+overdensity = map_to_overdensity(prior)
 density_steps = 10000
 lon_shift = 0.0
-
 
 density_range = 0.03
 
@@ -180,18 +193,18 @@ def to_thread():
             #                 + (np.log(unmasked_cluster_expectation) * unmasked_clusters[i] - unmasked_cluster_expectation)
             #                 , axis=0)
             #ln_prob -= np.max(ln_prob)
-            global to_print
+            """global to_print
             lock.acquire()
             if to_print > 0:
                 to_print -= 1
-                plt.imshow(temp, aspect=0.05, interpolation='none', cmap="plasma", extent=(overdensity_min, overdensity_max, float(density[0][0]), float(density[1][1])))
+                plt.imshow(temp, aspect=0.05, interpolation='none', cmap="plasma", extent=(prior_min, prior_max, float(density[0][0]), float(density[1][1])))
                 plt.plot((args.overdensity, args.overdensity), (density[0][0], density[1][1]), color="k")
                 plt.title(str(to_print + 1))
                 plt.ylabel("Density")
                 plt.xlabel("Overdensity")
                 plt.colorbar()
                 plt.show()
-                plt.plot(overdensity, np.exp(ln_prob))
+                plt.plot(prior, np.exp(ln_prob))
                 plt.plot((args.overdensity, args.overdensity), (0, np.exp(np.max(ln_prob))), color="k")
                 plt.xlabel("Overdensity")
                 plt.ylabel("LDF")
@@ -200,7 +213,7 @@ def to_thread():
             else:
                 #exit()
                 thread.interrupt_main(KeyboardInterrupt)
-            lock.release()
+            lock.release()"""
             return ln_prob
 
 
@@ -248,9 +261,13 @@ def to_thread():
                 else:
                     upper = int((upper + lower) / 2)
                 if (upper - lower) in (0, 1):
-                    x_vals.append(overdensity[lower])
+                    #x_vals.append(overdensity[lower])
+                    #i = search_percentiles.index(percentile)
+                    #plt.plot((overdensity[lower], overdensity[lower]), (0, results[lower]), color=colours[i],
+                    #         label=labels[i])
+                    x_vals.append(prior[lower])
                     i = search_percentiles.index(percentile)
-                    plt.plot((overdensity[lower], overdensity[lower]), (0, results[lower]), color=colours[i],
+                    plt.plot((prior[lower], prior[lower]), (0, results[lower]), color=colours[i],
                              label=labels[i])
                     break
         #to_write.append([NSIDE, *x_vals])
