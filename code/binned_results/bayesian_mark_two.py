@@ -7,7 +7,7 @@ import warnings
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-o", "--overdensity", type=float, help="Overdensity", default=0.2)
+parser.add_argument("-o", "--overdensity", type=float, help="Overdensity", default=0.0)
 parser.add_argument("-p", "--path", type=str, help="Output path", default="./")
 parser.add_argument("-t", "--threads", type=int, help="Number of threads", default=10)
 parser.add_argument("-n", "--processes", type=int, help="Number of processes", default=10)
@@ -16,16 +16,19 @@ parser.add_argument("-a", "--target", type=int, default=400000)
 parser.add_argument("-i", "--invert_bias", default=True, type=lambda x: (str(x).lower() == 'true'))
 parser.add_argument("-d", "--debug", type=float, help="Debug", default=10.0)
 
+to_print = 20
+lock = multiprocessing.Lock()
+
 args = parser.parse_args()
 
-NSIDES = [0, 1, 2, 4, 8, 16, 32, 64]
-#NSIDES = [0]
+#NSIDES = [0, 1, 2, 4, 8, 16, 32, 64]
+NSIDES = [32]
 
 raise_dir = 2
 cat_name = "sdss"
 mask_name = "act_point"
-overdensity_min = -0.95
-overdensity_max = 2.0
+overdensity_min = -0.5
+overdensity_max = 0.5
 overdensity_steps = 1001
 overdensity = np.linspace(overdensity_min, overdensity_max, overdensity_steps)
 density_steps = 10000
@@ -124,19 +127,22 @@ def to_thread():
         def func(i):
             #expectation_cutoff = 1
             expectation_cutoff = args.debug
-            if (unmasked_clusters[i] + masked_clusters[i] < 5 or
-                    (unmasked_clusters[i] + masked_clusters[i]) * min(sky_surveyed_fraction[i], 1 - sky_surveyed_fraction[i])
-                                                                                                < expectation_cutoff):
+            if not (0.001 < sky_masked_fraction[i] < 0.999):
                 return 0
+            #if (unmasked_clusters[i] + masked_clusters[i] < 5 or
+            #        (unmasked_clusters[i] + masked_clusters[i]) * min(sky_surveyed_fraction[i], 1 - sky_surveyed_fraction[i])
+            #                                                                                    < expectation_cutoff):
+            #    return 0
             #if unmasked_clusters[i] < 1:
             #    return 0  # quicker than applying a NaN filter later
             #ln_prob = np.zeros(overdensity_steps)
-            density_mid = (unmasked_clusters[i] + masked_clusters[i]) / (pixel_area * sky_surveyed_fraction[i])
+            #density_mid = (unmasked_clusters[i] + masked_clusters[i]) / (pixel_area * sky_surveyed_fraction[i])
+            density_mid = unmasked_clusters[i] / (pixel_area * sky_surveyed_fraction[i] * (1 - sky_masked_fraction[i]))
             #density_min = density_mid * max(0, 1 - 10/np.sqrt(unmasked_clusters[i]))
             #density_max = density_mid * max(0, 1 + 10/np.sqrt(unmasked_clusters[i]))
             #print(density_min, density_max)
             density_min = 1e4
-            density_delta = min(density_mid - density_min, density_mid * 5 /
+            density_delta = min(density_mid - density_min, density_mid * 100 /
                                np.sqrt((unmasked_clusters[i] + masked_clusters[i])))
             density_max = 1e5
             #density = np.outer(np.linspace(density_min, density_max, density_steps), np.ones(np.shape(overdensity)))
@@ -174,6 +180,27 @@ def to_thread():
             #                 + (np.log(unmasked_cluster_expectation) * unmasked_clusters[i] - unmasked_cluster_expectation)
             #                 , axis=0)
             #ln_prob -= np.max(ln_prob)
+            """global to_print
+            lock.acquire()
+            if to_print > 0:
+                to_print -= 1
+                plt.imshow(temp, aspect=0.05, interpolation='none', cmap="plasma", extent=(overdensity_min, overdensity_max, float(density[0][0]), float(density[1][1])))
+                plt.plot((args.overdensity, args.overdensity), (density[0][0], density[1][1]), color="k")
+                plt.title(str(to_print + 1))
+                plt.ylabel("Density")
+                plt.xlabel("Overdensity")
+                plt.colorbar()
+                plt.show()
+                plt.plot(overdensity, np.exp(ln_prob))
+                plt.plot((args.overdensity, args.overdensity), (0, np.exp(np.max(ln_prob))), color="k")
+                plt.xlabel("Overdensity")
+                plt.ylabel("LDF")
+                plt.title(str(to_print + 1))
+                plt.show()
+            else:
+                #exit()
+                thread.interrupt_main(KeyboardInterrupt)
+            lock.release()"""
             return ln_prob
 
 
