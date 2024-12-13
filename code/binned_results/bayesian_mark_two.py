@@ -28,7 +28,7 @@ raise_dir = 2
 cat_name = "sdss"
 mask_name = "act_point"
 overdensity_min = -0.95
-overdensity_max = 0.95
+overdensity_max = 1 / (1 + overdensity_min)
 overdensity_steps = 1001
 overdensity = np.linspace(overdensity_min, overdensity_max, overdensity_steps)
 density_steps = 10000
@@ -180,7 +180,7 @@ def to_thread():
             #                 + (np.log(unmasked_cluster_expectation) * unmasked_clusters[i] - unmasked_cluster_expectation)
             #                 , axis=0)
             #ln_prob -= np.max(ln_prob)
-            """global to_print
+            global to_print
             lock.acquire()
             if to_print > 0:
                 to_print -= 1
@@ -200,7 +200,7 @@ def to_thread():
             else:
                 #exit()
                 thread.interrupt_main(KeyboardInterrupt)
-            lock.release()"""
+            lock.release()
             return ln_prob
 
 
