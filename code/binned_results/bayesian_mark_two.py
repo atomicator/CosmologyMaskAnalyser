@@ -7,13 +7,13 @@ import warnings
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-o", "--overdensity", type=float, help="Overdensity", default=0.2)
+parser.add_argument("-o", "--overdensity", type=float, help="Overdensity", default=0.0)
 parser.add_argument("-p", "--path", type=str, help="Output path", default="./")
 parser.add_argument("-t", "--threads", type=int, help="Number of threads", default=10)
 parser.add_argument("-n", "--processes", type=int, help="Number of processes", default=10)
 parser.add_argument("-r", "--realisations", type=int, help="Number of realisations", default=1)
 parser.add_argument("-a", "--target", type=int, default=400000)
-parser.add_argument("-i", "--invert_bias", default=True, type=lambda x: (str(x).lower() == 'true'))
+parser.add_argument("-i", "--invert_bias", default=False, type=lambda x: (str(x).lower() == 'true'))
 parser.add_argument("-d", "--debug", type=float, help="Debug", default=10.0)
 
 to_print = 20
@@ -40,9 +40,9 @@ def map_to_overdensity(prior):
     final[temp] = -1 * prior[temp] / (prior[temp] - 1)
     return final
 
-prior_max = 5
+prior_max = 1
 prior_min = - prior_max
-overdensity_steps = 10001
+overdensity_steps = 1001
 prior = np.linspace(prior_min, prior_max, overdensity_steps)
 overdensity = map_to_overdensity(prior)
 density_steps = 10000
@@ -193,8 +193,8 @@ def to_thread():
             #                 + (np.log(unmasked_cluster_expectation) * unmasked_clusters[i] - unmasked_cluster_expectation)
             #                 , axis=0)
             #ln_prob -= np.max(ln_prob)
-            """global to_print
-            lock.acquire()
+            global to_print
+            """lock.acquire()
             if to_print > 0:
                 to_print -= 1
                 plt.imshow(temp, aspect=0.05, interpolation='none', cmap="plasma", extent=(prior_min, prior_max, float(density[0][0]), float(density[1][1])))
