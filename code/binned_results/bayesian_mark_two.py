@@ -40,11 +40,11 @@ def map_to_overdensity(prior):
     final[temp] = -1 * prior[temp] / (prior[temp] - 1)
     return final
 
-prior_max = 1
+prior_max = 0.8
 prior_min = - prior_max
 overdensity_steps = 1001
 prior = np.linspace(prior_min, prior_max, overdensity_steps)
-overdensity = map_to_overdensity(prior)
+overdensity = prior #map_to_overdensity(prior)
 density_steps = 10000
 lon_shift = 0.0
 
@@ -193,8 +193,8 @@ def to_thread():
             #                 + (np.log(unmasked_cluster_expectation) * unmasked_clusters[i] - unmasked_cluster_expectation)
             #                 , axis=0)
             #ln_prob -= np.max(ln_prob)
-            global to_print
-            """lock.acquire()
+            """global to_print
+            lock.acquire()
             if to_print > 0:
                 to_print -= 1
                 plt.imshow(temp, aspect=0.05, interpolation='none', cmap="plasma", extent=(prior_min, prior_max, float(density[0][0]), float(density[1][1])))
@@ -208,7 +208,8 @@ def to_thread():
                 plt.plot((args.overdensity, args.overdensity), (0, np.exp(np.max(ln_prob))), color="k")
                 plt.xlabel("Overdensity")
                 plt.ylabel("LDF")
-                plt.title(str(to_print + 1))
+                plt.title(rf"{to_print + 1}, $n_{{m}}$: {masked_clusters[i]}, $n_{{nm}}$: {unmasked_clusters[i]}, $f_{{m}}$: {sky_masked_fraction[i]}, E: {
+                (masked_clusters[i] - (masked_clusters[i] + unmasked_clusters[i]) * sky_masked_fraction[i]) / (unmasked_clusters[i] * sky_masked_fraction[i])}")
                 plt.show()
             else:
                 #exit()
