@@ -43,8 +43,8 @@ def map_to_overdensity(prior):
 prior_max = 0.8
 prior_min = - prior_max
 overdensity_steps = 1001
-prior = np.linspace(prior_min, prior_max, overdensity_steps)
-overdensity = prior #map_to_overdensity(prior)
+#prior = np.linspace(prior_min, prior_max, overdensity_steps)
+overdensity = np.geomspace(0.01, 100, 1001) - 1 #map_to_overdensity(prior)
 density_steps = 10000
 lon_shift = 0.0
 
@@ -204,8 +204,8 @@ def to_thread():
                 plt.xlabel("Overdensity")
                 plt.colorbar()
                 plt.show()
-                plt.plot(prior, np.exp(ln_prob))
-                plt.plot((args.overdensity, args.overdensity), (0, np.exp(np.max(ln_prob))), color="k")
+                plt.plot(overdensity, ln_prob)
+                #plt.plot((args.overdensity, args.overdensity), (0, np.exp(np.max(ln_prob))), color="k")
                 plt.xlabel("Overdensity")
                 plt.ylabel("LDF")
                 plt.title(rf"{to_print + 1}, $n_{{m}}$: {masked_clusters[i]}, $n_{{nm}}$: {unmasked_clusters[i]}, $f_{{m}}$: {sky_masked_fraction[i]}, E: {
@@ -266,9 +266,9 @@ def to_thread():
                     #i = search_percentiles.index(percentile)
                     #plt.plot((overdensity[lower], overdensity[lower]), (0, results[lower]), color=colours[i],
                     #         label=labels[i])
-                    x_vals.append(prior[lower])
+                    x_vals.append(overdensity[lower])
                     i = search_percentiles.index(percentile)
-                    plt.plot((prior[lower], prior[lower]), (0, results[lower]), color=colours[i],
+                    plt.plot((overdensity[lower], overdensity[lower]), (0, results[lower]), color=colours[i],
                              label=labels[i])
                     break
         #to_write.append([NSIDE, *x_vals])
