@@ -42,10 +42,10 @@ def map_to_overdensity(prior):
 
 prior_max = 0.8
 prior_min = - prior_max
-overdensity_steps = 1001
+overdensity_steps = 10001
 #prior = np.linspace(prior_min, prior_max, overdensity_steps)
-overdensity = np.geomspace(0.01, 100, 1001) - 1 #map_to_overdensity(prior)
-density_steps = 10000
+overdensity = np.geomspace(0.05, 20, overdensity_steps) - 1 #map_to_overdensity(prior)
+density_steps = 1000
 lon_shift = 0.0
 
 density_range = 0.03
@@ -197,19 +197,22 @@ def to_thread():
             lock.acquire()
             if to_print > 0:
                 to_print -= 1
-                plt.imshow(temp, aspect=0.05, interpolation='none', cmap="plasma", extent=(prior_min, prior_max, float(density[0][0]), float(density[1][1])))
-                plt.plot((args.overdensity, args.overdensity), (density[0][0], density[1][1]), color="k")
+                plt.imshow(temp, aspect=0.01, interpolation='none', cmap="plasma", extent=(prior_min, prior_max, float(density[0][0]), float(density[1][1])))
+                #plt.plot((args.overdensity + 1, args.overdensity + 1), (density[0][0], density[1][1]), color="k")
                 plt.title(str(to_print + 1))
                 plt.ylabel("Density")
                 plt.xlabel("Overdensity")
                 plt.colorbar()
                 plt.show()
-                plt.plot(overdensity, ln_prob)
-                #plt.plot((args.overdensity, args.overdensity), (0, np.exp(np.max(ln_prob))), color="k")
+                plt.plot(overdensity + 1, np.exp(ln_prob))
+                plt.plot((args.overdensity + 1, args.overdensity + 1), (np.exp(np.min(ln_prob)), np.exp(np.max(ln_prob))), color="k")
+                plt.plot(np.array((1, 1)) * (((masked_clusters[i] - (masked_clusters[i] + unmasked_clusters[i]) * sky_masked_fraction[i]) /
+                         (unmasked_clusters[i] * sky_masked_fraction[i])) + 1), (np.exp(np.min(ln_prob)), np.exp(np.max(ln_prob))), color="k", linestyle="dashed")
                 plt.xlabel("Overdensity")
                 plt.ylabel("LDF")
                 plt.title(rf"{to_print + 1}, $n_{{m}}$: {masked_clusters[i]}, $n_{{nm}}$: {unmasked_clusters[i]}, $f_{{m}}$: {sky_masked_fraction[i]}, E: {
                 (masked_clusters[i] - (masked_clusters[i] + unmasked_clusters[i]) * sky_masked_fraction[i]) / (unmasked_clusters[i] * sky_masked_fraction[i])}")
+                plt.xscale("log")
                 plt.show()
             else:
                 #exit()
