@@ -44,7 +44,7 @@ prior_max = 0.8
 prior_min = - prior_max
 overdensity_steps = 10001
 #prior = np.linspace(prior_min, prior_max, overdensity_steps)
-overdensity = np.geomspace(0.05, 20, overdensity_steps) - 1 #map_to_overdensity(prior)
+overdensity = np.linspace(0.05, 3, overdensity_steps) - 1 #map_to_overdensity(prior)
 density_steps = 1000
 lon_shift = 0.0
 
@@ -196,7 +196,7 @@ def to_thread():
             """global to_print
             lock.acquire()
             if to_print > 0:
-                to_print -= 1
+                to_print -= 10
                 plt.imshow(temp, aspect=0.01, interpolation='none', cmap="plasma", extent=(prior_min, prior_max, float(density[0][0]), float(density[1][1])))
                 #plt.plot((args.overdensity + 1, args.overdensity + 1), (density[0][0], density[1][1]), color="k")
                 plt.title(str(to_print + 1))
@@ -206,11 +206,15 @@ def to_thread():
                 plt.show()
                 plt.plot(overdensity + 1, np.exp(ln_prob))
                 plt.plot((args.overdensity + 1, args.overdensity + 1), (np.exp(np.min(ln_prob)), np.exp(np.max(ln_prob))), color="k")
+                debug = np.exp(masked_clusters[i] * np.log(overdensity + 1) - (masked_clusters[i] + unmasked_clusters[i])
+                               * np.log(1 + (sky_masked_fraction[i] / (1 - sky_masked_fraction[i])) * (1 + overdensity)))
+                debug = debug / np.sum(debug)
+                plt.plot(overdensity + 1, debug, linestyle="dotted", color="r")
                 plt.plot(np.array((1, 1)) * (((masked_clusters[i] - (masked_clusters[i] + unmasked_clusters[i]) * sky_masked_fraction[i]) /
                          (unmasked_clusters[i] * sky_masked_fraction[i])) + 1), (np.exp(np.min(ln_prob)), np.exp(np.max(ln_prob))), color="k", linestyle="dashed")
                 plt.xlabel("Overdensity")
                 plt.ylabel("LDF")
-                plt.title(rf"{to_print + 1}, $n_{{m}}$: {masked_clusters[i]}, $n_{{nm}}$: {unmasked_clusters[i]}, $f_{{m}}$: {sky_masked_fraction[i]}, E: {
+                plt.title(rf"{to_print + 1}, $n_{{m}}$: {masked_clusters[i]}, $n_{{nm}}$: {unmasked_clusters[i]}, $f_{{m}}$: {sky_masked_fraction[i]}, E: {1 +
                 (masked_clusters[i] - (masked_clusters[i] + unmasked_clusters[i]) * sky_masked_fraction[i]) / (unmasked_clusters[i] * sky_masked_fraction[i])}")
                 plt.xscale("log")
                 plt.show()
@@ -218,6 +222,11 @@ def to_thread():
                 #exit()
                 thread.interrupt_main(KeyboardInterrupt)
             lock.release()"""
+            debug = masked_clusters[i] * np.log(overdensity + 1) - (masked_clusters[i] + unmasked_clusters[i]) \
+                           * np.log(1 + (sky_masked_fraction[i] / (1 - sky_masked_fraction[i])) * (1 + overdensity))
+            debug[np.isnan(debug)] = np.nanmin(debug)
+            debug = debug - np.nanmax(debug)
+            ln_prob = debug
             return ln_prob
 
 
