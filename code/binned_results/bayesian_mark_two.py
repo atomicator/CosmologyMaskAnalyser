@@ -214,7 +214,7 @@ def to_thread():
                          (unmasked_clusters[i] * sky_masked_fraction[i])) + 1), (np.exp(np.min(ln_prob)), np.exp(np.max(ln_prob))), color="k", linestyle="dashed")
                 plt.xlabel("Overdensity")
                 plt.ylabel("LDF")
-                plt.title(rf"{to_print + 1}, $n_{{m}}$: {masked_clusters[i]}, $n_{{nm}}$: {unmasked_clusters[i]}, $f_{{m}}$: {sky_masked_fraction[i]}, E: {1 +
+                plt.title(rf"{to_print + 1}, $n_{{m}}$: {masked_clusters[i]}, $n_{{nm}}$: {unmasked_clusters[i]}, $f_{{m}}$: {sky_masked_fraction[i]}, E: {1 + \
                 (masked_clusters[i] - (masked_clusters[i] + unmasked_clusters[i]) * sky_masked_fraction[i]) / (unmasked_clusters[i] * sky_masked_fraction[i])}")
                 plt.xscale("log")
                 plt.show()
