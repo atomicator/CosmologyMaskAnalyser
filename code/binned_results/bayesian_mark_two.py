@@ -21,8 +21,8 @@ lock = multiprocessing.Lock()
 
 args = parser.parse_args()
 
-NSIDES = [0, 1, 2, 4, 8, 16, 32, 64]
-#NSIDES = [32]
+#NSIDES = [0, 1, 2, 4, 8, 16, 32, 64]
+NSIDES = [32]
 
 raise_dir = 2
 cat_name = "sdss"
@@ -42,7 +42,7 @@ def map_to_overdensity(prior):
 
 prior_max = 0.8
 prior_min = - prior_max
-overdensity_steps = 10001
+overdensity_steps = 1001
 #prior = np.linspace(prior_min, prior_max, overdensity_steps)
 overdensity = np.linspace(0.05, 3, overdensity_steps) - 1 #map_to_overdensity(prior)
 density_steps = 1000
@@ -138,14 +138,14 @@ def to_thread():
             pixel_area = 4 * np.pi
 
         def func(i):
-            #expectation_cutoff = 1
-            expectation_cutoff = args.debug
+            expectation_cutoff = 1
+            #expectation_cutoff = args.debug
             if not (0.001 < sky_masked_fraction[i] < 0.999):
                 return 0
-            #if (unmasked_clusters[i] + masked_clusters[i] < 5 or
-            #        (unmasked_clusters[i] + masked_clusters[i]) * min(sky_surveyed_fraction[i], 1 - sky_surveyed_fraction[i])
-            #                                                                                    < expectation_cutoff):
-            #    return 0
+            if (unmasked_clusters[i] + masked_clusters[i]) < 5 or \
+                    (unmasked_clusters[i] + masked_clusters[i]) * min(sky_surveyed_fraction[i], 1 - sky_surveyed_fraction[i]) \
+                                                                                                < expectation_cutoff:
+                return 0
             #if unmasked_clusters[i] < 1:
             #    return 0  # quicker than applying a NaN filter later
             #ln_prob = np.zeros(overdensity_steps)
@@ -193,7 +193,7 @@ def to_thread():
             #                 + (np.log(unmasked_cluster_expectation) * unmasked_clusters[i] - unmasked_cluster_expectation)
             #                 , axis=0)
             #ln_prob -= np.max(ln_prob)
-            """global to_print
+            global to_print
             lock.acquire()
             if to_print > 0:
                 to_print -= 10
@@ -221,7 +221,7 @@ def to_thread():
             else:
                 #exit()
                 thread.interrupt_main(KeyboardInterrupt)
-            lock.release()"""
+            lock.release()
             debug = masked_clusters[i] * np.log(overdensity + 1) - (masked_clusters[i] + unmasked_clusters[i]) \
                            * np.log(1 + (sky_masked_fraction[i] / (1 - sky_masked_fraction[i])) * (1 + overdensity))
             debug[np.isnan(debug)] = np.nanmin(debug)
