@@ -150,21 +150,21 @@ def to_thread():
             #    return 0  # quicker than applying a NaN filter later
             #ln_prob = np.zeros(overdensity_steps)
             #density_mid = (unmasked_clusters[i] + masked_clusters[i]) / (pixel_area * sky_surveyed_fraction[i])
-            density_mid = unmasked_clusters[i] / (pixel_area * sky_surveyed_fraction[i] * (1 - sky_masked_fraction[i]))
+            #density_mid = unmasked_clusters[i] / (pixel_area * sky_surveyed_fraction[i] * (1 - sky_masked_fraction[i]))
             #density_min = density_mid * max(0, 1 - 10/np.sqrt(unmasked_clusters[i]))
             #density_max = density_mid * max(0, 1 + 10/np.sqrt(unmasked_clusters[i]))
             #print(density_min, density_max)
-            density_min = 1e4
-            density_delta = min(density_mid - density_min, density_mid * 100 /
-                               np.sqrt((unmasked_clusters[i] + masked_clusters[i])))
-            density_max = 1e5
+            #density_min = 1e4
+            #density_delta = min(density_mid - density_min, density_mid * 100 /
+            #                   np.sqrt((unmasked_clusters[i] + masked_clusters[i])))
+            #density_max = 1e5
             #density = np.outer(np.linspace(density_min, density_max, density_steps), np.ones(np.shape(overdensity)))
-            density = np.outer(np.linspace(density_mid - density_delta, density_mid + density_delta, density_steps)
-                               , np.ones(np.shape(overdensity)))
-            alpha = np.outer(np.ones(np.shape(density[:, 0])), overdensity)
-            masked_cluster_expectation = (1 + alpha) * sky_masked_fraction[i] * density * sky_surveyed_fraction[i] * \
-                                        pixel_area
-            unmasked_cluster_expectation = (1 - sky_masked_fraction[i]) * density * sky_surveyed_fraction[i] * pixel_area
+            #density = np.outer(np.linspace(density_mid - density_delta, density_mid + density_delta, density_steps)
+            #                   , np.ones(np.shape(overdensity)))
+            #alpha = np.outer(np.ones(np.shape(density[:, 0])), overdensity)
+            #masked_cluster_expectation = (1 + alpha) * sky_masked_fraction[i] * density * sky_surveyed_fraction[i] * \
+            #                            pixel_area
+            #unmasked_cluster_expectation = (1 - sky_masked_fraction[i]) * density * sky_surveyed_fraction[i] * pixel_area
            # if np.min((masked_cluster_expectation, unmasked_cluster_expectation)) < expectation_cutoff:  # prevents NaN forming later - only triggers if
            #     # the masked fraction of the pixel is small
            #     return 0
@@ -175,26 +175,26 @@ def to_thread():
             #plt.imshow(temp)
             #plt.title("prob 2")
             #plt.show()
-            with np.errstate(all="ignore"):
-                with warnings.catch_warnings():
-                    warnings.simplefilter("ignore", category=RuntimeWarning)
-                    temp = ((np.log(masked_cluster_expectation) * masked_clusters[i] - masked_cluster_expectation)
-                                     + (np.log(unmasked_cluster_expectation) * unmasked_clusters[i] -
-                                        unmasked_cluster_expectation))
-                    temp_min = np.min(temp)
-                    if np.isnan(temp_min):
-                        return 0
-            temp[np.isnan(temp)] = temp_min
-            temp = temp - np.max(temp)
-            temp = np.exp(temp)
-            temp = temp / np.sum(temp)
-            ln_prob = np.log(np.sum(temp, axis=0))
+            #with np.errstate(all="ignore"):
+            #    with warnings.catch_warnings():
+            #        warnings.simplefilter("ignore", category=RuntimeWarning)
+            #        temp = ((np.log(masked_cluster_expectation) * masked_clusters[i] - masked_cluster_expectation)
+            #                         + (np.log(unmasked_cluster_expectation) * unmasked_clusters[i] -
+            #                            unmasked_cluster_expectation))
+            #        temp_min = np.min(temp)
+            #        if np.isnan(temp_min):
+            #            return 0
+            #temp[np.isnan(temp)] = temp_min
+            #temp = temp - np.max(temp)
+            #temp = np.exp(temp)
+            #temp = temp / np.sum(temp)
+            #ln_prob = np.log(np.sum(temp, axis=0))
             #ln_prob = np.sum((np.log(masked_cluster_expectation) * masked_clusters[i] - masked_cluster_expectation)
             #                 + (np.log(unmasked_cluster_expectation) * unmasked_clusters[i] - unmasked_cluster_expectation)
             #                 , axis=0)
             #ln_prob -= np.max(ln_prob)
-            global to_print
-            """lock.acquire()
+            """global to_print
+            lock.acquire()
             if to_print > 0:
                 to_print -= 10
                 plt.imshow(temp, aspect=0.01, interpolation='none', cmap="plasma", extent=(prior_min, prior_max, float(density[0][0]), float(density[1][1])))
@@ -222,11 +222,13 @@ def to_thread():
                 #exit()
                 thread.interrupt_main(KeyboardInterrupt)
             lock.release()"""
-            debug = masked_clusters[i] * np.log(overdensity + 1) - (masked_clusters[i] + unmasked_clusters[i]) \
-                           * np.log(1 + (sky_masked_fraction[i] / (1 - sky_masked_fraction[i])) * (1 + overdensity))
-            debug[np.isnan(debug)] = np.nanmin(debug)
-            debug = debug - np.nanmax(debug)
-            ln_prob = debug
+            with np.errstate(all="ignore"):
+                with warnings.catch_warnings():
+                    debug = masked_clusters[i] * np.log(overdensity + 1) - (masked_clusters[i] + unmasked_clusters[i]) \
+                                   * np.log(1 + (sky_masked_fraction[i] / (1 - sky_masked_fraction[i])) * (1 + overdensity))
+                    debug[np.isnan(debug)] = np.nanmin(debug)
+                    debug = debug - np.nanmax(debug)
+                    ln_prob = debug
             return ln_prob
 
 
