@@ -140,12 +140,12 @@ def to_thread():
         def func(i):
             expectation_cutoff = 0.001
             #expectation_cutoff = args.debug
-            if not (0.001 < sky_masked_fraction[i] < 0.999):
-                return 0
-            if (unmasked_clusters[i] + masked_clusters[i]) < 5 or \
-                    (unmasked_clusters[i] + masked_clusters[i]) * min(sky_surveyed_fraction[i], 1 - sky_surveyed_fraction[i]) \
-                                                                                                < expectation_cutoff:
-                return 0
+            #if not (0.001 < sky_masked_fraction[i] < 0.999):
+            #    return 0
+            #if (unmasked_clusters[i] + masked_clusters[i]) < 5 or \
+            #        (unmasked_clusters[i] + masked_clusters[i]) * min(sky_surveyed_fraction[i], 1 - sky_surveyed_fraction[i]) \
+            #                                                                                    < expectation_cutoff:
+            #    return 0
             #if unmasked_clusters[i] < 1:
             #    return 0  # quicker than applying a NaN filter later
             #ln_prob = np.zeros(overdensity_steps)
