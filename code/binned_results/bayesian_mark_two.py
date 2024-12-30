@@ -138,7 +138,7 @@ def to_thread():
             pixel_area = 4 * np.pi
 
         def func(i):
-            expectation_cutoff = 1
+            expectation_cutoff = 0.1
             #expectation_cutoff = args.debug
             if not (0.001 < sky_masked_fraction[i] < 0.999):
                 return 0
