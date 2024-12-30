@@ -194,7 +194,7 @@ def to_thread():
             #                 , axis=0)
             #ln_prob -= np.max(ln_prob)
             global to_print
-            lock.acquire()
+            """lock.acquire()
             if to_print > 0:
                 to_print -= 10
                 plt.imshow(temp, aspect=0.01, interpolation='none', cmap="plasma", extent=(prior_min, prior_max, float(density[0][0]), float(density[1][1])))
@@ -221,7 +221,7 @@ def to_thread():
             else:
                 #exit()
                 thread.interrupt_main(KeyboardInterrupt)
-            lock.release()
+            lock.release()"""
             debug = masked_clusters[i] * np.log(overdensity + 1) - (masked_clusters[i] + unmasked_clusters[i]) \
                            * np.log(1 + (sky_masked_fraction[i] / (1 - sky_masked_fraction[i])) * (1 + overdensity))
             debug[np.isnan(debug)] = np.nanmin(debug)
