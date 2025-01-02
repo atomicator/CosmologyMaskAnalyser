@@ -255,7 +255,7 @@ def to_thread():
                 with warnings.catch_warnings():
                     debug = masked_clusters[i] * np.log(overdensity + 1) - (masked_clusters[i] + unmasked_clusters[i]) \
                                    * np.log(1 + (sky_masked_fraction[i] / (1 - sky_masked_fraction[i])) * (1 + overdensity))
-                    if sp.isnan(debug).all():
+                    if np.isnan(debug).all():
                         print(masked_clusters[i], unmasked_clusters[i], sky_masked_fraction[i], sky_masked_fraction[i])
                     debug[np.isnan(debug)] = np.nanmin(debug)
                     debug = debug - np.nanmax(debug)
