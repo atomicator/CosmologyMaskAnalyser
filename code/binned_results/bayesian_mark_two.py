@@ -15,18 +15,35 @@ parser.add_argument("-r", "--realisations", type=int, help="Number of realisatio
 parser.add_argument("-a", "--target", type=int, default=400000)
 parser.add_argument("-i", "--invert_bias", default=False, type=lambda x: (str(x).lower() == 'true'))
 parser.add_argument("-d", "--debug", type=float, help="Debug", default=10.0)
-
+# TODO: Debug args below this
+parser.add_argument("--data_mask", default="sdss_planck")
+parser.add_argument("--catalogue", default="random")
+parser.add_argument("--lon_shift", type=float, default=0.0)
 to_print = 20
 lock = multiprocessing.Lock()
 
 args = parser.parse_args()
 
+#NSIDES = [0, 1, 2, 4]
 NSIDES = [0, 1, 2, 4, 8, 16, 32, 64]
 #NSIDES = [32]
 
+def data_filter(redshift, richness):
+    global args
+    return (args.min_z < redshift < args.max_z) and (args.min_r < richness < args.max_r)
+
 raise_dir = 2
-cat_name = "sdss"
-mask_name = "act_point"
+#cat_name = "sdss"
+
+
+data_mask = args.data_mask
+if data_mask == "sdss_act":
+    mask_name = "act_point"
+elif data_mask == "sdss_planck":
+    mask_name = "planck_modified_point"
+else:
+    raise ValueError
+
 #overdensity_min = -0.95
 #overdensity_max = 1 / (1 + overdensity_min)
 #overdensity_steps = 1001
@@ -56,7 +73,7 @@ def data_filter(z, r):
     return (z > 0) and (r > 20)
 
 print("Loading mask")
-sdss_mask = data.load_mask("sdss_mask", raise_dir)
+sdss_mask = data.load_mask("sdss_mask", raise_dir, lon_shift=args.lon_shift)
 mask = data.load_mask(mask_name, raise_dir)
 Lock = multiprocessing.Lock()
 to_write = []
@@ -93,18 +110,30 @@ for NSIDE in NSIDES:
 def to_thread():
     np.random.seed()
     array_to_return = []
-    print("Generating catalogue")
-    cat = toolkit.ClusterCatalogue()
-    random_points = toolkit.gen_random_coords(args.target, sdss_mask)[::-1].transpose()
-    if args.overdensity != 0.0:
-        bias_points = toolkit.gen_random_coords(args.target * args.overdensity, sdss_mask)[::-1].transpose()
-        if not args.invert_bias:
-            bias_points = bias_points[mask.lookup_point(*bias_points.transpose()) == 0.0]
+    if args.catalogue == "random":
+        print("Generating catalogue")
+        cat = toolkit.ClusterCatalogue()
+        random_points = toolkit.gen_random_coords(args.target, sdss_mask)[::-1].transpose()
+        if args.overdensity != 0.0:
+            bias_points = toolkit.gen_random_coords(args.target * args.overdensity, sdss_mask)[::-1].transpose()
+            if not args.invert_bias:
+                bias_points = bias_points[mask.lookup_point(*bias_points.transpose()) == 0.0]
+            else:
+                bias_points = bias_points[mask.lookup_point(*bias_points.transpose()) != 0.0]
+            cat.lon_lat = np.append(arr=random_points, values=bias_points, axis=0)
         else:
-            bias_points = bias_points[mask.lookup_point(*bias_points.transpose()) != 0.0]
-        cat.lon_lat = np.append(arr=random_points, values=bias_points, axis=0)
+            cat.lon_lat = random_points
+    elif args.catalogue == "sdss":
+        cat = data.load_catalogue("sdss", raise_dir)
+    elif args.catalogue == "sdss_filtered":
+        cat = data.load_catalogue("sdss", raise_dir)
+        cat.load_data(selection_function=data_filter, requested_fields=["ZRED", "LAMBDA_CHISQ"], lon_lat=True)
+        cat.lon_lat[:, 0] -= args.lon_shift
+        cat.lon_lat[cat.lon_lat[:, 0] < 0, 0] += 360
+        cat.lon_lat[cat.lon_lat[:, 0] > 360, 0] -= 360
     else:
-        cat.lon_lat = random_points
+        raise ValueError
+
     for NSIDE in NSIDES:
         results = np.zeros(overdensity_steps)  # replace with mutex
         print("Resizing sky fractions")
@@ -249,18 +278,10 @@ def to_thread():
             results += thread_objects[i].get()
             #print(thread_objects[i].get())
 
-        #print(results)
         results = results - np.max(results)
-        #print(results)
         results = np.exp(results)
         results = (results / np.sum(results))
-        # print(np.shape(results))
-        # print(np.shape(x))
-        # print(np.sum(y) * (overdensity_max - overdensity_min) / overdensity_steps)
-        # Percentiles - need 68-95-99.7
         y_cum = np.cumsum(results) * 100  # convert to percentiles
-        # print(y_cum)
-
         search_percentiles = [0.15, 2.5, 16, 25, 50, 75, 84, 97.5, 99.85]
         colours = ["m", "c", "g", "b", "r", "b", "g", "c", "m"]
         labels = [r"$3 \sigma$", r"$2 \sigma$", r"$1 \sigma$", r"$25 \%$", "Median", None, None, None, None]
