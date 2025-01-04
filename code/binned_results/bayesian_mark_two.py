@@ -25,7 +25,7 @@ lock = multiprocessing.Lock()
 args = parser.parse_args()
 
 #NSIDES = [0, 1, 2, 4]
-NSIDES = [0, 1, 2, 4, 8, 16, 32, 64, 128, 256]
+NSIDES = [0, 1, 2, 4, 8, 16, 32, 64, 128]
 #NSIDES = [32]
 
 def data_filter(redshift, richness):
@@ -170,6 +170,8 @@ def to_thread():
             expectation_cutoff = 0.001
             #expectation_cutoff = args.debug
             if not (0.001 < sky_masked_fraction[i] < 0.999):
+                return 0
+            if (unmasked_clusters[i] + masked_clusters[i]) < 1:
                 return 0
             #if (unmasked_clusters[i] + masked_clusters[i]) < 5 or \
             #        (unmasked_clusters[i] + masked_clusters[i]) * min(sky_surveyed_fraction[i], 1 - sky_surveyed_fraction[i]) \
