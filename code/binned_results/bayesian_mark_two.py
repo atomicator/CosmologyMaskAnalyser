@@ -173,6 +173,8 @@ def to_thread():
                 return 0
             if (unmasked_clusters[i] + masked_clusters[i]) < 1:
                 return 0
+            if (unmasked_clusters[i] + masked_clusters[i]) * min(sky_masked_fraction[i], 1 - sky_surveyed_fraction[i]) < 0.1:
+                return 0
             #if (unmasked_clusters[i] + masked_clusters[i]) < 5 or \
             #        (unmasked_clusters[i] + masked_clusters[i]) * min(sky_surveyed_fraction[i], 1 - sky_surveyed_fraction[i]) \
             #                                                                                    < expectation_cutoff:
