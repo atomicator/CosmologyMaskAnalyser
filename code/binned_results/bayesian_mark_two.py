@@ -61,7 +61,7 @@ prior_max = 0.8
 prior_min = - prior_max
 overdensity_steps = 10001
 #prior = np.linspace(prior_min, prior_max, overdensity_steps)
-overdensity = np.linspace(0.7, 1.3, overdensity_steps) - 1 #map_to_overdensity(prior)
+overdensity = np.linspace(0.5, 1.5, overdensity_steps) - 1 #map_to_overdensity(prior)
 density_steps = 1000
 lon_shift = 0.0
 
