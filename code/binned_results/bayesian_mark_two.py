@@ -171,10 +171,10 @@ def to_thread():
             #expectation_cutoff = args.debug
             if not (0.001 < sky_masked_fraction[i] < 0.999):
                 return 0
-            if (unmasked_clusters[i] + masked_clusters[i]) < 1:
+            if (unmasked_clusters[i] + masked_clusters[i]) < 2:
                 return 0
-            if (unmasked_clusters[i] + masked_clusters[i]) * min(sky_masked_fraction[i], 1 - sky_surveyed_fraction[i]) < 0.01:
-                return 0
+            #if (unmasked_clusters[i] + masked_clusters[i]) * min(sky_masked_fraction[i], 1 - sky_surveyed_fraction[i]) < 0.001:
+            #    return 0
             #if (unmasked_clusters[i] + masked_clusters[i]) < 5 or \
             #        (unmasked_clusters[i] + masked_clusters[i]) * min(sky_surveyed_fraction[i], 1 - sky_surveyed_fraction[i]) \
             #                                                                                    < expectation_cutoff:
