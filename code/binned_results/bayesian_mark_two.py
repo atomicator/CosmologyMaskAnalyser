@@ -169,6 +169,7 @@ def to_thread():
         def func(i):
             expectation_cutoff = (NSIDE / 2048) ** 2  # At this scale, quantization errors caused by the calculations of
             # f_s become significant. If f_s or 1 - f_s is less than this value, the pixel is rejected.
+            # Resolution of the calculation was 8192, for reference.
             #expectation_cutoff = args.debug
             if not (expectation_cutoff < sky_masked_fraction[i] < 1 - expectation_cutoff):
                 return 0
