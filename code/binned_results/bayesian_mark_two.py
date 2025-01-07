@@ -262,7 +262,7 @@ def to_thread():
                     #debug = masked_clusters[i] * np.log(overdensity + 1) - (masked_clusters[i] + unmasked_clusters[i]) \
                     #               * np.log(1 + (sky_masked_fraction[i] / (1 - sky_masked_fraction[i])) * (1 + overdensity))
                     debug = masked_clusters[i] * np.log(1 + overdensity) - (masked_clusters[i] + unmasked_clusters[i]) \
-                            * np.log(sky_masked_fraction[i] + (1 - sky_masked_fraction[i]) * overdensity)
+                            * np.log(sky_masked_fraction[i] * overdensity + (1 - sky_masked_fraction[i]))
                     if np.isnan(debug).all():
                         print(masked_clusters[i], unmasked_clusters[i], sky_masked_fraction[i], sky_masked_fraction[i])
                     debug[np.isnan(debug)] = np.nanmin(debug)
