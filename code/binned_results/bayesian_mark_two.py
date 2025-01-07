@@ -171,8 +171,8 @@ def to_thread():
             #expectation_cutoff = args.debug
             if not (0.001 < sky_masked_fraction[i] < 0.999):
                 return 0
-            if (unmasked_clusters[i] + masked_clusters[i]) < 5:
-                return 0
+            #if (unmasked_clusters[i] + masked_clusters[i]) < 5:
+            #    return 0
             #if (unmasked_clusters[i] + masked_clusters[i]) * min(sky_masked_fraction[i], 1 - sky_surveyed_fraction[i]) < 0.001:
             #    return 0
             #if (unmasked_clusters[i] + masked_clusters[i]) < 5 or \
@@ -259,7 +259,7 @@ def to_thread():
                 with warnings.catch_warnings():
                     #debug = masked_clusters[i] * np.log(overdensity + 1) - (masked_clusters[i] + unmasked_clusters[i]) \
                     #               * np.log(1 + (sky_masked_fraction[i] / (1 - sky_masked_fraction[i])) * (1 + overdensity))
-                    debug = masked_clusters[i] * np.log(1 + overdensity) - (masked_clusters[i] + unmasked_clusters[i]) \
+                    debug = masked_clusters[i] * np.log(1 + overdensity) - (masked_clusters[i] + unmasked_clusters[i] + 1) \
                             * np.log(1 + overdensity * sky_masked_fraction[i])
                     if np.isnan(debug).all():
                         print(masked_clusters[i], unmasked_clusters[i], sky_masked_fraction[i], sky_masked_fraction[i])
