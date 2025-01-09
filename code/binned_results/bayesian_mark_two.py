@@ -25,7 +25,7 @@ lock = multiprocessing.Lock()
 args = parser.parse_args()
 
 #NSIDES = [0, 1, 2, 4]
-NSIDES = [0, 1, 2, 4, 8, 16, 32, 64, 128, 256]
+NSIDES = [0, 1, 2, 4, 8, 16, 32, 64, 128]
 #NSIDES = [32]
 
 def data_filter(redshift, richness):
@@ -167,7 +167,7 @@ def to_thread():
             pixel_area = 4 * np.pi
 
         def func(i):
-            expectation_cutoff = (NSIDE / 512) ** 2  # At this scale, quantization errors caused by the calculations of
+            expectation_cutoff = (NSIDE / 256) ** 2  # At this scale, quantization errors caused by the calculations of
             # f_s become significant. If f_s or 1 - f_s is less than this value, the pixel is rejected.
             # Resolution of the calculation was 8192, for reference.
             #expectation_cutoff = args.debug
