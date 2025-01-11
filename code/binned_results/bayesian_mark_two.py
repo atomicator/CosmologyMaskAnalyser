@@ -167,7 +167,7 @@ def to_thread():
             pixel_area = 4 * np.pi
 
         def func(i):
-            expectation_cutoff = 2000 * (NSIDE / 8192) ** 2  # At this scale, quantization errors caused by the calculations of
+            expectation_cutoff = 500 * (NSIDE / 8192) ** 2  # At this scale, quantization errors caused by the calculations of
             # f_s become significant. If f_s or 1 - f_s is less than this value, the pixel is rejected.
             # Resolution of the calculation was 8192, for reference.
             #expectation_cutoff = args.debug
