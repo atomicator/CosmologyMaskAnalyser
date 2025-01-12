@@ -16,7 +16,7 @@ parser.add_argument("-a", "--target", type=int, default=400000)
 parser.add_argument("-i", "--invert_bias", default=False, type=lambda x: (str(x).lower() == 'true'))
 parser.add_argument("-d", "--debug", type=float, help="Debug", default=10.0)
 # TODO: Debug args below this
-parser.add_argument("--data_mask", default="sdss_planck")
+parser.add_argument("--data_mask", default="sdss_act")
 parser.add_argument("--catalogue", default="random")
 parser.add_argument("--lon_shift", type=float, default=0.0)
 to_print = 20
@@ -167,7 +167,7 @@ def to_thread():
             pixel_area = 4 * np.pi
 
         def func(i):
-            expectation_cutoff = 500 * (NSIDE / 8192) ** 2  # At this scale, quantization errors caused by the calculations of
+            expectation_cutoff = 1000 * (NSIDE / 8192) ** 2  # At this scale, quantization errors caused by the calculations of
             # f_s become significant. If f_s or 1 - f_s is less than this value, the pixel is rejected.
             # Resolution of the calculation was 8192, for reference.
             #expectation_cutoff = args.debug
