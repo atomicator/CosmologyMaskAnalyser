@@ -25,7 +25,7 @@ lock = multiprocessing.Lock()
 args = parser.parse_args()
 
 #NSIDES = [0, 1, 2, 4]
-NSIDES = [0, 1, 2, 4, 8, 16, 32, 64, 128]
+NSIDES = [0, 1, 2, 4, 8, 16, 32, 64]
 #NSIDES = [32]
 
 def data_filter(redshift, richness):
