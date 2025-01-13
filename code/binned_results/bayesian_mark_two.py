@@ -16,7 +16,7 @@ parser.add_argument("-a", "--target", type=int, default=400000)
 parser.add_argument("-i", "--invert_bias", default=False, type=lambda x: (str(x).lower() == 'true'))
 parser.add_argument("-d", "--debug", type=float, help="Debug", default=10.0)
 # TODO: Debug args below this
-parser.add_argument("--data_mask", default="sdss_planck")
+parser.add_argument("--data_mask", default="sdss_act")
 parser.add_argument("--catalogue", default="random")
 parser.add_argument("--lon_shift", type=float, default=0.0)
 to_print = 20
