@@ -3,8 +3,10 @@ from toolkit.toolkit import HealpyMask, PixellMask, CombinationMask, ClusterCata
 import numpy as np
 import healpy as hp
 import toolkit.filters as filters
+import os
 
 def load_mask(mask, raise_dir=2, nside=8, invert=False, lon_shift=None):
+    value = None
     if mask == "planck_galactic":
         value = HealpyMask("../" * raise_dir + "data/planck_galactic_mask.fits", partial=True, mask_using_latlon=True)
     elif mask == "planck_point" or mask == "planck_modified_total":
@@ -69,6 +71,45 @@ def load_mask(mask, raise_dir=2, nside=8, invert=False, lon_shift=None):
         galactic_mask = load_mask("act_galactic", raise_dir, nside, invert)
         galactic_mask.invert = True
         value = CombinationMask(act_mask, galactic_mask, use_and=False)
+    elif mask == "spt_total":
+        mask_files = os.listdir("../" * raise_dir + "./data/test")
+        temp_path = mask_files.pop(0)
+        mask = PixellMask("../" * raise_dir + "./data/test/" + temp_path,
+                          mask_using_latlon=False, init_val=0, suppress_warnings=True)
+        while mask_files:
+            temp_path = mask_files.pop(0)
+            temp_mask = PixellMask("../" * raise_dir + "./data/test/" + temp_path,
+                                   mask_using_latlon=False, init_val=0, suppress_warnings=True)
+            mask = CombinationMask(mask, temp_mask, lon_shift=0, use_and=False)
+        value = mask
+    elif mask == "spt_point":
+        mask_files = os.listdir("../" * raise_dir + "./data/test")
+        overwrite_path = "../" * raise_dir + "./data/test2/"
+        temp_path = mask_files.pop(0)
+        mask = PixellMask("../" * raise_dir + "./data/test/" + temp_path,
+                                  mask_using_latlon=False, init_val=1, suppress_warnings=True)
+        mask.map = np.load(overwrite_path + "point_" + temp_path + ".npy")
+        while mask_files:
+            temp_path = mask_files.pop(0)
+            temp_mask = PixellMask("../" * raise_dir + "./data/test/" + temp_path,
+                                           mask_using_latlon=False, init_val=1, suppress_warnings=True)
+            temp_mask.map = np.load(overwrite_path + "point_" + temp_path + ".npy")
+            mask = CombinationMask(mask, temp_mask, lon_shift=0, use_and=True)
+        value = mask
+    elif mask == "spt_galactic":
+        mask_files = os.listdir("../" * raise_dir + "./data/test")
+        overwrite_path = "../" * raise_dir + "./data/test2/"
+        temp_path = mask_files.pop(0)
+        mask = PixellMask("../" * raise_dir + "./data/test/" + temp_path,
+                                  mask_using_latlon=False, init_val=0, suppress_warnings=True)
+        mask.map = (mask.map + np.load(overwrite_path + "point_" + temp_path + ".npy") + 1) % 2
+        while mask_files:
+            temp_path = mask_files.pop(0)
+            temp_mask = PixellMask("../" * raise_dir + "./data/test/" + temp_path,
+                                           mask_using_latlon=False, init_val=0, suppress_warnings=True)
+            temp_mask.map = (temp_mask.map + np.load(overwrite_path + "point_" + temp_path + ".npy") + 1) % 2
+            mask = CombinationMask(mask, temp_mask, lon_shift=0, use_and=False)
+        value = mask
     else:
         raise ValueError(f"{mask} is not a recognised mask")
     return value

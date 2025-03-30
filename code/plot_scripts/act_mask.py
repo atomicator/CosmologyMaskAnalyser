@@ -1,4 +1,4 @@
-from toolkit import toolkit
+from toolkit import toolkit, data
 import matplotlib.pyplot as plt
 import numpy as np
 import astropy
@@ -66,7 +66,7 @@ lon_shift = -50
 # Point mask
 """galactic_mask.invert = True
 point_mask = toolkit.CombinationMask(act_mask, galactic_mask, use_and=False)"""
-point_mask = toolkit.load_mask("sdss_mask", lon_shift=lon_shift)
+point_mask = data.load_mask("sdss_mask", lon_shift=lon_shift)
 
 plot_mask = point_mask
 plot_mask.set_fig_ax(fig, ax)

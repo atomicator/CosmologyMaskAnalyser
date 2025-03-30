@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 
-from toolkit import toolkit
+from toolkit import toolkit, data
 import argparse
 
 parser = argparse.ArgumentParser()
@@ -15,8 +15,8 @@ parser.add_argument("--save_path")
 args = parser.parse_args()
 mask_names = [args.mask_one, args.mask_two]
 
-mask1 = toolkit.load_mask(args.mask_one)
-mask2 = toolkit.load_mask(args.mask_two)
+mask1 = data.load_mask(args.mask_one)
+mask2 = data.load_mask(args.mask_two)
 
 fig = plt.figure()
 ax = fig.add_subplot(111)

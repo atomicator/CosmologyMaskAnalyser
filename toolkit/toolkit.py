@@ -1,6 +1,8 @@
 # This defines all the classes used by the rest of the project
+import warnings
 
 import numpy as np
+import matplotlib
 import matplotlib.pyplot as plt
 import pixell
 import pixell.enmap
@@ -11,6 +13,7 @@ import astropy.io.fits
 import astropy.table
 import astropy.wcs.utils
 import copy
+from astropy import units as u
 
 
 def plt_use_tex():  # updates variables in the matplotlib library so that it uses LaTeX
@@ -66,21 +69,29 @@ class __Mask(object):  # A template class, used to define general methods. Separ
         raise NotMaskError("__Mask.calc_exact_unmasked_fraction() called")
 
     def plot(self, resolution=(1000, 2000), clear=True, cbar=None, title=None, save_path=None, show=False,
-             cmap="plasma", alpha=1, nan_filter=True):  # Resolution is the resolution of the plot. Clear determines if
+             cmap="plasma", alpha=1, nan_filter=True, lon_range=(0, 360), lat_range=(-90, 90)):  # Resolution is the resolution of the plot. Clear determines if
         # the plot environment needs clearing before it gets plotted. Cbar adds a colourbar to the plot. Title adds a
         # title to the plot. Nan_filter determines if the non-masked region should be transparent. Cmap is the colourmap
         # to be used for the plot.
         if clear:
             self.ax.cla()  # Clear the plot environment
         x, y = resolution
-        lon = np.linspace(-90, 90, y)  # Create a 2D grid for a heatmap
-        lat = np.linspace(0, 360, x)
+        lat = np.linspace(lat_range[0], lat_range[1], x)  # Create a 2D grid for a heatmap
+        lon = np.linspace(lon_range[0], lon_range[1], y)
         lon, lat = np.meshgrid(lon, lat)
-        pixel_data = self.lookup_point(lat, lon)
+        pixel_data = self.lookup_point(lon, lat)
+        #plt.imshow(pixel_data)
+        #plt.title("pixel_data")
+        #plt.colorbar()
+        #plt.show()
         if nan_filter:
             pixel_data[pixel_data == 1] = np.nan  # Convert the non-masked regions to be transparent
-        lon = np.linspace(0, 360, y + 1)  # Create a co-ordinate grid for a heatmap
-        lat = np.linspace(- 90, 90, x + 1)
+        #plt.imshow(pixel_data)
+        #plt.title("pixel_data_2")
+        #plt.colorbar()
+        #plt.show()
+        lon = np.linspace(lon_range[0], lon_range[1], y + 1)  # Create a co-ordinate grid for a heatmap
+        lat = np.linspace(lat_range[0], lat_range[1], x + 1)
         lon, lat = np.meshgrid(lon, lat)
         c = self.ax.pcolormesh(lon, lat, pixel_data, alpha=alpha, cmap=cmap)  # Plot a colourmap
         if cbar:
@@ -100,10 +111,15 @@ class __Mask(object):  # A template class, used to define general methods. Separ
 
 
 class PixellMask(__Mask):  # Defines the methods for the PixellMask classes
-    def __init__(self, path, mask_using_latlon=True, invert=False, lon_shift=0, **kwargs):
+    def __init__(self, path, mask_using_latlon=True, invert=False, lon_shift=0, init_val=0, suppress_warnings=False, **kwargs):
         # Load data from fits file
         super().__init__(lon_shift, mask_using_latlon, invert)  # Calls the constructor of the base class
-        self.imap = pixell.enmap.read_map(path, **kwargs)  # Loads the file
+        if suppress_warnings:
+            with warnings.catch_warnings():
+                warnings.filterwarnings(action="ignore", category=RuntimeWarning)
+                self.imap = pixell.enmap.read_map(path, **kwargs)  # Loads the file
+        else:
+            self.imap = pixell.enmap.read_map(path, **kwargs)  # Loads the file
         self.map = np.array(self.imap)  # A numpy version of the map
         self.x = len(self.map)  # The dimensions of the map - useful to have them saved
         self.y = len(self.map[0])
@@ -111,17 +127,42 @@ class PixellMask(__Mask):  # Defines the methods for the PixellMask classes
         self.lat_max = 90
         self.lon_min = 00
         self.lon_max = 360
+        self.init_val = init_val
+        #print(self.imap.wcs)
 
     def _lookup_point(self, lon, lat):
-        pix = np.int_(pixell.enmap.sky2pix(self.imap.shape, self.imap.wcs, np.array((lat, lon)) * np.pi / 180))
+        #print(np.min(lon), np.max(lon))
+        #print(np.min(lat), np.max(lat))
+        #print(self.imap.wcs)
+        #wcs = astropy.wcs.WCS(self.imap.wcs)
+        # Note: co-ord are transformed by wrapper so they match the mask
+        if not self.mask_using_latlon:
+            c = astropy.coordinates.SkyCoord(ra=lon * u.degree, dec=lat * u.degree)
+        else:
+            c = astropy.coordinates.SkyCoord(lon * u.degree, lat * u.degree)
+        pix = np.int_(self.imap.wcs.world_to_pixel(c))[::-1]
+        # Line below works for ACT mask, not for SPT
+        #pix = np.int_(pixell.enmap.sky2pix(self.imap.shape, self.imap.wcs, np.array((lat, lon)) * np.pi / 180))
+        #print(pix, lon, lat)
         # convert lat lon co-ords to pixel co-ords
-        point = np.zeros(np.shape(pix)[1:])  # initialise the array as masked
+        point = np.ones(np.shape(pix)[1:]) * self.init_val  # initialise the array as masked
         points_in_range = np.bitwise_and(
             np.bool_(np.int_(0 < np.array(pix[0])) * np.int_(np.array(pix[0]) < np.shape(self.map)[0] - 1)),
             np.bool_(np.int_(0 < np.array(pix[1])) * np.int_(np.array(pix[1]) < np.shape(self.map)[1] - 1)))
+        #plt.imshow(points_in_range)
+        #plt.title("Points in range")
+        #plt.show()
+        print(f"Points in range: {np.sum(points_in_range)} / {points_in_range.shape}")
+        print(f"Default: {point[0][0]}")
+        print(f"Pix range: {pix[0][0]}, {pix[0][-1]}, {pix[-1][0]}, {pix[-1][-1]}")
         # Check which co-ords are within the range detailed in the mask
+        print(f"{np.sum(point)}")
         point[points_in_range] = self.map[pix[0, points_in_range], pix[1, points_in_range]]  # update the points in the
+        print(f"{np.sum(point)}")
         # region covered by the mask
+        #plt.imshow(point)
+        #plt.title("Point")
+        #plt.show()
         return point
 
     def calc_exact_unmasked_fraction(self):
@@ -540,3 +581,8 @@ def run_nside(n, data_set, mask, cat, weight_function, convert_to_mask_frac):
     except ValueError:
         final = np.array([np.nan, np.nan])
     return final
+
+#  Define a black and white heatmap
+__cdict_bw = [(0, 0, 0), (1, 1, 1)]
+bw_heatmap = matplotlib.colors.LinearSegmentedColormap.from_list("black and white", __cdict_bw, N=2)
+rb_heatmap = matplotlib.colors.LinearSegmentedColormap.from_list("rb", [(1, 0, 0), (0, 0, 1)])
