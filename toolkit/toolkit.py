@@ -533,7 +533,7 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="
     print("Querying masks")
     for i in range(steps):
         print(f"{25 * (i / steps)} %")
-        points = hp.pix2ang(NSIDE_internal[divisions[i]:divisions[i+1]], pix, lonlat=True)
+        points = hp.pix2ang(NSIDE_internal, pix[divisions[i]:divisions[i+1]], lonlat=True)
         mask1_masked = mask1.lookup_point(*copy.deepcopy(points)) == 0.0
         mask2_masked = mask2.lookup_point(*copy.deepcopy(points)) == 0.0
         data[divisions[i]:divisions[i+1]] = np.bitwise_and(mask1_masked, mask2_masked)
@@ -543,7 +543,7 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="
 
     for i in range(steps):
         print(f"{25 + 25 * (i / steps)} %")
-        points = hp.pix2ang(NSIDE_internal[divisions[i]:divisions[i+1]], pix, lonlat=True)
+        points = hp.pix2ang(NSIDE_internal, pix[divisions[i]:divisions[i+1]], lonlat=True)
         mask1_masked = mask1.lookup_point(*copy.deepcopy(points)) == 0.0
         mask2_masked = mask2.lookup_point(*copy.deepcopy(points)) == 0.0
         data[divisions[i]:divisions[i+1]] = np.bitwise_and(np.bitwise_not(mask1_masked), mask2_masked)
@@ -553,7 +553,7 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="
 
     for i in range(steps):
         print(f"{50 + 25 * (i / steps)} %")
-        points = hp.pix2ang(NSIDE_internal[divisions[i]:divisions[i+1]], pix, lonlat=True)
+        points = hp.pix2ang(NSIDE_internal, pix[divisions[i]:divisions[i+1]], lonlat=True)
         mask1_masked = mask1.lookup_point(*copy.deepcopy(points)) == 0.0
         mask2_masked = mask2.lookup_point(*copy.deepcopy(points)) == 0.0
         data[divisions[i]:divisions[i+1]] = np.bitwise_and(mask1_masked, np.bitwise_not(mask2_masked))
@@ -563,7 +563,7 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="
 
     for i in range(steps):
         print(f"{75 + 25 * (i / steps)} %")
-        points = hp.pix2ang(NSIDE_internal[divisions[i]:divisions[i+1]], pix, lonlat=True)
+        points = hp.pix2ang(NSIDE_internal, pix[divisions[i]:divisions[i+1]], lonlat=True)
         mask1_masked = mask1.lookup_point(*copy.deepcopy(points)) == 0.0
         mask2_masked = mask2.lookup_point(*copy.deepcopy(points)) == 0.0
         data[divisions[i]:divisions[i+1]] = np.bitwise_and(np.bitwise_not(mask1_masked), np.bitwise_not(mask2_masked))
