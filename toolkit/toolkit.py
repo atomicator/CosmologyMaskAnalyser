@@ -528,6 +528,7 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="
     data = np.int_(np.zeros(pix.size))
 
     print("Test")
+    input("")
     exit()
     print("Querying masks")
     if copy:
