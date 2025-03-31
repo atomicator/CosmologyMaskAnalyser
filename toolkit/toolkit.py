@@ -533,6 +533,9 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="
     print("Querying masks")
     for i in range(steps):
         print(f"{25 * (i / steps)} %")
+        print(divisions[i], divisions[i+1])
+        print(pix[divisions[i]], pix[divisions[i+1]])
+        print(pix[divisions[i]:divisions[i+1]])
         points = hp.pix2ang(NSIDE_internal, pix[divisions[i]:divisions[i+1]], lonlat=True)
         mask1_masked = mask1.lookup_point(*copy.deepcopy(points)) == 0.0
         mask2_masked = mask2.lookup_point(*copy.deepcopy(points)) == 0.0
