@@ -525,7 +525,7 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="
     print("Allocating memory for mask2")
     #mask2_masked = np.int_(np.zeros(pix.size))
     print("Allocating memory for data")
-    data = np.int_(np.zeros(pix.size))
+    data = np.float32(np.zeros(pix.size))
 
     print("Test")
     input("")
