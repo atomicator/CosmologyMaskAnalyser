@@ -518,17 +518,19 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="
     points = hp.pix2ang(NSIDE_internal, pix, lonlat=True)
     mask1_masked = mask1.lookup_point(*copy.deepcopy(points)) == 0.0
     mask2_masked = mask2.lookup_point(*copy.deepcopy(points)) == 0.0
-    data1 = hp.ud_grade(np.float64(np.bitwise_and(mask1_masked, mask2_masked)), NSIDE)
-    data2 = hp.ud_grade(np.float64(np.bitwise_and(np.bitwise_not(mask1_masked), mask2_masked)), NSIDE)
-    data3 = hp.ud_grade(np.float64(np.bitwise_and(mask1_masked, np.bitwise_not(mask2_masked))), NSIDE)
-    data4 = hp.ud_grade(np.float64(np.bitwise_and(np.bitwise_not(mask1_masked), np.bitwise_not(mask2_masked))), NSIDE)
-    results = np.float64(np.array([data1, data2, data3, data4]))
+    data = hp.ud_grade(np.float64(np.bitwise_and(mask1_masked, mask2_masked)), NSIDE)
     if write:
-        hp.fitsfunc.write_map(f"./{name}_{NSIDE}_1.fits", results[0], overwrite=True)
-        hp.fitsfunc.write_map(f"./{name}_{NSIDE}_2.fits", results[1], overwrite=True)
-        hp.fitsfunc.write_map(f"./{name}_{NSIDE}_3.fits", results[2], overwrite=True)
-        hp.fitsfunc.write_map(f"./{name}_{NSIDE}_4.fits", results[3], overwrite=True)
-    return results
+        hp.fitsfunc.write_map(f"./{name}_{NSIDE}_1.fits", data, overwrite=True)
+    data = hp.ud_grade(np.float64(np.bitwise_and(np.bitwise_not(mask1_masked), mask2_masked)), NSIDE)
+    if write:
+        hp.fitsfunc.write_map(f"./{name}_{NSIDE}_2.fits", data, overwrite=True)
+    data = hp.ud_grade(np.float64(np.bitwise_and(mask1_masked, np.bitwise_not(mask2_masked))), NSIDE)
+    if write:
+        hp.fitsfunc.write_map(f"./{name}_{NSIDE}_3.fits", data, overwrite=True)
+    data = hp.ud_grade(np.float64(np.bitwise_and(np.bitwise_not(mask1_masked), np.bitwise_not(mask2_masked))), NSIDE)
+    if write:
+        hp.fitsfunc.write_map(f"./{name}_{NSIDE}_4.fits", data, overwrite=True)
+    return None
 
 
 def run_const(data_set, mask, cat, weight_function, convert_to_mask_frac):
