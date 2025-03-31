@@ -1,5 +1,4 @@
 import numpy as np
-
 import toolkit.toolkit as toolkit
 import os
 import matplotlib.pyplot as plt
@@ -12,7 +11,7 @@ i = 0
 for file_name in files:
     i += 1
     print(f"{i}/{len(files)}")
-    mask = toolkit.PixellMask(path_old + file_name)
+    mask = toolkit.PixellMask(path_old + file_name, suppress_warnings=True)
     mask_to_edit = mask.map.copy()
     plt.imshow(mask_to_edit)
     plt.title(f"Initial: {i}")
