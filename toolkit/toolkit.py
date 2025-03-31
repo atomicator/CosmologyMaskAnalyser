@@ -521,9 +521,9 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="
     #points = hp.pix2ang(NSIDE_internal, np.int_(np.linspace(0, hp.nside2npix(NSIDE_internal) - 1,
     #                                                        hp.nside2npix(NSIDE_internal))), lonlat=True)
     print("Allocating memory for mask1")
-    mask1_masked = np.int_(np.zeros(pix.size))
+    #mask1_masked = np.int_(np.zeros(pix.size))
     print("Allocating memory for mask2")
-    mask2_masked = np.int_(np.zeros(pix.size))
+    #mask2_masked = np.int_(np.zeros(pix.size))
     print("Allocating memory for data")
     data = np.int_(np.zeros(pix.size))
 
