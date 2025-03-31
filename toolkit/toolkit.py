@@ -516,8 +516,10 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="
 
     pix = np.int_(np.linspace(0, hp.nside2npix(NSIDE_internal) - 1, hp.nside2npix(NSIDE_internal)))
     points = hp.pix2ang(NSIDE_internal, pix, lonlat=True)
+    del pix
     mask1_masked = mask1.lookup_point(*copy.deepcopy(points)) == 0.0
     mask2_masked = mask2.lookup_point(*copy.deepcopy(points)) == 0.0
+    del points
     data = hp.ud_grade(np.float64(np.bitwise_and(mask1_masked, mask2_masked)), NSIDE)
     if write:
         hp.fitsfunc.write_map(f"./{name}_{NSIDE}_1.fits", data, overwrite=True)
