@@ -527,11 +527,51 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="
     print("Allocating memory for data")
     data = np.float32(np.zeros(pix.size))
 
-    print("Test")
-    input("")
-    exit()
+    steps = 1000
+    divisions = np.int_(np.linspace(0, pix.shape, steps + 1))
+
     print("Querying masks")
-    if copy:
+    for i in range(steps):
+        print(f"{25 * (i / steps)} %")
+        points = hp.pix2ang(NSIDE_internal[divisions[i]:divisions[i+1]], pix, lonlat=True)
+        mask1_masked = mask1.lookup_point(*copy.deepcopy(points)) == 0.0
+        mask2_masked = mask2.lookup_point(*copy.deepcopy(points)) == 0.0
+        data[divisions[i]:divisions[i+1]] = np.bitwise_and(mask1_masked, mask2_masked)
+    data = hp.ud_grade(np.float32(data), NSIDE)
+    if write:
+        hp.fitsfunc.write_map(f"./{name}_{NSIDE}_1.fits", data, overwrite=True)
+
+    for i in range(steps):
+        print(f"{25 + 25 * (i / steps)} %")
+        points = hp.pix2ang(NSIDE_internal[divisions[i]:divisions[i+1]], pix, lonlat=True)
+        mask1_masked = mask1.lookup_point(*copy.deepcopy(points)) == 0.0
+        mask2_masked = mask2.lookup_point(*copy.deepcopy(points)) == 0.0
+        data[divisions[i]:divisions[i+1]] = np.bitwise_and(np.bitwise_not(mask1_masked), mask2_masked)
+    data = hp.ud_grade(np.float32(data), NSIDE)
+    if write:
+        hp.fitsfunc.write_map(f"./{name}_{NSIDE}_2.fits", data, overwrite=True)
+
+    for i in range(steps):
+        print(f"{50 + 25 * (i / steps)} %")
+        points = hp.pix2ang(NSIDE_internal[divisions[i]:divisions[i+1]], pix, lonlat=True)
+        mask1_masked = mask1.lookup_point(*copy.deepcopy(points)) == 0.0
+        mask2_masked = mask2.lookup_point(*copy.deepcopy(points)) == 0.0
+        data[divisions[i]:divisions[i+1]] = np.bitwise_and(mask1_masked, np.bitwise_not(mask2_masked))
+    data = hp.ud_grade(np.float32(data), NSIDE)
+    if write:
+        hp.fitsfunc.write_map(f"./{name}_{NSIDE}_3.fits", data, overwrite=True)
+
+    for i in range(steps):
+        print(f"{75 + 25 * (i / steps)} %")
+        points = hp.pix2ang(NSIDE_internal[divisions[i]:divisions[i+1]], pix, lonlat=True)
+        mask1_masked = mask1.lookup_point(*copy.deepcopy(points)) == 0.0
+        mask2_masked = mask2.lookup_point(*copy.deepcopy(points)) == 0.0
+        data[divisions[i]:divisions[i+1]] = np.bitwise_and(np.bitwise_not(mask1_masked), np.bitwise_not(mask2_masked))
+    data = hp.ud_grade(np.float32(data), NSIDE)
+    if write:
+        hp.fitsfunc.write_map(f"./{name}_{NSIDE}_4.fits", data, overwrite=True)
+
+    """if copy:
         mask1_masked = mask1.lookup_point(*copy.deepcopy(points)) == 0.0
         mask2_masked = mask2.lookup_point(*copy.deepcopy(points)) == 0.0
     else:
@@ -554,7 +594,7 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="
     data = hp.ud_grade(np.float64(np.bitwise_and(np.bitwise_not(mask1_masked), np.bitwise_not(mask2_masked))), NSIDE)
     if write:
         hp.fitsfunc.write_map(f"./{name}_{NSIDE}_4.fits", data, overwrite=True)
-    print("Mask generated")
+    print("Mask generated")"""
     return None
 
 
