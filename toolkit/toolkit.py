@@ -532,12 +532,14 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="
 
     print("Querying masks")
     for i in range(steps):
-        print(f"{25 * (i / steps)} %")
+        print(f"{25 * (i / steps)}%")
         points = hp.pix2ang(NSIDE_internal, pix[divisions[i]:divisions[i+1]], lonlat=True)
         mask1_masked = mask1.lookup_point(*points) == 0.0
         mask2_masked = mask2.lookup_point(*points) == 0.0
         data[divisions[i]:divisions[i+1]] = np.bitwise_and(mask1_masked, mask2_masked)
-    data = hp.ud_grade(np.float32(data), NSIDE)
+    print("Rescaling")
+    data = hp.ud_grade(data, NSIDE)
+    print("Writing")
     if write:
         hp.fitsfunc.write_map(f"./{name}_{NSIDE}_1.fits", data, overwrite=True)
 
