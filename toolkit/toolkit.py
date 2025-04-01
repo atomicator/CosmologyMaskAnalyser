@@ -538,10 +538,10 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="
         mask2_masked = mask2.lookup_point(*points) == 0.0
         data[divisions[i]:divisions[i+1]] = np.bitwise_and(mask1_masked, mask2_masked)
     print("Rescaling")
-    data = hp.ud_grade(data, NSIDE)
+    temp = hp.ud_grade(data, NSIDE)
     print("Writing")
     if write:
-        hp.fitsfunc.write_map(f"./{name}_{NSIDE}_1.fits", data, overwrite=True)
+        hp.fitsfunc.write_map(f"./{name}_{NSIDE}_1.fits", temp, overwrite=True)
 
     for i in range(steps):
         print(f"{25 + 25 * (i / steps)} %")
