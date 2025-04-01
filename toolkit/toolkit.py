@@ -551,9 +551,13 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="
         mask1_masked = mask1.lookup_point(*points) == 0.0
         mask2_masked = mask2.lookup_point(*points) == 0.0
         data[divisions[i]:divisions[i+1]] = np.bitwise_and(np.bitwise_not(mask1_masked), mask2_masked)
-    data = hp.ud_grade(np.float32(data), NSIDE)
+    print("Rescaling")
+    del pix
+    temp = hp.ud_grade(data, NSIDE)
+    pix = np.int_(np.linspace(0, hp.nside2npix(NSIDE_internal) - 1, hp.nside2npix(NSIDE_internal)))
+    print("Writing")
     if write:
-        hp.fitsfunc.write_map(f"./{name}_{NSIDE}_2.fits", data, overwrite=True)
+        hp.fitsfunc.write_map(f"./{name}_{NSIDE}_1.fits", temp, overwrite=True)
 
     for i in range(steps):
         print(f"{50 + 25 * (i / steps)} %")
@@ -561,9 +565,13 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="
         mask1_masked = mask1.lookup_point(*points) == 0.0
         mask2_masked = mask2.lookup_point(*points) == 0.0
         data[divisions[i]:divisions[i+1]] = np.bitwise_and(mask1_masked, np.bitwise_not(mask2_masked))
-    data = hp.ud_grade(np.float32(data), NSIDE)
+    print("Rescaling")
+    del pix
+    temp = hp.ud_grade(data, NSIDE)
+    pix = np.int_(np.linspace(0, hp.nside2npix(NSIDE_internal) - 1, hp.nside2npix(NSIDE_internal)))
+    print("Writing")
     if write:
-        hp.fitsfunc.write_map(f"./{name}_{NSIDE}_3.fits", data, overwrite=True)
+        hp.fitsfunc.write_map(f"./{name}_{NSIDE}_1.fits", temp, overwrite=True)
 
     for i in range(steps):
         print(f"{75 + 25 * (i / steps)} %")
@@ -571,9 +579,13 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="
         mask1_masked = mask1.lookup_point(*points) == 0.0
         mask2_masked = mask2.lookup_point(*points) == 0.0
         data[divisions[i]:divisions[i+1]] = np.bitwise_and(np.bitwise_not(mask1_masked), np.bitwise_not(mask2_masked))
-    data = hp.ud_grade(np.float32(data), NSIDE)
+    print("Rescaling")
+    del pix
+    temp = hp.ud_grade(data, NSIDE)
+    #pix = np.int_(np.linspace(0, hp.nside2npix(NSIDE_internal) - 1, hp.nside2npix(NSIDE_internal)))
+    print("Writing")
     if write:
-        hp.fitsfunc.write_map(f"./{name}_{NSIDE}_4.fits", data, overwrite=True)
+        hp.fitsfunc.write_map(f"./{name}_{NSIDE}_1.fits", temp, overwrite=True)
 
     """if copy:
         mask1_masked = mask1.lookup_point(*copy.deepcopy(points)) == 0.0
