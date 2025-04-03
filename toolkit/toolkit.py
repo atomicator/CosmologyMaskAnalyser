@@ -521,18 +521,20 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="
     #del pix
     #points = hp.pix2ang(NSIDE_internal, np.int_(np.linspace(0, hp.nside2npix(NSIDE_internal) - 1,
     #                                                        hp.nside2npix(NSIDE_internal))), lonlat=True)
-    print("Allocating memory for mask1")
+    #print("Allocating memory for mask1")
     #mask1_masked = np.int_(np.zeros(pix.size))
-    print("Allocating memory for mask2")
+    #print("Allocating memory for mask2")
     #mask2_masked = np.int_(np.zeros(pix.size))
     print("Allocating memory for data")
     data = np.float32(np.zeros(pix.size))
 
     steps = 1000
     divisions = np.int_(np.linspace(0, pix.shape[0] - 1, steps + 1))
-
+    count = 0
     def scope_func(i):
-        print(f"{25 * (i / steps)}%")
+        global count
+        print(f"{25 * (count / steps)}%")
+        count += 1
         points = hp.pix2ang(NSIDE_internal, pix[divisions[i]:divisions[i + 1]], lonlat=True)
         mask1_masked = mask1.lookup_point(*points) == 0.0
         mask2_masked = mask2.lookup_point(*points) == 0.0
@@ -556,12 +558,14 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="
     if write:
         hp.fitsfunc.write_map(f"./{name}_{NSIDE}_1.fits", temp, overwrite=True)
 
-    for i in range(steps):
-        print(f"{25 + 25 * (i / steps)} %")
-        points = hp.pix2ang(NSIDE_internal, pix[divisions[i]:divisions[i+1]], lonlat=True)
-        mask1_masked = mask1.lookup_point(*points) == 0.0
-        mask2_masked = mask2.lookup_point(*points) == 0.0
-        data[divisions[i]:divisions[i+1]] = np.bitwise_and(np.bitwise_not(mask1_masked), mask2_masked)
+    #for i in range(steps):
+    #    print(f"{25 + 25 * (i / steps)} %")
+    #    points = hp.pix2ang(NSIDE_internal, pix[divisions[i]:divisions[i+1]], lonlat=True)
+    #    mask1_masked = mask1.lookup_point(*points) == 0.0
+    #    mask2_masked = mask2.lookup_point(*points) == 0.0
+    #    data[divisions[i]:divisions[i+1]] = np.bitwise_and(np.bitwise_not(mask1_masked), mask2_masked)
+    for result in pool.map(scope_func, range(steps)):
+        pass
     print("Rescaling")
     del pix
     temp = hp.ud_grade(data, NSIDE)
@@ -570,12 +574,14 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="
     if write:
         hp.fitsfunc.write_map(f"./{name}_{NSIDE}_1.fits", temp, overwrite=True)
 
-    for i in range(steps):
-        print(f"{50 + 25 * (i / steps)} %")
-        points = hp.pix2ang(NSIDE_internal, pix[divisions[i]:divisions[i+1]], lonlat=True)
-        mask1_masked = mask1.lookup_point(*points) == 0.0
-        mask2_masked = mask2.lookup_point(*points) == 0.0
-        data[divisions[i]:divisions[i+1]] = np.bitwise_and(mask1_masked, np.bitwise_not(mask2_masked))
+    #for i in range(steps):
+    #    print(f"{50 + 25 * (i / steps)} %")
+    #    points = hp.pix2ang(NSIDE_internal, pix[divisions[i]:divisions[i+1]], lonlat=True)
+    #    mask1_masked = mask1.lookup_point(*points) == 0.0
+    #    mask2_masked = mask2.lookup_point(*points) == 0.0
+    #    data[divisions[i]:divisions[i+1]] = np.bitwise_and(mask1_masked, np.bitwise_not(mask2_masked))
+    for result in pool.map(scope_func, range(steps)):
+        pass
     print("Rescaling")
     del pix
     temp = hp.ud_grade(data, NSIDE)
@@ -584,12 +590,14 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="
     if write:
         hp.fitsfunc.write_map(f"./{name}_{NSIDE}_1.fits", temp, overwrite=True)
 
-    for i in range(steps):
-        print(f"{75 + 25 * (i / steps)} %")
-        points = hp.pix2ang(NSIDE_internal, pix[divisions[i]:divisions[i+1]], lonlat=True)
-        mask1_masked = mask1.lookup_point(*points) == 0.0
-        mask2_masked = mask2.lookup_point(*points) == 0.0
-        data[divisions[i]:divisions[i+1]] = np.bitwise_and(np.bitwise_not(mask1_masked), np.bitwise_not(mask2_masked))
+    #for i in range(steps):
+    #    print(f"{75 + 25 * (i / steps)} %")
+    #    points = hp.pix2ang(NSIDE_internal, pix[divisions[i]:divisions[i+1]], lonlat=True)
+    #    mask1_masked = mask1.lookup_point(*points) == 0.0
+    #    mask2_masked = mask2.lookup_point(*points) == 0.0
+    #    data[divisions[i]:divisions[i+1]] = np.bitwise_and(np.bitwise_not(mask1_masked), np.bitwise_not(mask2_masked))
+    for result in pool.map(scope_func, range(steps)):
+        pass
     print("Rescaling")
     del pix
     temp = hp.ud_grade(data, NSIDE)
