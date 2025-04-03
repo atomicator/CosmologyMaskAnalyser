@@ -1,5 +1,6 @@
 # This defines all the classes used by the rest of the project
 import warnings
+from multiprocessing.pool import ThreadPool
 
 import numpy as np
 import matplotlib
@@ -512,7 +513,7 @@ class HealpixBinMap(_BinMap):
         return value
 
 
-def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="", write=True, copy=False):
+def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="", write=True, copy=False, num_thread=20):
     print("Creating pix array")
     pix = np.int_(np.linspace(0, hp.nside2npix(NSIDE_internal) - 1, hp.nside2npix(NSIDE_internal)))
     #print("Creating point array")
@@ -530,13 +531,23 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="
     steps = 1000
     divisions = np.int_(np.linspace(0, pix.shape[0] - 1, steps + 1))
 
-    print("Querying masks")
-    for i in range(steps):
+    def scope_func(i):
         print(f"{25 * (i / steps)}%")
-        points = hp.pix2ang(NSIDE_internal, pix[divisions[i]:divisions[i+1]], lonlat=True)
+        points = hp.pix2ang(NSIDE_internal, pix[divisions[i]:divisions[i + 1]], lonlat=True)
         mask1_masked = mask1.lookup_point(*points) == 0.0
         mask2_masked = mask2.lookup_point(*points) == 0.0
-        data[divisions[i]:divisions[i+1]] = np.bitwise_and(mask1_masked, mask2_masked)
+        data[divisions[i]:divisions[i + 1]] = np.bitwise_and(mask1_masked, mask2_masked)
+    pool = ThreadPool(num_thread)
+    print("Querying masks")
+    #for i in range(steps):
+        #print(f"{25 * (i / steps)}%")
+        #points = hp.pix2ang(NSIDE_internal, pix[divisions[i]:divisions[i+1]], lonlat=True)
+        #mask1_masked = mask1.lookup_point(*points) == 0.0
+        #mask2_masked = mask2.lookup_point(*points) == 0.0
+        #data[divisions[i]:divisions[i+1]] = np.bitwise_and(mask1_masked, mask2_masked)
+    #    scope_func(i)
+    for result in pool.map(scope_func, range(steps)):
+        pass
     print("Rescaling")
     del pix
     temp = hp.ud_grade(data, NSIDE)
