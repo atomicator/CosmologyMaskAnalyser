@@ -152,13 +152,13 @@ class PixellMask(__Mask):  # Defines the methods for the PixellMask classes
         #plt.imshow(points_in_range)
         #plt.title("Points in range")
         #plt.show()
-        print(f"Points in range: {np.sum(points_in_range)} / {points_in_range.shape}")
-        print(f"Default: {point[0][0]}")
-        print(f"Pix range: {pix[0][0]}, {pix[0][-1]}, {pix[-1][0]}, {pix[-1][-1]}")
+        #print(f"Points in range: {np.sum(points_in_range)} / {points_in_range.shape}")
+        #print(f"Default: {point[0][0]}")
+        #print(f"Pix range: {pix[0][0]}, {pix[0][-1]}, {pix[-1][0]}, {pix[-1][-1]}")
         # Check which co-ords are within the range detailed in the mask
-        print(f"{np.sum(point)}")
+        #print(f"{np.sum(point)}")
         point[points_in_range] = self.map[pix[0, points_in_range], pix[1, points_in_range]]  # update the points in the
-        print(f"{np.sum(point)}")
+        #print(f"{np.sum(point)}")
         # region covered by the mask
         #plt.imshow(point)
         #plt.title("Point")
