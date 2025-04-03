@@ -10,6 +10,7 @@ parser.add_argument("--mask_two", help="The second mask to use", default="planck
 parser.add_argument("--path_raise", type=int, default=2)
 parser.add_argument("--nside_internal", type=int, default=65536)
 parser.add_argument("--nside", type=int, default=512)
+parser.add_argument("--threads", type=int, default=1)
 parser.add_argument("--save_path")
 
 args = parser.parse_args()
@@ -21,4 +22,5 @@ mask2 = data.load_mask(args.mask_two, raise_dir=args.path_raise)
 print(f"Loaded {args.mask_two}")
 
 toolkit.gen_mask_comparison_map(mask1, mask2, NSIDE=args.nside, NSIDE_internal=args.nside_internal,
-                                name="../" * args.path_raise + f"./data/{args.mask_one}_{args.mask_two}")
+                                name="../" * args.path_raise + f"./data/{args.mask_one}_{args.mask_two}",
+                                num_thread=args.threads)

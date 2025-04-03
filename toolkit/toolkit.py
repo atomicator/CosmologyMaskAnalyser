@@ -513,7 +513,7 @@ class HealpixBinMap(_BinMap):
         return value
 
 
-def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="", write=True, copy=False, num_thread=20):
+def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="", write=True, copy=False, num_thread=1):
     print("Creating pix array")
     pix = np.int_(np.linspace(0, hp.nside2npix(NSIDE_internal) - 1, hp.nside2npix(NSIDE_internal)))
     #print("Creating point array")
