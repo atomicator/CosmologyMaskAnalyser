@@ -532,7 +532,7 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="
     divisions = np.int_(np.linspace(0, pix.shape[0] - 1, steps + 1))
     count = 0
     def scope_func(i):
-        global count
+        nonlocal count
         print(f"{25 * (count / steps)}%")
         count += 1
         points = hp.pix2ang(NSIDE_internal, pix[divisions[i]:divisions[i + 1]], lonlat=True)
