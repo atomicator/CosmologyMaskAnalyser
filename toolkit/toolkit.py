@@ -528,7 +528,7 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="
     print("Allocating memory for data")
     data = np.float32(np.zeros(pix.size))
 
-    steps = 1000
+    steps = 1000 * num_thread
     divisions = np.int_(np.linspace(0, pix.shape[0] - 1, steps + 1))
     count = 0
     def scope_func(i):
