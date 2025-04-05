@@ -1,6 +1,8 @@
 # This defines all the classes used by the rest of the project
 import warnings
+from idlelib.autocomplete import ATTRS
 from multiprocessing.pool import ThreadPool
+from os import error
 
 import numpy as np
 import matplotlib
@@ -531,6 +533,10 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="
     steps = 100 * num_thread
     divisions = np.int_(np.linspace(0, pix.shape[0] - 1, steps + 1))
     count = 0
+
+    def numpy_func(_mask1_masked, _mask2_masked):
+        raise AttributeError
+
     def scope_func(i):
         nonlocal count
         nonlocal divisions
@@ -541,7 +547,8 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="
         mask2_masked = mask2.lookup_point(*points) == 0.0
         #data[divisions[i]:divisions[i + 1]] = np.bitwise_and(mask1_masked, mask2_masked)
         #del points, mask1_masked, mask2_masked  # For some reason, the memory wasn't freed. This eventually causes a
-        return [i, np.bitwise_and(mask1_masked, mask2_masked)]
+        #return [i, np.bitwise_and(mask1_masked, mask2_masked)]
+        return [i, numpy_func(mask1_masked, mask2_masked)]
         # segfault (somehow)
     pool = ThreadPool(num_thread)
     print("Querying masks")
@@ -552,6 +559,9 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="
         #mask2_masked = mask2.lookup_point(*points) == 0.0
         #data[divisions[i]:divisions[i+1]] = np.bitwise_and(mask1_masked, mask2_masked)
     #    scope_func(i)
+    def numpy_func(mask1_masked, mask2_masked):
+        return np.bitwise_and(mask1_masked, mask2_masked)
+
     for result in pool.map(scope_func, range(steps)):
         i = result[0]
         data[divisions[i]:divisions[i + 1]] = result[1]
@@ -569,6 +579,10 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="
     #    mask1_masked = mask1.lookup_point(*points) == 0.0
     #    mask2_masked = mask2.lookup_point(*points) == 0.0
     #    data[divisions[i]:divisions[i+1]] = np.bitwise_and(np.bitwise_not(mask1_masked), mask2_masked)
+
+    def numpy_func(mask1_masked, mask2_masked):
+        return np.bitwise_and(np.bitwise_not(mask1_masked), mask2_masked)
+
     for result in pool.map(scope_func, range(steps)):
         pass
     print("Rescaling")
@@ -585,6 +599,10 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="
     #    mask1_masked = mask1.lookup_point(*points) == 0.0
     #    mask2_masked = mask2.lookup_point(*points) == 0.0
     #    data[divisions[i]:divisions[i+1]] = np.bitwise_and(mask1_masked, np.bitwise_not(mask2_masked))
+
+    def numpy_func(mask1_masked, mask2_masked):
+        return np.bitwise_and(mask1_masked, np.bitwise_not(mask2_masked))
+
     for result in pool.map(scope_func, range(steps)):
         pass
     print("Rescaling")
@@ -601,6 +619,10 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="
     #    mask1_masked = mask1.lookup_point(*points) == 0.0
     #    mask2_masked = mask2.lookup_point(*points) == 0.0
     #    data[divisions[i]:divisions[i+1]] = np.bitwise_and(np.bitwise_not(mask1_masked), np.bitwise_not(mask2_masked))
+
+    def numpy_func(mask1_masked, mask2_masked):
+        return np.bitwise_and(np.bitwise_not(mask1_masked), np.bitwise_not(mask2_masked))
+
     for result in pool.map(scope_func, range(steps)):
         pass
     print("Rescaling")
