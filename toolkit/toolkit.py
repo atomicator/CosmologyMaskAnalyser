@@ -533,14 +533,16 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="
     count = 0
     def scope_func(i):
         nonlocal count
+        nonlocal divisions
         print(f"{25 * (count / steps)}%")
         count += 1
         points = hp.pix2ang(NSIDE_internal, pix[divisions[i]:divisions[i + 1]], lonlat=True)
         mask1_masked = mask1.lookup_point(*points) == 0.0
         mask2_masked = mask2.lookup_point(*points) == 0.0
-        data[divisions[i]:divisions[i + 1]] = np.bitwise_and(mask1_masked, mask2_masked)
-        del points, mask1_masked, mask2_masked  # For some reason, the memory wasn't freed. This eventually causes a
-        # segfault
+        #data[divisions[i]:divisions[i + 1]] = np.bitwise_and(mask1_masked, mask2_masked)
+        #del points, mask1_masked, mask2_masked  # For some reason, the memory wasn't freed. This eventually causes a
+        return [i, np.bitwise_and(mask1_masked, mask2_masked)]
+        # segfault (somehow)
     pool = ThreadPool(num_thread)
     print("Querying masks")
     #for i in range(steps):
@@ -551,7 +553,8 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="
         #data[divisions[i]:divisions[i+1]] = np.bitwise_and(mask1_masked, mask2_masked)
     #    scope_func(i)
     for result in pool.map(scope_func, range(steps)):
-        print(result)
+        i = result[0]
+        data[divisions[i]:divisions[i + 1]] = result[1]
     print("Rescaling")
     del pix
     temp = hp.ud_grade(data, NSIDE)
