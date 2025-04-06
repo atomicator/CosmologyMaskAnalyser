@@ -559,9 +559,9 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="
         #mask2_masked = mask2.lookup_point(*points) == 0.0
         #data[divisions[i]:divisions[i+1]] = np.bitwise_and(mask1_masked, mask2_masked)
     #    scope_func(i)
-    def numpy_func(mask1_masked, mask2_masked):
+    def func_one(mask1_masked, mask2_masked):
         return np.bitwise_and(mask1_masked, mask2_masked)
-
+    numpy_func = func_one
     for result in pool.map(scope_func, range(steps)):
         i = result[0]
         data[divisions[i]:divisions[i + 1]] = result[1]
@@ -580,11 +580,13 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="
     #    mask2_masked = mask2.lookup_point(*points) == 0.0
     #    data[divisions[i]:divisions[i+1]] = np.bitwise_and(np.bitwise_not(mask1_masked), mask2_masked)
 
-    def numpy_func(mask1_masked, mask2_masked):
+    def func_two(mask1_masked, mask2_masked):
         return np.bitwise_and(np.bitwise_not(mask1_masked), mask2_masked)
 
+    numpy_func = func_two
     for result in pool.map(scope_func, range(steps)):
-        pass
+        i = result[0]
+        data[divisions[i]:divisions[i + 1]] = result[1]
     print("Rescaling")
     del pix
     temp = hp.ud_grade(data, NSIDE)
@@ -600,11 +602,13 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="
     #    mask2_masked = mask2.lookup_point(*points) == 0.0
     #    data[divisions[i]:divisions[i+1]] = np.bitwise_and(mask1_masked, np.bitwise_not(mask2_masked))
 
-    def numpy_func(mask1_masked, mask2_masked):
+    def func_three(mask1_masked, mask2_masked):
         return np.bitwise_and(mask1_masked, np.bitwise_not(mask2_masked))
 
+    numpy_func = func_three
     for result in pool.map(scope_func, range(steps)):
-        pass
+        i = result[0]
+        data[divisions[i]:divisions[i + 1]] = result[1]
     print("Rescaling")
     del pix
     temp = hp.ud_grade(data, NSIDE)
@@ -620,11 +624,13 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="
     #    mask2_masked = mask2.lookup_point(*points) == 0.0
     #    data[divisions[i]:divisions[i+1]] = np.bitwise_and(np.bitwise_not(mask1_masked), np.bitwise_not(mask2_masked))
 
-    def numpy_func(mask1_masked, mask2_masked):
+    def func_four(mask1_masked, mask2_masked):
         return np.bitwise_and(np.bitwise_not(mask1_masked), np.bitwise_not(mask2_masked))
 
+    numpy_func = func_four
     for result in pool.map(scope_func, range(steps)):
-        pass
+        i = result[0]
+        data[divisions[i]:divisions[i + 1]] = result[1]
     print("Rescaling")
     del pix
     temp = hp.ud_grade(data, NSIDE)
