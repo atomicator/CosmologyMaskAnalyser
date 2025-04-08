@@ -514,12 +514,12 @@ class HealpixBinMap(_BinMap):
         return value
 
 
-def gen_mask_comparison_map(load_func, mask1_name, mask2_name, NSIDE=512, NSIDE_internal=2048, name="", write=True,
+def gen_mask_comparison_map(load_func, args, kwargs, mask1_name, mask2_name, NSIDE=512, NSIDE_internal=2048, name="", write=True,
                             copy=False, num_thread=1):
     print("Creating pix array")
     pix = np.int_(np.linspace(0, hp.nside2npix(NSIDE_internal) - 1, hp.nside2npix(NSIDE_internal)))
-    mask1 = load_func(mask1_name)
-    mask2 = load_func(mask2_name)
+    mask1 = load_func(mask1_name, *args, **kwargs)
+    mask2 = load_func(mask2_name, *args, **kwargs)
     #print("Creating point array")
     #points = hp.pix2ang(NSIDE_internal, pix, lonlat=True)
     #del pix
@@ -577,8 +577,8 @@ def gen_mask_comparison_map(load_func, mask1_name, mask2_name, NSIDE=512, NSIDE_
     if write:
         hp.fitsfunc.write_map(f"./{name}_{NSIDE}_1.fits", temp, overwrite=True)
     pix = np.int_(np.linspace(0, hp.nside2npix(NSIDE_internal) - 1, hp.nside2npix(NSIDE_internal)))
-    mask1 = load_mask(mask1_name)
-    mask2 = load_mask(mask2_name)
+    mask1 = load_func(mask1_name, *args, **kwargs)
+    mask2 = load_func(mask2_name, *args, **kwargs)
     #for i in range(steps):
     #    print(f"{25 + 25 * (i / steps)} %")
     #    points = hp.pix2ang(NSIDE_internal, pix[divisions[i]:divisions[i+1]], lonlat=True)
@@ -602,8 +602,8 @@ def gen_mask_comparison_map(load_func, mask1_name, mask2_name, NSIDE=512, NSIDE_
     if write:
         hp.fitsfunc.write_map(f"./{name}_{NSIDE}_2.fits", temp, overwrite=True)
     pix = np.int_(np.linspace(0, hp.nside2npix(NSIDE_internal) - 1, hp.nside2npix(NSIDE_internal)))
-    mask1 = load_mask(mask1_name)
-    mask2 = load_mask(mask2_name)
+    mask1 = load_func(mask1_name, *args, **kwargs)
+    mask2 = load_func(mask2_name, *args, **kwargs)
 
     #for i in range(steps):
     #    print(f"{50 + 25 * (i / steps)} %")
@@ -628,8 +628,8 @@ def gen_mask_comparison_map(load_func, mask1_name, mask2_name, NSIDE=512, NSIDE_
     if write:
         hp.fitsfunc.write_map(f"./{name}_{NSIDE}_3.fits", temp, overwrite=True)
     pix = np.int_(np.linspace(0, hp.nside2npix(NSIDE_internal) - 1, hp.nside2npix(NSIDE_internal)))
-    mask1 = load_mask(mask1_name)
-    mask2 = load_mask(mask2_name)
+    mask1 = load_func(mask1_name, *args, **kwargs)
+    mask2 = load_func(mask2_name, *args, **kwargs)
 
     #for i in range(steps):
     #    print(f"{75 + 25 * (i / steps)} %")
