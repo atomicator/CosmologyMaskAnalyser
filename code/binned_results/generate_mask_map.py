@@ -20,6 +20,6 @@ print(f"Loaded {args.mask_one}")
 #mask2 = data.load_mask(args.mask_two, raise_dir=args.path_raise)
 print(f"Loaded {args.mask_two}")
 
-toolkit.gen_mask_comparison_map(data.load_mask, args.mask1, args.mask2, NSIDE=args.nside, NSIDE_internal=args.nside_internal,
+toolkit.gen_mask_comparison_map(data.load_mask, args.mask_one, args.mask_one, NSIDE=args.nside, NSIDE_internal=args.nside_internal,
                                 name="../" * args.path_raise + f"./data/{args.mask_one}_{args.mask_two}",
                                 num_thread=args.threads)
