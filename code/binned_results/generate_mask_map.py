@@ -16,11 +16,11 @@ parser.add_argument("--save_path")
 args = parser.parse_args()
 mask_names = [args.mask_one, args.mask_two]
 print("Loading masks")
-mask1 = data.load_mask(args.mask_one, raise_dir=args.path_raise)
+#mask1 = data.load_mask(args.mask_one, raise_dir=args.path_raise)
 print(f"Loaded {args.mask_one}")
-mask2 = data.load_mask(args.mask_two, raise_dir=args.path_raise)
+#mask2 = data.load_mask(args.mask_two, raise_dir=args.path_raise)
 print(f"Loaded {args.mask_two}")
 
-toolkit.gen_mask_comparison_map(mask1, mask2, NSIDE=args.nside, NSIDE_internal=args.nside_internal,
+toolkit.gen_mask_comparison_map(args.mask1, args.mask2, NSIDE=args.nside, NSIDE_internal=args.nside_internal,
                                 name="../" * args.path_raise + f"./data/{args.mask_one}_{args.mask_two}",
                                 num_thread=args.threads)

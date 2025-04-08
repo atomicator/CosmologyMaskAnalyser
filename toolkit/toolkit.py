@@ -3,7 +3,7 @@ import warnings
 from idlelib.autocomplete import ATTRS
 from multiprocessing.pool import ThreadPool
 from os import error
-
+from toolkit.data import load_mask
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
@@ -515,9 +515,11 @@ class HealpixBinMap(_BinMap):
         return value
 
 
-def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="", write=True, copy=False, num_thread=1):
+def gen_mask_comparison_map(mask1_name, mask2_name, NSIDE=512, NSIDE_internal=2048, name="", write=True, copy=False, num_thread=1):
     print("Creating pix array")
     pix = np.int_(np.linspace(0, hp.nside2npix(NSIDE_internal) - 1, hp.nside2npix(NSIDE_internal)))
+    mask1 = load_mask(mask1_name)
+    mask2 = load_mask(mask2_name)
     #print("Creating point array")
     #points = hp.pix2ang(NSIDE_internal, pix, lonlat=True)
     #del pix
@@ -538,10 +540,11 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="
         raise AttributeError
 
     def scope_func(i):
-        nonlocal count
+        #nonlocal count
         nonlocal divisions
-        print(f"{25 * (count / steps)}%")
-        count += 1
+        nonlocal mask1
+        nonlocal mask2
+        print(f"{25 * (i / steps)}%")
         points = hp.pix2ang(NSIDE_internal, pix[divisions[i]:divisions[i + 1]], lonlat=True)
         mask1_masked = mask1.lookup_point(*points) == 0.0
         mask2_masked = mask2.lookup_point(*points) == 0.0
@@ -566,12 +569,16 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="
         i = result[0]
         data[divisions[i]:divisions[i + 1]] = result[1]
     print("Rescaling")
-    del pix
+    pix = None
+    mask1 = None
+    mask2 = None
     temp = hp.ud_grade(data, NSIDE)
     print("Writing")
     if write:
         hp.fitsfunc.write_map(f"./{name}_{NSIDE}_1.fits", temp, overwrite=True)
     pix = np.int_(np.linspace(0, hp.nside2npix(NSIDE_internal) - 1, hp.nside2npix(NSIDE_internal)))
+    mask1 = load_mask(mask1_name)
+    mask2 = load_mask(mask2_name)
     #for i in range(steps):
     #    print(f"{25 + 25 * (i / steps)} %")
     #    points = hp.pix2ang(NSIDE_internal, pix[divisions[i]:divisions[i+1]], lonlat=True)
@@ -587,12 +594,16 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="
         i = result[0]
         data[divisions[i]:divisions[i + 1]] = result[1]
     print("Rescaling")
-    del pix
+    pix = None
+    mask1 = None
+    mask2 = None
     temp = hp.ud_grade(data, NSIDE)
     print("Writing")
     if write:
         hp.fitsfunc.write_map(f"./{name}_{NSIDE}_2.fits", temp, overwrite=True)
     pix = np.int_(np.linspace(0, hp.nside2npix(NSIDE_internal) - 1, hp.nside2npix(NSIDE_internal)))
+    mask1 = load_mask(mask1_name)
+    mask2 = load_mask(mask2_name)
 
     #for i in range(steps):
     #    print(f"{50 + 25 * (i / steps)} %")
@@ -609,12 +620,16 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="
         i = result[0]
         data[divisions[i]:divisions[i + 1]] = result[1]
     print("Rescaling")
-    del pix
+    pix = None
+    mask1 = None
+    mask2 = None
     temp = hp.ud_grade(data, NSIDE)
     print("Writing")
     if write:
         hp.fitsfunc.write_map(f"./{name}_{NSIDE}_3.fits", temp, overwrite=True)
     pix = np.int_(np.linspace(0, hp.nside2npix(NSIDE_internal) - 1, hp.nside2npix(NSIDE_internal)))
+    mask1 = load_mask(mask1_name)
+    mask2 = load_mask(mask2_name)
 
     #for i in range(steps):
     #    print(f"{75 + 25 * (i / steps)} %")
@@ -631,7 +646,9 @@ def gen_mask_comparison_map(mask1, mask2, NSIDE=512, NSIDE_internal=2048, name="
         i = result[0]
         data[divisions[i]:divisions[i + 1]] = result[1]
     print("Rescaling")
-    del pix
+    pix = None
+    mask1 = None
+    mask2 = None
     temp = hp.ud_grade(data, NSIDE)
     print("Writing")
     if write:
