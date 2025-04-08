@@ -518,8 +518,8 @@ def gen_mask_comparison_map(load_func, mask1_name, mask2_name, NSIDE=512, NSIDE_
                             copy=False, num_thread=1):
     print("Creating pix array")
     pix = np.int_(np.linspace(0, hp.nside2npix(NSIDE_internal) - 1, hp.nside2npix(NSIDE_internal)))
-    mask1 = load_mask(mask1_name)
-    mask2 = load_mask(mask2_name)
+    mask1 = load_func(mask1_name)
+    mask2 = load_func(mask2_name)
     #print("Creating point array")
     #points = hp.pix2ang(NSIDE_internal, pix, lonlat=True)
     #del pix
