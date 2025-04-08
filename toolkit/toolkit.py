@@ -3,7 +3,6 @@ import warnings
 from idlelib.autocomplete import ATTRS
 from multiprocessing.pool import ThreadPool
 from os import error
-from toolkit.data import load_mask
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
@@ -515,7 +514,8 @@ class HealpixBinMap(_BinMap):
         return value
 
 
-def gen_mask_comparison_map(mask1_name, mask2_name, NSIDE=512, NSIDE_internal=2048, name="", write=True, copy=False, num_thread=1):
+def gen_mask_comparison_map(load_func, mask1_name, mask2_name, NSIDE=512, NSIDE_internal=2048, name="", write=True,
+                            copy=False, num_thread=1):
     print("Creating pix array")
     pix = np.int_(np.linspace(0, hp.nside2npix(NSIDE_internal) - 1, hp.nside2npix(NSIDE_internal)))
     mask1 = load_mask(mask1_name)
