@@ -21,6 +21,6 @@ print(f"Loaded {args.mask_one}")
 print(f"Loaded {args.mask_two}")
 kwargs = {"raise_dir":args.path_raise}
 toolkit.gen_mask_comparison_map(data.load_mask, args=[], kwargs=kwargs, mask1_name=args.mask_one,
-                                mask2_name=args.mask_one, NSIDE=args.nside, NSIDE_internal=args.nside_internal,
+                                mask2_name=args.mask_two, NSIDE=args.nside, NSIDE_internal=args.nside_internal,
                                 name="../" * args.path_raise + f"./data/{args.mask_one}_{args.mask_two}",
                                 num_thread=args.threads)
