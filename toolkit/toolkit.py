@@ -544,7 +544,7 @@ def gen_mask_comparison_map(load_func, args, kwargs, mask1_name, mask2_name, NSI
         nonlocal divisions
         nonlocal mask1
         nonlocal mask2
-        print(f"{25 * (i / steps)}%")
+        #print(f"{25 * (i / steps)}%")
         points = hp.pix2ang(NSIDE_internal, pix[divisions[i]:divisions[i + 1]], lonlat=True)
         mask1_masked = mask1.lookup_point(*points) == 0.0
         mask2_masked = mask2.lookup_point(*points) == 0.0
@@ -567,6 +567,7 @@ def gen_mask_comparison_map(load_func, args, kwargs, mask1_name, mask2_name, NSI
     numpy_func = func_one
     for result in pool.map(scope_func, range(steps)):
         i = result[0]
+        print(f"{i/(steps * 4)}%")
         data[divisions[i]:divisions[i + 1]] = result[1]
     print("Rescaling")
     pix = None
@@ -575,6 +576,7 @@ def gen_mask_comparison_map(load_func, args, kwargs, mask1_name, mask2_name, NSI
     temp = hp.ud_grade(data, NSIDE)
     print("Writing")
     if write:
+        print(f"Writing to: \"./{name}_{NSIDE}_1.fits\"")
         hp.fitsfunc.write_map(f"./{name}_{NSIDE}_1.fits", temp, overwrite=True)
     pix = np.int_(np.linspace(0, hp.nside2npix(NSIDE_internal) - 1, hp.nside2npix(NSIDE_internal)))
     mask1 = load_func(mask1_name, *args, **kwargs)
@@ -592,6 +594,7 @@ def gen_mask_comparison_map(load_func, args, kwargs, mask1_name, mask2_name, NSI
     numpy_func = func_two
     for result in pool.map(scope_func, range(steps)):
         i = result[0]
+        print(f"{25 + i/(steps * 4)}%")
         data[divisions[i]:divisions[i + 1]] = result[1]
     print("Rescaling")
     pix = None
@@ -600,6 +603,7 @@ def gen_mask_comparison_map(load_func, args, kwargs, mask1_name, mask2_name, NSI
     temp = hp.ud_grade(data, NSIDE)
     print("Writing")
     if write:
+        print(f"Writing to: \"./{name}_{NSIDE}_2.fits\"")
         hp.fitsfunc.write_map(f"./{name}_{NSIDE}_2.fits", temp, overwrite=True)
     pix = np.int_(np.linspace(0, hp.nside2npix(NSIDE_internal) - 1, hp.nside2npix(NSIDE_internal)))
     mask1 = load_func(mask1_name, *args, **kwargs)
@@ -618,6 +622,7 @@ def gen_mask_comparison_map(load_func, args, kwargs, mask1_name, mask2_name, NSI
     numpy_func = func_three
     for result in pool.map(scope_func, range(steps)):
         i = result[0]
+        print(f"{50 + i/(steps * 4)}%")
         data[divisions[i]:divisions[i + 1]] = result[1]
     print("Rescaling")
     pix = None
@@ -626,6 +631,7 @@ def gen_mask_comparison_map(load_func, args, kwargs, mask1_name, mask2_name, NSI
     temp = hp.ud_grade(data, NSIDE)
     print("Writing")
     if write:
+        print(f"Writing to: \"./{name}_{NSIDE}_3.fits\"")
         hp.fitsfunc.write_map(f"./{name}_{NSIDE}_3.fits", temp, overwrite=True)
     pix = np.int_(np.linspace(0, hp.nside2npix(NSIDE_internal) - 1, hp.nside2npix(NSIDE_internal)))
     mask1 = load_func(mask1_name, *args, **kwargs)
@@ -644,6 +650,7 @@ def gen_mask_comparison_map(load_func, args, kwargs, mask1_name, mask2_name, NSI
     numpy_func = func_four
     for result in pool.map(scope_func, range(steps)):
         i = result[0]
+        print(f"{75 + i/(steps * 4)}%")
         data[divisions[i]:divisions[i + 1]] = result[1]
     print("Rescaling")
     pix = None
@@ -652,6 +659,7 @@ def gen_mask_comparison_map(load_func, args, kwargs, mask1_name, mask2_name, NSI
     temp = hp.ud_grade(data, NSIDE)
     print("Writing")
     if write:
+        print(f"Writing to: \"./{name}_{NSIDE}_4.fits\"")
         hp.fitsfunc.write_map(f"./{name}_{NSIDE}_4.fits", temp, overwrite=True)
 
     """if copy:
