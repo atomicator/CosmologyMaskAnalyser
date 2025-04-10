@@ -516,8 +516,9 @@ class HealpixBinMap(_BinMap):
 
 def gen_mask_comparison_map(load_func, args, kwargs, mask1_name, mask2_name, NSIDE=512, NSIDE_internal=2048, name="", write=True,
                             copy=False, num_thread=1):
-    print("Creating pix array")
+    print("Initialising pix array")
     pix = np.int_(np.linspace(0, hp.nside2npix(NSIDE_internal) - 1, hp.nside2npix(NSIDE_internal)))
+    print("Loading masks")
     mask1 = load_func(mask1_name, *args, **kwargs)
     mask2 = load_func(mask2_name, *args, **kwargs)
     #print("Creating point array")
@@ -567,7 +568,7 @@ def gen_mask_comparison_map(load_func, args, kwargs, mask1_name, mask2_name, NSI
     numpy_func = func_one
     for result in pool.map(scope_func, range(steps)):
         i = result[0]
-        print(f"{i/(steps * 4)}%")
+        print(f"{i/(steps * 0.04)}%")
         data[divisions[i]:divisions[i + 1]] = result[1]
     print("Rescaling")
     pix = None
@@ -578,7 +579,10 @@ def gen_mask_comparison_map(load_func, args, kwargs, mask1_name, mask2_name, NSI
     if write:
         print(f"Writing to: \"./{name}_{NSIDE}_1.fits\"")
         hp.fitsfunc.write_map(f"./{name}_{NSIDE}_1.fits", temp, overwrite=True)
+    print("Finished writing")
+    print("Initialising pix array")
     pix = np.int_(np.linspace(0, hp.nside2npix(NSIDE_internal) - 1, hp.nside2npix(NSIDE_internal)))
+    print("Loading masks")
     mask1 = load_func(mask1_name, *args, **kwargs)
     mask2 = load_func(mask2_name, *args, **kwargs)
     #for i in range(steps):
@@ -594,7 +598,7 @@ def gen_mask_comparison_map(load_func, args, kwargs, mask1_name, mask2_name, NSI
     numpy_func = func_two
     for result in pool.map(scope_func, range(steps)):
         i = result[0]
-        print(f"{25 + i/(steps * 4)}%")
+        print(f"{25 + i/(steps * 0.04)}%")
         data[divisions[i]:divisions[i + 1]] = result[1]
     print("Rescaling")
     pix = None
@@ -605,7 +609,10 @@ def gen_mask_comparison_map(load_func, args, kwargs, mask1_name, mask2_name, NSI
     if write:
         print(f"Writing to: \"./{name}_{NSIDE}_2.fits\"")
         hp.fitsfunc.write_map(f"./{name}_{NSIDE}_2.fits", temp, overwrite=True)
+    print("Finished writing")
+    print("Initialising pix array")
     pix = np.int_(np.linspace(0, hp.nside2npix(NSIDE_internal) - 1, hp.nside2npix(NSIDE_internal)))
+    print("Loading masks")
     mask1 = load_func(mask1_name, *args, **kwargs)
     mask2 = load_func(mask2_name, *args, **kwargs)
 
@@ -622,7 +629,7 @@ def gen_mask_comparison_map(load_func, args, kwargs, mask1_name, mask2_name, NSI
     numpy_func = func_three
     for result in pool.map(scope_func, range(steps)):
         i = result[0]
-        print(f"{50 + i/(steps * 4)}%")
+        print(f"{50 + i/(steps * 0.04)}%")
         data[divisions[i]:divisions[i + 1]] = result[1]
     print("Rescaling")
     pix = None
@@ -633,7 +640,10 @@ def gen_mask_comparison_map(load_func, args, kwargs, mask1_name, mask2_name, NSI
     if write:
         print(f"Writing to: \"./{name}_{NSIDE}_3.fits\"")
         hp.fitsfunc.write_map(f"./{name}_{NSIDE}_3.fits", temp, overwrite=True)
+    print("Finished writing")
+    print("Initialising pix array")
     pix = np.int_(np.linspace(0, hp.nside2npix(NSIDE_internal) - 1, hp.nside2npix(NSIDE_internal)))
+    print("Loading masks")
     mask1 = load_func(mask1_name, *args, **kwargs)
     mask2 = load_func(mask2_name, *args, **kwargs)
 
@@ -650,7 +660,7 @@ def gen_mask_comparison_map(load_func, args, kwargs, mask1_name, mask2_name, NSI
     numpy_func = func_four
     for result in pool.map(scope_func, range(steps)):
         i = result[0]
-        print(f"{75 + i/(steps * 4)}%")
+        print(f"{75 + i/(steps * 0.04)}%")
         data[divisions[i]:divisions[i + 1]] = result[1]
     print("Rescaling")
     pix = None
@@ -661,6 +671,7 @@ def gen_mask_comparison_map(load_func, args, kwargs, mask1_name, mask2_name, NSI
     if write:
         print(f"Writing to: \"./{name}_{NSIDE}_4.fits\"")
         hp.fitsfunc.write_map(f"./{name}_{NSIDE}_4.fits", temp, overwrite=True)
+    print("Finished writing")
 
     """if copy:
         mask1_masked = mask1.lookup_point(*copy.deepcopy(points)) == 0.0
