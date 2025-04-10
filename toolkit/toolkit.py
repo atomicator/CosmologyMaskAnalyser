@@ -541,11 +541,12 @@ def gen_mask_comparison_map(load_func, args, kwargs, mask1_name, mask2_name, NSI
         raise AttributeError
 
     def scope_func(i):
-        #nonlocal count
+        nonlocal count
         nonlocal divisions
         nonlocal mask1
         nonlocal mask2
-        #print(f"{25 * (i / steps)}%")
+        print(f"{25 * (count / steps)}%")
+        count += 1
         points = hp.pix2ang(NSIDE_internal, pix[divisions[i]:divisions[i + 1]], lonlat=True)
         mask1_masked = mask1.lookup_point(*points) == 0.0
         mask2_masked = mask2.lookup_point(*points) == 0.0
@@ -568,7 +569,7 @@ def gen_mask_comparison_map(load_func, args, kwargs, mask1_name, mask2_name, NSI
     numpy_func = func_one
     for result in pool.map(scope_func, range(steps)):
         i = result[0]
-        print(f"{i/(steps * 0.04)}%")
+        #print(f"{i/(steps * 0.04)}%")
         data[divisions[i]:divisions[i + 1]] = result[1]
     print("Rescaling")
     pix = None
@@ -598,7 +599,7 @@ def gen_mask_comparison_map(load_func, args, kwargs, mask1_name, mask2_name, NSI
     numpy_func = func_two
     for result in pool.map(scope_func, range(steps)):
         i = result[0]
-        print(f"{25 + i/(steps * 0.04)}%")
+        #print(f"{25 + i/(steps * 0.04)}%")
         data[divisions[i]:divisions[i + 1]] = result[1]
     print("Rescaling")
     pix = None
@@ -629,7 +630,7 @@ def gen_mask_comparison_map(load_func, args, kwargs, mask1_name, mask2_name, NSI
     numpy_func = func_three
     for result in pool.map(scope_func, range(steps)):
         i = result[0]
-        print(f"{50 + i/(steps * 0.04)}%")
+        #print(f"{50 + i/(steps * 0.04)}%")
         data[divisions[i]:divisions[i + 1]] = result[1]
     print("Rescaling")
     pix = None
@@ -660,7 +661,7 @@ def gen_mask_comparison_map(load_func, args, kwargs, mask1_name, mask2_name, NSI
     numpy_func = func_four
     for result in pool.map(scope_func, range(steps)):
         i = result[0]
-        print(f"{75 + i/(steps * 0.04)}%")
+        #print(f"{75 + i/(steps * 0.04)}%")
         data[divisions[i]:divisions[i + 1]] = result[1]
     print("Rescaling")
     pix = None
