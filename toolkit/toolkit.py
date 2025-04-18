@@ -71,7 +71,7 @@ class __Mask(object):  # A template class, used to define general methods. Separ
         raise NotMaskError("__Mask.calc_exact_unmasked_fraction() called")
 
     def plot(self, resolution=(1000, 2000), clear=True, cbar=None, title=None, save_path=None, show=False,
-             cmap="plasma", alpha=1, nan_filter=True, lon_range=(0, 360), lat_range=(-90, 90)):  # Resolution is the resolution of the plot. Clear determines if
+             cmap="plasma", alpha=1, nan_filter=True, lon_range=(0, 360), lat_range=(-90, 90), use_lon_lat=True):  # Resolution is the resolution of the plot. Clear determines if
         # the plot environment needs clearing before it gets plotted. Cbar adds a colourbar to the plot. Title adds a
         # title to the plot. Nan_filter determines if the non-masked region should be transparent. Cmap is the colourmap
         # to be used for the plot.
@@ -81,7 +81,13 @@ class __Mask(object):  # A template class, used to define general methods. Separ
         lat = np.linspace(lat_range[0], lat_range[1], x)  # Create a 2D grid for a heatmap
         lon = np.linspace(lon_range[0], lon_range[1], y)
         lon, lat = np.meshgrid(lon, lat)
-        pixel_data = self.lookup_point(lon, lat)
+        if not use_lon_lat:
+            #temp = astropy.coordinates.SkyCoord(l=lon*u.degree, b=lat*u.degree, frame='galactic')
+            #pixel_data = self.lookup_point(temp.icrs.ra.degree, temp.icrs.dec.degree)
+            temp = astropy.coordinates.SkyCoord(ra=lon*u.degree, dec=lat*u.degree, frame='icrs')
+            pixel_data = self.lookup_point(temp.galactic.l.degree, temp.galactic.b.degree)
+        else:
+            pixel_data = self.lookup_point(lon, lat)
         #plt.imshow(pixel_data)
         #plt.title("pixel_data")
         #plt.colorbar()
@@ -139,6 +145,7 @@ class PixellMask(__Mask):  # Defines the methods for the PixellMask classes
         #wcs = astropy.wcs.WCS(self.imap.wcs)
         # Note: co-ord are transformed by wrapper so they match the mask
         if not self.mask_using_latlon:
+        #if True:
             c = astropy.coordinates.SkyCoord(ra=lon * u.degree, dec=lat * u.degree)
         else:
             c = astropy.coordinates.SkyCoord(lon * u.degree, lat * u.degree)
@@ -276,7 +283,7 @@ class ClusterCatalogue(object):
 
     def load_data(self, lon_lat=True, selection_function=None, requested_fields=(), *args, **kwargs):
         # List of co-ord column names, in the format [lon_name, lat_name, "lon_lat"] or [dec_name, ra_name, "RA_DEC"]
-        column_list = [["GLON", "GLAT", "lon_lat"], ["DEC", "RA", "RA_DEC"], ["decDeg", "RADeg", "RA_DEC"],]
+        column_list = [["GLON", "GLAT", "lon_lat"], ["RA", "DEC", "RA_DEC"], ["decDeg", "RADeg", "RA_DEC"],]
         loaded = False
         data_format = None
         data = None
@@ -292,7 +299,7 @@ class ClusterCatalogue(object):
             raise KeyError("None of the keys match the data")
 
         if lon_lat and data_format == "RA_DEC":
-            c = astropy.coordinates.SkyCoord(ra=data[1], dec=data[0], unit="deg")  # convert ICRS to galactic co ords
+            c = astropy.coordinates.SkyCoord(ra=data[0], dec=data[1], unit="deg")  # convert ICRS to galactic co ords
             data = [c.galactic.l.degree, c.galactic.b.degree]
         elif not lon_lat and data_format == "lon_lat":
             c = astropy.coordinates.SkyCoord(lon=data[0], lat=data[1], unit="deg", frame="galactic")  # convert galactic
@@ -515,12 +522,12 @@ class HealpixBinMap(_BinMap):
 
 
 def gen_mask_comparison_map(load_func, args, kwargs, mask1_name, mask2_name, NSIDE=512, NSIDE_internal=2048, name="", write=True,
-                            copy=False, num_thread=1):
-    print("Initialising pix array")
-    pix = np.int_(np.linspace(0, hp.nside2npix(NSIDE_internal) - 1, hp.nside2npix(NSIDE_internal)))
-    print("Loading masks")
-    mask1 = load_func(mask1_name, *args, **kwargs)
-    mask2 = load_func(mask2_name, *args, **kwargs)
+                            copy=False, num_thread=1, skip=0):
+    #print("Initialising pix array")
+    #pix = np.int_(np.linspace(0, hp.nside2npix(NSIDE_internal) - 1, hp.nside2npix(NSIDE_internal)))
+    #print("Loading masks")
+    #mask1 = load_func(mask1_name, *args, **kwargs)
+    #mask2 = load_func(mask2_name, *args, **kwargs)
     #print("Creating point array")
     #points = hp.pix2ang(NSIDE_internal, pix, lonlat=True)
     #del pix
@@ -534,11 +541,25 @@ def gen_mask_comparison_map(load_func, args, kwargs, mask1_name, mask2_name, NSI
     data = np.float32(np.zeros(pix.size))
 
     steps = 100 * num_thread
-    divisions = np.int_(np.linspace(0, pix.shape[0] - 1, steps + 1))
+    divisions = np.int_(np.linspace(0, hp.nside2npix(NSIDE_internal) - 1, steps + 1))
     count = 0
 
     def numpy_func(_mask1_masked, _mask2_masked):
         raise AttributeError
+
+    def func_one(mask1_masked, mask2_masked):
+        return np.bitwise_and(mask1_masked, mask2_masked)
+
+    def func_two(mask1_masked, mask2_masked):
+        return np.bitwise_and(np.bitwise_not(mask1_masked), mask2_masked)
+
+    def func_three(mask1_masked, mask2_masked):
+        return np.bitwise_and(mask1_masked, np.bitwise_not(mask2_masked))
+
+    def func_four(mask1_masked, mask2_masked):
+        return np.bitwise_and(np.bitwise_not(mask1_masked), np.bitwise_not(mask2_masked))
+
+    funcs = [func_one, func_two, func_three, func_four]
 
     def scope_func(i):
         nonlocal count
@@ -550,56 +571,42 @@ def gen_mask_comparison_map(load_func, args, kwargs, mask1_name, mask2_name, NSI
         points = hp.pix2ang(NSIDE_internal, pix[divisions[i]:divisions[i + 1]], lonlat=True)
         mask1_masked = mask1.lookup_point(*points) == 0.0
         mask2_masked = mask2.lookup_point(*points) == 0.0
-        #data[divisions[i]:divisions[i + 1]] = np.bitwise_and(mask1_masked, mask2_masked)
-        #del points, mask1_masked, mask2_masked  # For some reason, the memory wasn't freed. This eventually causes a
-        #return [i, np.bitwise_and(mask1_masked, mask2_masked)]
         return [i, numpy_func(mask1_masked, mask2_masked)]
         # segfault (somehow)
+
     pool = ThreadPool(num_thread)
-    print("Querying masks")
-    #for i in range(steps):
-        #print(f"{25 * (i / steps)}%")
-        #points = hp.pix2ang(NSIDE_internal, pix[divisions[i]:divisions[i+1]], lonlat=True)
-        #mask1_masked = mask1.lookup_point(*points) == 0.0
-        #mask2_masked = mask2.lookup_point(*points) == 0.0
-        #data[divisions[i]:divisions[i+1]] = np.bitwise_and(mask1_masked, mask2_masked)
-    #    scope_func(i)
-    def func_one(mask1_masked, mask2_masked):
-        return np.bitwise_and(mask1_masked, mask2_masked)
-    numpy_func = func_one
-    for result in pool.map(scope_func, range(steps)):
-        i = result[0]
-        #print(f"{i/(steps * 0.04)}%")
-        data[divisions[i]:divisions[i + 1]] = result[1]
-    print("Rescaling")
-    pix = None
-    mask1 = None
-    mask2 = None
-    temp = hp.ud_grade(data, NSIDE)
-    print("Writing")
-    if write:
-        print(f"Writing to: \"./{name}_{NSIDE}_1.fits\"")
-        hp.fitsfunc.write_map(f"./{name}_{NSIDE}_1.fits", temp, overwrite=True)
-    print("Finished writing")
-    print("Initialising pix array")
+    for j in range(skip, 4):
+        print("Initialising pix array")
+        pix = np.int_(np.linspace(0, hp.nside2npix(NSIDE_internal) - 1, hp.nside2npix(NSIDE_internal)))
+        print("Loading masks")
+        mask1 = load_func(mask1_name, *args, **kwargs)
+        mask2 = load_func(mask2_name, *args, **kwargs)
+        print("Querying masks")
+        numpy_func = funcs[j]
+        for result in pool.map(scope_func, range(steps)):
+            i = result[0]
+            data[divisions[i]:divisions[i + 1]] = result[1]
+        print("Rescaling")
+        pix = None
+        mask1 = None
+        mask2 = None
+        temp = hp.ud_grade(data, NSIDE)
+        print("Writing")
+        if write:
+            print(f"Writing to: \"./{name}_{NSIDE}_{j+1}.fits\"")
+            hp.fitsfunc.write_map(f"./{name}_{NSIDE}_{j+1}.fits", temp, overwrite=True)
+        print("Finished writing")
+
+
+    """print("Initialising pix array")
     pix = np.int_(np.linspace(0, hp.nside2npix(NSIDE_internal) - 1, hp.nside2npix(NSIDE_internal)))
     print("Loading masks")
     mask1 = load_func(mask1_name, *args, **kwargs)
     mask2 = load_func(mask2_name, *args, **kwargs)
-    #for i in range(steps):
-    #    print(f"{25 + 25 * (i / steps)} %")
-    #    points = hp.pix2ang(NSIDE_internal, pix[divisions[i]:divisions[i+1]], lonlat=True)
-    #    mask1_masked = mask1.lookup_point(*points) == 0.0
-    #    mask2_masked = mask2.lookup_point(*points) == 0.0
-    #    data[divisions[i]:divisions[i+1]] = np.bitwise_and(np.bitwise_not(mask1_masked), mask2_masked)
-
-    def func_two(mask1_masked, mask2_masked):
-        return np.bitwise_and(np.bitwise_not(mask1_masked), mask2_masked)
-
+    
     numpy_func = func_two
     for result in pool.map(scope_func, range(steps)):
         i = result[0]
-        #print(f"{25 + i/(steps * 0.04)}%")
         data[divisions[i]:divisions[i + 1]] = result[1]
     print("Rescaling")
     pix = None
@@ -617,20 +624,9 @@ def gen_mask_comparison_map(load_func, args, kwargs, mask1_name, mask2_name, NSI
     mask1 = load_func(mask1_name, *args, **kwargs)
     mask2 = load_func(mask2_name, *args, **kwargs)
 
-    #for i in range(steps):
-    #    print(f"{50 + 25 * (i / steps)} %")
-    #    points = hp.pix2ang(NSIDE_internal, pix[divisions[i]:divisions[i+1]], lonlat=True)
-    #    mask1_masked = mask1.lookup_point(*points) == 0.0
-    #    mask2_masked = mask2.lookup_point(*points) == 0.0
-    #    data[divisions[i]:divisions[i+1]] = np.bitwise_and(mask1_masked, np.bitwise_not(mask2_masked))
-
-    def func_three(mask1_masked, mask2_masked):
-        return np.bitwise_and(mask1_masked, np.bitwise_not(mask2_masked))
-
     numpy_func = func_three
     for result in pool.map(scope_func, range(steps)):
         i = result[0]
-        #print(f"{50 + i/(steps * 0.04)}%")
         data[divisions[i]:divisions[i + 1]] = result[1]
     print("Rescaling")
     pix = None
@@ -648,16 +644,6 @@ def gen_mask_comparison_map(load_func, args, kwargs, mask1_name, mask2_name, NSI
     mask1 = load_func(mask1_name, *args, **kwargs)
     mask2 = load_func(mask2_name, *args, **kwargs)
 
-    #for i in range(steps):
-    #    print(f"{75 + 25 * (i / steps)} %")
-    #    points = hp.pix2ang(NSIDE_internal, pix[divisions[i]:divisions[i+1]], lonlat=True)
-    #    mask1_masked = mask1.lookup_point(*points) == 0.0
-    #    mask2_masked = mask2.lookup_point(*points) == 0.0
-    #    data[divisions[i]:divisions[i+1]] = np.bitwise_and(np.bitwise_not(mask1_masked), np.bitwise_not(mask2_masked))
-
-    def func_four(mask1_masked, mask2_masked):
-        return np.bitwise_and(np.bitwise_not(mask1_masked), np.bitwise_not(mask2_masked))
-
     numpy_func = func_four
     for result in pool.map(scope_func, range(steps)):
         i = result[0]
@@ -672,32 +658,7 @@ def gen_mask_comparison_map(load_func, args, kwargs, mask1_name, mask2_name, NSI
     if write:
         print(f"Writing to: \"./{name}_{NSIDE}_4.fits\"")
         hp.fitsfunc.write_map(f"./{name}_{NSIDE}_4.fits", temp, overwrite=True)
-    print("Finished writing")
-
-    """if copy:
-        mask1_masked = mask1.lookup_point(*copy.deepcopy(points)) == 0.0
-        mask2_masked = mask2.lookup_point(*copy.deepcopy(points)) == 0.0
-    else:
-        mask1_masked = mask1.lookup_point(*points) == 0.0
-        mask2_masked = mask2.lookup_point(*points) == 0.0
-    del points
-    print("1/4")
-    data = hp.ud_grade(np.float64(np.bitwise_and(mask1_masked, mask2_masked)), NSIDE)
-    if write:
-        hp.fitsfunc.write_map(f"./{name}_{NSIDE}_1.fits", data, overwrite=True)
-    print("2/4")
-    data = hp.ud_grade(np.float64(np.bitwise_and(np.bitwise_not(mask1_masked), mask2_masked)), NSIDE)
-    if write:
-        hp.fitsfunc.write_map(f"./{name}_{NSIDE}_2.fits", data, overwrite=True)
-    print("3/4")
-    data = hp.ud_grade(np.float64(np.bitwise_and(mask1_masked, np.bitwise_not(mask2_masked))), NSIDE)
-    if write:
-        hp.fitsfunc.write_map(f"./{name}_{NSIDE}_3.fits", data, overwrite=True)
-    print("4/4")
-    data = hp.ud_grade(np.float64(np.bitwise_and(np.bitwise_not(mask1_masked), np.bitwise_not(mask2_masked))), NSIDE)
-    if write:
-        hp.fitsfunc.write_map(f"./{name}_{NSIDE}_4.fits", data, overwrite=True)
-    print("Mask generated")"""
+    print("Finished writing"))"""
     return None
 
 
