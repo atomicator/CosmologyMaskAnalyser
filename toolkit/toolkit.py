@@ -538,11 +538,11 @@ def gen_mask_comparison_map(load_func, args, kwargs, mask1_name, mask2_name, NSI
     #print("Allocating memory for mask2")
     #mask2_masked = np.int_(np.zeros(pix.size))
     print("Allocating memory for data")
-    data = np.float32(np.zeros(pix.size))
+    data = np.float32(np.zeros(hp.nside2npix(NSIDE_internal)))
 
     steps = 100 * num_thread
     divisions = np.int_(np.linspace(0, hp.nside2npix(NSIDE_internal) - 1, steps + 1))
-    count = 0
+    count = skip * steps
 
     def numpy_func(_mask1_masked, _mask2_masked):
         raise AttributeError
