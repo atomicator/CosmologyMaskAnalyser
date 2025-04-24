@@ -33,7 +33,7 @@ def data_filter(redshift, richness):
     global args
     return (args.min_z < redshift < args.max_z) and (args.min_r < richness < args.max_r)
 
-raise_dir = args.realisations
+raise_dir = args.raise_dir
 #cat_name = "sdss"
 
 
@@ -76,8 +76,6 @@ def data_filter(z, r):
     return (z > 0) and (r > 20)
 
 print("Loading mask")
-print(raise_dir)
-exit()
 sdss_mask = data.load_mask("sdss_mask", raise_dir, lon_shift=args.lon_shift)
 mask = data.load_mask(mask_name, raise_dir)
 Lock = multiprocessing.Lock()
