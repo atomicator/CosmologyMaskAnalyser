@@ -33,7 +33,7 @@ def data_filter(redshift, richness):
     global args
     return (args.min_z < redshift < args.max_z) and (args.min_r < richness < args.max_r)
 
-raise_dir = args.s
+raise_dir = args.realisations
 #cat_name = "sdss"
 
 
