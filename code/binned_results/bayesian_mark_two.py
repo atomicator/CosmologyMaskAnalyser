@@ -76,6 +76,8 @@ def data_filter(z, r):
     return (z > 0) and (r > 20)
 
 print("Loading mask")
+print(raise_dir)
+exit()
 sdss_mask = data.load_mask("sdss_mask", raise_dir, lon_shift=args.lon_shift)
 mask = data.load_mask(mask_name, raise_dir)
 Lock = multiprocessing.Lock()
