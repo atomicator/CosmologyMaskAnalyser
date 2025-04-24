@@ -15,6 +15,7 @@ parser.add_argument("-r", "--realisations", type=int, help="Number of realisatio
 parser.add_argument("-a", "--target", type=int, default=80000)
 parser.add_argument("-i", "--invert_bias", default=False, type=lambda x: (str(x).lower() == 'true'))
 parser.add_argument("-d", "--debug", type=float, help="Debug", default=10.0)
+parser.add_argument("-s", "--raise", type=int, help="Number of folders to raise", default=2)
 # TODO: Debug args below this
 parser.add_argument("--data_mask", default="sdss_planck")
 parser.add_argument("--catalogue", default="random")
@@ -32,7 +33,7 @@ def data_filter(redshift, richness):
     global args
     return (args.min_z < redshift < args.max_z) and (args.min_r < richness < args.max_r)
 
-raise_dir = 2
+raise_dir = args.s
 #cat_name = "sdss"
 
 
