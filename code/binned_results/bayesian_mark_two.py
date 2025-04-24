@@ -342,5 +342,5 @@ for thread in globalThreadObjects:
     to_write.append(thread.get())
 
 to_write = np.array(to_write)
-print(to_write)
+#print(to_write)
 np.save(args.path, to_write)
