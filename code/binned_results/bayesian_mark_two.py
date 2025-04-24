@@ -7,16 +7,16 @@ import warnings
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-o", "--overdensity", type=float, help="Overdensity", default=0.0)
-parser.add_argument("-p", "--path", type=str, help="Output path", default="./act_sdss_modified")
-parser.add_argument("-t", "--threads", type=int, help="Number of threads", default=10)
-parser.add_argument("-n", "--processes", type=int, help="Number of processes", default=10)
-parser.add_argument("-r", "--realisations", type=int, help="Number of realisations", default=5)
-parser.add_argument("-a", "--target", type=int, default=400000)
+parser.add_argument("-o", "--overdensity", type=float, help="Overdensity", default=0.2)
+parser.add_argument("-p", "--path", type=str, help="Output path", default="./temp.npy")
+parser.add_argument("-t", "--threads", type=int, help="Number of threads", default=5)
+parser.add_argument("-n", "--processes", type=int, help="Number of processes", default=5)
+parser.add_argument("-r", "--realisations", type=int, help="Number of realisations", default=10)
+parser.add_argument("-a", "--target", type=int, default=80000)
 parser.add_argument("-i", "--invert_bias", default=False, type=lambda x: (str(x).lower() == 'true'))
 parser.add_argument("-d", "--debug", type=float, help="Debug", default=10.0)
 # TODO: Debug args below this
-parser.add_argument("--data_mask", default="sdss_act")
+parser.add_argument("--data_mask", default="sdss_planck")
 parser.add_argument("--catalogue", default="random")
 parser.add_argument("--lon_shift", type=float, default=0.0)
 to_print = 20
@@ -25,7 +25,7 @@ lock = multiprocessing.Lock()
 args = parser.parse_args()
 
 #NSIDES = [0, 1, 2, 4]
-NSIDES = [0, 1, 2, 4, 8, 16, 32, 64, 128]
+NSIDES = [0, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
 #NSIDES = [32]
 
 def data_filter(redshift, richness):
@@ -41,6 +41,8 @@ if data_mask == "sdss_act":
     mask_name = "act_point"
 elif data_mask == "sdss_planck":
     mask_name = "planck_modified_point"
+elif data_mask == "sdss_spt":
+    mask_name = "spt_point"
 else:
     raise ValueError
 
@@ -84,10 +86,10 @@ if lon_shift != 0.0:
 else:
     print("Loading masked fractions")
     data_set = np.float64(np.array((
-        toolkit.HealpyMask("../" * raise_dir + f"code/binned_results/sdss_mask_{mask_name}_256_1.fits").map,
-        toolkit.HealpyMask("../" * raise_dir + f"code/binned_results/sdss_mask_{mask_name}_256_2.fits").map,
-        toolkit.HealpyMask("../" * raise_dir + f"code/binned_results/sdss_mask_{mask_name}_256_3.fits").map,
-        toolkit.HealpyMask("../" * raise_dir + f"code/binned_results/sdss_mask_{mask_name}_256_4.fits").map
+        toolkit.HealpyMask("../" * raise_dir + f"data/sdss_mask_{mask_name}_512_1.fits").map,
+        toolkit.HealpyMask("../" * raise_dir + f"data/sdss_mask_{mask_name}_512_2.fits").map,
+        toolkit.HealpyMask("../" * raise_dir + f"data/sdss_mask_{mask_name}_512_3.fits").map,
+        toolkit.HealpyMask("../" * raise_dir + f"data/sdss_mask_{mask_name}_512_4.fits").map
     )))
 
 for NSIDE in NSIDES:
@@ -111,7 +113,7 @@ def to_thread():
     np.random.seed()
     array_to_return = []
     if args.catalogue == "random":
-        print("Generating catalogue")
+        #print("Generating catalogue")
         cat = toolkit.ClusterCatalogue()
         random_points = toolkit.gen_random_coords(args.target, sdss_mask)[::-1].transpose()
         if args.overdensity != 0.0:
@@ -136,16 +138,16 @@ def to_thread():
 
     for NSIDE in NSIDES:
         results = np.zeros(overdensity_steps)  # replace with mutex
-        print("Resizing sky fractions")
+        #print("Resizing sky fractions")
         data_array = hashmap_cache[NSIDE]
         if NSIDE != 0:
             binmap = toolkit.HealpixBinMap(NSIDE)
         else:
             binmap = toolkit.ConstantBinMap()
-        print("Creating binmap")
+        #print("Creating binmap")
         binmap.set_mask(mask)
         binmap.bin_catalogue(cat)
-        print("Dividing catalogue")
+        #print("Dividing catalogue")
         output = binmap.divide_sample(mask, data_array, filter_fully_masked=False, filter_empty=False)
 
         #cat = toolkit.ClusterCatalogue()
@@ -167,7 +169,8 @@ def to_thread():
             pixel_area = 4 * np.pi
 
         def func(i):
-            expectation_cutoff = 1000 * (NSIDE / 8192) ** 2  # At this scale, quantization errors caused by the calculations of
+            expectation_cutoff = 0
+            #expectation_cutoff = 1000 * (NSIDE / 32768) ** 2  # At this scale, quantization errors caused by the calculations of
             # f_s become significant. If f_s or 1 - f_s is less than this value, the pixel is rejected.
             # Resolution of the calculation was 8192, for reference.
             #expectation_cutoff = args.debug
@@ -267,7 +270,7 @@ def to_thread():
                     #               * np.log(1 + (sky_masked_fraction[i] / (1 - sky_masked_fraction[i])) * (1 + overdensity))
                     #debug = masked_clusters[i] * np.log(1 + overdensity) - (masked_clusters[i] + unmasked_clusters[i]) \
                     #        * np.log(sky_masked_fraction[i] * (1 + overdensity) + (1 - sky_masked_fraction[i]))
-                    debug = masked_clusters[i] * np.log(1 + overdensity) - (masked_clusters[i] + unmasked_clusters[i] + 1) \
+                    debug = masked_clusters[i] * np.log(1 + overdensity) - (masked_clusters[i] + unmasked_clusters[i]) \
                             * np.log(sky_masked_fraction[i] * (1 + overdensity) + (1 - sky_masked_fraction[i]))
                     if np.isnan(debug).all():
                         print(masked_clusters[i], unmasked_clusters[i], sky_masked_fraction[i], sky_masked_fraction[i])
@@ -279,7 +282,7 @@ def to_thread():
 
         pool = multiprocessing.pool.ThreadPool(args.threads)
         thread_objects = []
-        print("Initiating threads")
+        #print("Initiating threads")
         for pixel_num in range(len(masked_clusters)):
             #TODO: Thread this
             thread_objects.append(pool.apply_async(func, args=(pixel_num,)))
@@ -327,6 +330,7 @@ def to_thread():
         #array_to_return.append([NSIDE, *x_vals])
         array_to_return.append([NSIDE, *y_cum])
         #print(f"NSIDE {NSIDE}: {x_vals[4]} +/- {x_vals[6] / 2 - x_vals[2] / 2}")
+        plt.clf()
     return array_to_return
 
 globalPool = multiprocessing.Pool(args.processes)
@@ -337,4 +341,5 @@ for thread in globalThreadObjects:
     to_write.append(thread.get())
 
 to_write = np.array(to_write)
+print(to_write)
 np.save(args.path, to_write)
