@@ -564,15 +564,15 @@ def gen_mask_comparison_map(load_func, args, kwargs, mask1_name, mask2_name, NSI
 
     def scope_func(i):
         nonlocal count
-        nonlocal divisions
-        nonlocal mask1
-        nonlocal mask2
+        #nonlocal divisions
+        #nonlocal mask1
+        #nonlocal mask2
         print(f"{25 * (count / steps)}%")
         count += 1
         points = hp.pix2ang(NSIDE_internal, pix[divisions[i]:divisions[i + 1]], lonlat=True)
         mask1_masked = mask1.lookup_point(*points) == 0.0
         mask2_masked = mask2.lookup_point(*points) == 0.0
-        return [i, numpy_func(mask1_masked, mask2_masked)]
+        return [i, np.int_(numpy_func(mask1_masked, mask2_masked))]
         # segfault (somehow)
 
     lock = multiprocessing.Lock()
@@ -582,7 +582,7 @@ def gen_mask_comparison_map(load_func, args, kwargs, mask1_name, mask2_name, NSI
         nonlocal lock
         lock.acquire()
         i = result[0]
-        print(result)
+        #print(result)
         print(result[0])
         print(result[1])
         data[divisions[i]:divisions[i + 1]] = result[1]
