@@ -1,4 +1,5 @@
 # This defines all the classes used by the rest of the project
+import multiprocessing
 import warnings
 from idlelib.autocomplete import ATTRS
 from multiprocessing.pool import ThreadPool
@@ -574,6 +575,16 @@ def gen_mask_comparison_map(load_func, args, kwargs, mask1_name, mask2_name, NSI
         return [i, numpy_func(mask1_masked, mask2_masked)]
         # segfault (somehow)
 
+    lock = multiprocessing.Lock()
+
+    def return_func(result):
+        nonlocal data
+        nonlocal lock
+        lock.acquire()
+        i = result[0]
+        data[divisions[i]:divisions[i + 1]] = result[1]
+        lock.release()
+
     pool = ThreadPool(num_thread)
     for j in range(skip, 4):
         print("Initialising pix array")
@@ -583,9 +594,12 @@ def gen_mask_comparison_map(load_func, args, kwargs, mask1_name, mask2_name, NSI
         mask2 = load_func(mask2_name, *args, **kwargs)
         print("Querying masks")
         numpy_func = funcs[j]
-        for result in pool.map(scope_func, range(steps)):
-            i = result[0]
-            data[divisions[i]:divisions[i + 1]] = result[1]
+        #for result in pool.map(scope_func, range(steps)):
+        #    i = result[0]
+        #    data[divisions[i]:divisions[i + 1]] = result[1]
+        pool.map_async(scope_func, range(steps), callback=return_func)
+        pool.close()
+        pool.join()
         print("Rescaling")
         pix = None
         mask1 = None
