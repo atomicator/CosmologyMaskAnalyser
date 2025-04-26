@@ -585,8 +585,8 @@ def gen_mask_comparison_map(load_func, args, kwargs, mask1_name, mask2_name, NSI
         lock.acquire()
         i = result[0]
         #print(result)
-        print(result[0])
-        print(result[1])
+        #print(result[0])
+        #print(result[1])
         data[divisions[i]:divisions[i + 1]] = result[1]
         lock.release()
 
