@@ -572,7 +572,9 @@ def gen_mask_comparison_map(load_func, args, kwargs, mask1_name, mask2_name, NSI
         points = hp.pix2ang(NSIDE_internal, pix[divisions[i]:divisions[i + 1]], lonlat=True)
         mask1_masked = mask1.lookup_point(*points) == 0.0
         mask2_masked = mask2.lookup_point(*points) == 0.0
-        return [i, np.int_(numpy_func(mask1_masked, mask2_masked))]
+        #return [i, np.int_(numpy_func(mask1_masked, mask2_masked))]
+        return_func((i, np.int_(numpy_func(mask1_masked, mask2_masked))))
+        return None
         # segfault (somehow)
 
     lock = multiprocessing.Lock()
@@ -600,7 +602,7 @@ def gen_mask_comparison_map(load_func, args, kwargs, mask1_name, mask2_name, NSI
         #for result in pool.map(scope_func, range(steps)):
         #    i = result[0]
         #    data[divisions[i]:divisions[i + 1]] = result[1]
-        pool.map_async(scope_func, range(steps), callback=return_func)
+        pool.map_async(scope_func, range(steps))#, callback=return_func)
         pool.close()
         pool.join()
         print("Rescaling")
