@@ -541,7 +541,7 @@ def gen_mask_comparison_map(load_func, args, kwargs, mask1_name, mask2_name, NSI
     print("Allocating memory for data")
     data = np.float32(np.zeros(hp.nside2npix(NSIDE_internal)))
 
-    steps = 10 * num_thread
+    steps = 100 * num_thread
     divisions = np.int_(np.linspace(0, hp.nside2npix(NSIDE_internal) - 1, steps + 1))
     count = skip * steps
 
