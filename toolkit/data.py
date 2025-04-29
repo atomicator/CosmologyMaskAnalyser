@@ -72,17 +72,56 @@ def load_mask(mask, raise_dir=2, nside=8, invert=False, lon_shift=None):
         galactic_mask.invert = True
         value = CombinationMask(act_mask, galactic_mask, use_and=False)
     elif mask == "spt_total":
-        mask_files = os.listdir("../" * raise_dir + "./data/test")
+        #mask_files = os.listdir("../" * raise_dir + "./data/test")
+        mask_files = os.listdir("../" * raise_dir + "./data/test_2_year_ps")
         temp_path = mask_files.pop(0)
-        mask = PixellMask("../" * raise_dir + "./data/test/" + temp_path,
+        #mask = PixellMask("../" * raise_dir + "./data/test/" + temp_path,
+        #                  mask_using_latlon=False, init_val=0, suppress_warnings=True)
+        mask = PixellMask("../" * raise_dir + "./data/test_2_year_ps/" + temp_path,
                           mask_using_latlon=False, init_val=0, suppress_warnings=True)
         while mask_files:
             temp_path = mask_files.pop(0)
-            temp_mask = PixellMask("../" * raise_dir + "./data/test/" + temp_path,
+            #temp_mask = PixellMask("../" * raise_dir + "./data/test/" + temp_path,
+            #                       mask_using_latlon=False, init_val=0, suppress_warnings=True)
+            temp_mask = PixellMask("../" * raise_dir + "./data/test_2_year_ps/" + temp_path,
+                                   mask_using_latlon=False, init_val=0, suppress_warnings=True)
+            mask = CombinationMask(mask, temp_mask, lon_shift=0, use_and=False)
+        value = mask
+    elif mask == "spt_galactic":
+        #mask_files = os.listdir("../" * raise_dir + "./data/test")
+        mask_files = os.listdir("../" * raise_dir + "./data/test_2_year")
+        temp_path = mask_files.pop(0)
+        #mask = PixellMask("../" * raise_dir + "./data/test/" + temp_path,
+        #                  mask_using_latlon=False, init_val=0, suppress_warnings=True)
+        mask = PixellMask("../" * raise_dir + "./data/test_2_year/" + temp_path,
+                          mask_using_latlon=False, init_val=0, suppress_warnings=True)
+        while mask_files:
+            temp_path = mask_files.pop(0)
+            #temp_mask = PixellMask("../" * raise_dir + "./data/test/" + temp_path,
+            #                       mask_using_latlon=False, init_val=0, suppress_warnings=True)
+            temp_mask = PixellMask("../" * raise_dir + "./data/test_2_year/" + temp_path,
                                    mask_using_latlon=False, init_val=0, suppress_warnings=True)
             mask = CombinationMask(mask, temp_mask, lon_shift=0, use_and=False)
         value = mask
     elif mask == "spt_point":
+        mask_files = os.listdir("../" * raise_dir + "./data/test_2_year")
+        temp_path = mask_files.pop(0)
+        mask = PixellMask("../" * raise_dir + "./data/test_2_year/" + temp_path,
+                          mask_using_latlon=False, init_val=0, suppress_warnings=True)
+        temp = PixellMask("../" * raise_dir + "./data/test_2_year_ps/" + temp_path[:-8] + "_ps.fits.gz",
+                          mask_using_latlon=False, init_val=0, suppress_warnings=True)
+        mask.map = temp.map - mask.map
+        while mask_files:
+            temp_path = mask_files.pop(0)
+            temp_mask = PixellMask("../" * raise_dir + "./data/test_2_year/" + temp_path,
+                          mask_using_latlon=False, init_val=0, suppress_warnings=True)
+            temp = PixellMask("../" * raise_dir + "./data/test_2_year_ps/" + temp_path[:-8] + "_ps.fits.gz",
+                              mask_using_latlon=False, init_val=0, suppress_warnings=True)
+            temp_mask.map = temp.map - temp_mask.map
+            mask = CombinationMask(mask, temp_mask, lon_shift=0, use_and=False)
+        mask.invert = True
+        value = mask
+    elif mask == "spt_point_old":
         mask_files = os.listdir("../" * raise_dir + "./data/test")
         overwrite_path = "../" * raise_dir + "./data/test2/"
         temp_path = mask_files.pop(0)
@@ -96,7 +135,7 @@ def load_mask(mask, raise_dir=2, nside=8, invert=False, lon_shift=None):
             temp_mask.map = np.load(overwrite_path + "point_" + temp_path + ".npy")
             mask = CombinationMask(mask, temp_mask, lon_shift=0, use_and=True)
         value = mask
-    elif mask == "spt_galactic":
+    elif mask == "spt_galactic_old":
         mask_files = os.listdir("../" * raise_dir + "./data/test")
         overwrite_path = "../" * raise_dir + "./data/test2/"
         temp_path = mask_files.pop(0)

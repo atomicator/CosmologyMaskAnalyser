@@ -590,8 +590,8 @@ def gen_mask_comparison_map(load_func, args, kwargs, mask1_name, mask2_name, NSI
         data[divisions[i]:divisions[i + 1]] = result[1]
         lock.release()
 
-    pool = ThreadPool(num_thread)
     for j in range(skip, 4):
+        pool = ThreadPool(num_thread)
         print("Initialising pix array")
         pix = np.int_(np.linspace(0, hp.nside2npix(NSIDE_internal) - 1, hp.nside2npix(NSIDE_internal)))
         print("Loading masks")
