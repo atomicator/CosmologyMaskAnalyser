@@ -11,13 +11,14 @@ parser.add_argument("-o", "--overdensity", type=float, help="Overdensity", defau
 parser.add_argument("-p", "--path", type=str, help="Output path", default="./temp.npy")
 parser.add_argument("-t", "--threads", type=int, help="Number of threads", default=5)
 parser.add_argument("-n", "--processes", type=int, help="Number of processes", default=5)
-parser.add_argument("-r", "--realisations", type=int, help="Number of realisations", default=10)
+parser.add_argument("-r", "--realisations", type=int, help="Number of realisations", default=1)
 parser.add_argument("-a", "--target", type=int, default=80000)
 parser.add_argument("-i", "--invert_bias", default=False, type=lambda x: (str(x).lower() == 'true'))
+parser.add_argument("-f", "--flat_prior", default=False, type=lambda x: (str(x).lower() == 'true'))
 parser.add_argument("-d", "--debug", type=float, help="Debug", default=10.0)
 parser.add_argument("-s", "--raise_dir", type=int, help="Number of folders to raise", default=2)
 # TODO: Debug args below this
-parser.add_argument("--data_mask", default="sdss_planck")
+parser.add_argument("--data_mask", default="sdss_spt")
 parser.add_argument("--catalogue", default="random")
 parser.add_argument("--lon_shift", type=float, default=0.0)
 to_print = 20
@@ -25,8 +26,8 @@ lock = multiprocessing.Lock()
 
 args = parser.parse_args()
 
-#NSIDES = [0, 1, 2, 4]
-NSIDES = [0, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
+NSIDES = [0, 1]
+#NSIDES = [0, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
 #NSIDES = [32]
 
 def data_filter(redshift, richness):
@@ -170,13 +171,14 @@ def to_thread():
             pixel_area = 4 * np.pi
 
         def func(i):
-            expectation_cutoff = 0
+            #print(sky_masked_fraction[i], masked_clusters[i], unmasked_clusters[i])
+            #expectation_cutoff = 0
             #expectation_cutoff = 1000 * (NSIDE / 32768) ** 2  # At this scale, quantization errors caused by the calculations of
             # f_s become significant. If f_s or 1 - f_s is less than this value, the pixel is rejected.
             # Resolution of the calculation was 8192, for reference.
             #expectation_cutoff = args.debug
-            if not (expectation_cutoff < sky_masked_fraction[i] < 1 - expectation_cutoff):
-                return 0
+            #if not (expectation_cutoff < sky_masked_fraction[i] < 1 - expectation_cutoff):
+            #    return 0
             #if (masked_clusters[i] + unmasked_clusters[i]) < 1:
             #    return 0
             #if (unmasked_clusters[i] + masked_clusters[i]) < 5:
@@ -271,7 +273,11 @@ def to_thread():
                     #               * np.log(1 + (sky_masked_fraction[i] / (1 - sky_masked_fraction[i])) * (1 + overdensity))
                     #debug = masked_clusters[i] * np.log(1 + overdensity) - (masked_clusters[i] + unmasked_clusters[i]) \
                     #        * np.log(sky_masked_fraction[i] * (1 + overdensity) + (1 - sky_masked_fraction[i]))
-                    debug = masked_clusters[i] * np.log(1 + overdensity) - (masked_clusters[i] + unmasked_clusters[i]) \
+                    if args.flat_prior:
+                        debug = masked_clusters[i] * np.log(1 + overdensity) - (masked_clusters[i] + unmasked_clusters[i] + 1) \
+                                * np.log(sky_masked_fraction[i] * (1 + overdensity) + (1 - sky_masked_fraction[i]))
+                    else:
+                        debug = masked_clusters[i] * np.log(1 + overdensity) - (masked_clusters[i] + unmasked_clusters[i]) \
                             * np.log(sky_masked_fraction[i] * (1 + overdensity) + (1 - sky_masked_fraction[i]))
                     if np.isnan(debug).all():
                         print(masked_clusters[i], unmasked_clusters[i], sky_masked_fraction[i], sky_masked_fraction[i])
@@ -306,6 +312,9 @@ def to_thread():
         colours = ["m", "c", "g", "b", "r", "b", "g", "c", "m"]
         labels = [r"$3 \sigma$", r"$2 \sigma$", r"$1 \sigma$", r"$25 \%$", "Median", None, None, None, None]
         x_vals = []
+
+        plt.plot(overdensity, results)
+        plt.show()
 
         for percentile in search_percentiles:
             lower = 0
