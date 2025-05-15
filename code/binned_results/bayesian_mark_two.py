@@ -172,13 +172,13 @@ def to_thread():
 
         def func(i):
             #print(sky_masked_fraction[i], masked_clusters[i], unmasked_clusters[i])
-            #expectation_cutoff = 0
+            expectation_cutoff = 0
             #expectation_cutoff = 1000 * (NSIDE / 32768) ** 2  # At this scale, quantization errors caused by the calculations of
             # f_s become significant. If f_s or 1 - f_s is less than this value, the pixel is rejected.
             # Resolution of the calculation was 8192, for reference.
             #expectation_cutoff = args.debug
-            #if not (expectation_cutoff < sky_masked_fraction[i] < 1 - expectation_cutoff):
-            #    return 0
+            if not (expectation_cutoff < sky_masked_fraction[i] < 1 - expectation_cutoff):
+                return 0
             #if (masked_clusters[i] + unmasked_clusters[i]) < 1:
             #    return 0
             #if (unmasked_clusters[i] + masked_clusters[i]) < 5:
