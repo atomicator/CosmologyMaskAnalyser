@@ -284,8 +284,9 @@ def to_thread():
                     debug[np.isnan(debug)] = np.nanmin(debug)
                     debug = debug - np.nanmax(debug)
                     ln_prob = debug
-            return ln_prob
-
+            #return ln_prob
+            nonlocal results
+            results += ln_prob
 
         pool = multiprocessing.pool.ThreadPool(args.threads)
         thread_objects = []
@@ -296,13 +297,15 @@ def to_thread():
             # TODO: Constrain range of density - calculate density of unmasked regions
             # This is a problem when no unmasked clusters exist - introduce a prior on density?
 
-        for i in range(len(masked_clusters)):
+        #for i in range(len(masked_clusters)):
             #results += thread_objects[i].get()
             #print(thread_objects[i])
             #print(f"r: {np.shape(results)}")
             #print(f"t: {np.shape(thread_objects[i].get())}")
-            results += thread_objects[i].get()
+            #results += thread_objects[i].get()
             #print(thread_objects[i].get())
+        pool.join()
+        pool.close()
 
         results = results - np.max(results)
         results = np.exp(results)
