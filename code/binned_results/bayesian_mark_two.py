@@ -304,8 +304,8 @@ def to_thread():
             #print(f"t: {np.shape(thread_objects[i].get())}")
             #results += thread_objects[i].get()
             #print(thread_objects[i].get())
-        pool.join()
         pool.close()
+        pool.join()
 
         results = results - np.max(results)
         results = np.exp(results)
