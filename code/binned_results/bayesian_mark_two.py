@@ -140,16 +140,16 @@ def to_thread():
 
     for NSIDE in NSIDES:
         results = np.zeros(overdensity_steps)  # replace with mutex
-        #print("Resizing sky fractions")
+        print("Resizing sky fractions")
         data_array = hashmap_cache[NSIDE]
         if NSIDE != 0:
             binmap = toolkit.HealpixBinMap(NSIDE)
         else:
             binmap = toolkit.ConstantBinMap()
-        #print("Creating binmap")
+        print("Creating binmap")
         binmap.set_mask(mask)
         binmap.bin_catalogue(cat)
-        #print("Dividing catalogue")
+        print("Dividing catalogue")
         output = binmap.divide_sample(mask, data_array, filter_fully_masked=False, filter_empty=False)
 
         #cat = toolkit.ClusterCatalogue()
@@ -159,16 +159,16 @@ def to_thread():
         sky_masked_fraction = output[1]
         cluster_masked_fraction = output[2]
         n = output[3]
-        sky_surveyed_fraction = (data_array[1] + data_array[3])[binmap.final_filter]
+        #sky_surveyed_fraction = (data_array[1] + data_array[3])[binmap.final_filter]
 
         masked_clusters = np.int_(np.round(n * cluster_masked_fraction))
         unmasked_clusters = np.int_(np.round(n * (1 - cluster_masked_fraction)))
         #shared_arr = multiprocessing.Array("d", np.zeros(overdensity_steps))
 
-        if NSIDE != 0:
-            pixel_area = 4 * np.pi / (12 * NSIDE ** 2)
-        else:
-            pixel_area = 4 * np.pi
+        #if NSIDE != 0:
+        #    pixel_area = 4 * np.pi / (12 * NSIDE ** 2)
+        #else:
+        #    pixel_area = 4 * np.pi
 
         def func(i):
             #print(sky_masked_fraction[i], masked_clusters[i], unmasked_clusters[i])

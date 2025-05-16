@@ -412,12 +412,24 @@ class _BinMap(object):
         self.mask = mask
 
     def bin_catalogue(self, catalogue):
-        for cluster in catalogue.lon_lat:
-            self.binned_sample[self.lookup_pix(*cluster)].append(cluster)
+        print("Looking up clusters")
+        masked = self.mask.lookup_point(*catalogue)
+        masked_count_pixels = np.zeros(np.shape(self.n))
+        print("Binning Catalogue")
+        for cluster_number in range(len(catalogue.lon_lat)):
+            cluster = catalogue.lon_lat[cluster_number]
+            pix_location = self.lookup_pix(*cluster)
+            self.binned_sample[pix_location].append(cluster)
+            masked_count_pixels[pix_location] += masked[cluster_number]
+        print("Sorting Catalogue")
         for i in range(len(self.binned_sample)):
             self.binned_sample[i] = np.array(self.binned_sample[i])
             self.n[i] = len(self.binned_sample[i])
-        self.calc_masked_fraction()
+        has_clusters_filter = self.n > 0
+        self.cluster_masked_fraction[has_clusters_filter] = masked_count_pixels[has_clusters_filter] / self.n[has_clusters_filter]
+        self.cluster_masked_fraction[np.bitwise_not(has_clusters_filter)] = np.nan
+        print("Sorted catalogue")
+        #self.calc_masked_fraction()
 
     def calc_masked_fraction(self):
         print("Calculating masked fraction")
