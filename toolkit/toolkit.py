@@ -420,7 +420,7 @@ class _BinMap(object):
             cluster = catalogue.lon_lat[cluster_number]
             pix_location = self.lookup_pix(*cluster)
             self.binned_sample[pix_location].append(cluster)
-            masked_count_pixels[pix_location] += masked[cluster_number]
+            masked_count_pixels[pix_location] += (1 - masked[cluster_number])
         print("Sorting Catalogue")
         for i in range(len(self.binned_sample)):
             self.binned_sample[i] = np.array(self.binned_sample[i])
