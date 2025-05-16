@@ -413,7 +413,7 @@ class _BinMap(object):
 
     def bin_catalogue(self, catalogue):
         print("Looking up clusters")
-        masked = self.mask.lookup_point(*catalogue)
+        masked = self.mask.lookup_point(*catalogue.lon_lat.transpose())
         masked_count_pixels = np.zeros(np.shape(self.n))
         print("Binning Catalogue")
         for cluster_number in range(len(catalogue.lon_lat)):
