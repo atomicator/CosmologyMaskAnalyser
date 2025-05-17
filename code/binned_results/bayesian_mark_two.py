@@ -79,7 +79,7 @@ def data_filter(z, r):
 print("Loading mask")
 sdss_mask = data.load_mask("sdss_mask", raise_dir, lon_shift=args.lon_shift)
 mask = data.load_mask(mask_name, raise_dir)
-Lock = multiprocessing.Lock()
+#Lock = multiprocessing.Lock()
 to_write = []
 hashmap_cache = {}
 if lon_shift != 0.0:
@@ -140,16 +140,16 @@ def to_thread():
 
     for NSIDE in NSIDES:
         results = np.zeros(overdensity_steps)  # replace with mutex
-        print("Resizing sky fractions")
+        #print("Resizing sky fractions")
         data_array = hashmap_cache[NSIDE]
         if NSIDE != 0:
             binmap = toolkit.HealpixBinMap(NSIDE)
         else:
             binmap = toolkit.ConstantBinMap()
-        print("Creating binmap")
+        #print("Creating binmap")
         binmap.set_mask(mask)
         binmap.bin_catalogue(cat)
-        print("Dividing catalogue")
+        #print("Dividing catalogue")
         output = binmap.divide_sample(mask, data_array, filter_fully_masked=False, filter_empty=False)
 
         #cat = toolkit.ClusterCatalogue()
@@ -285,11 +285,16 @@ def to_thread():
                     debug = debug - np.nanmax(debug)
                     ln_prob = debug
             #return ln_prob
+            nonlocal lock
+            lock.acquire()
             nonlocal results
             results += ln_prob
+            lock.release()
+            return None
 
         pool = multiprocessing.pool.ThreadPool(args.threads)
         thread_objects = []
+        lock = multiprocessing.Lock()
         #print("Initiating threads")
         for pixel_num in range(len(masked_clusters)):
             #TODO: Thread this
