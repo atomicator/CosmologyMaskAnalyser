@@ -18,17 +18,20 @@ parser.add_argument("-f", "--flat_prior", default=False, type=lambda x: (str(x).
 parser.add_argument("-d", "--debug", type=float, help="Debug", default=10.0)
 parser.add_argument("-s", "--raise_dir", type=int, help="Number of folders to raise", default=2)
 # TODO: Debug args below this
-parser.add_argument("--data_mask", default="sdss_spt")
+parser.add_argument("--data_mask", default="sdss_planck")
 parser.add_argument("--catalogue", default="random")
 parser.add_argument("--lon_shift", type=float, default=0.0)
 to_print = 20
 lock = multiprocessing.Lock()
 
 args = parser.parse_args()
-
-#NSIDES = [0, 1]
+print(vars(args))
+#exit()
+#NSIDES = [0, 1, 2, 4, 8, 16, 32, 64]
 NSIDES = [0, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
 #NSIDES = [32]
+
+
 
 def data_filter(redshift, richness):
     global args
@@ -274,9 +277,11 @@ def to_thread():
                     #debug = masked_clusters[i] * np.log(1 + overdensity) - (masked_clusters[i] + unmasked_clusters[i]) \
                     #        * np.log(sky_masked_fraction[i] * (1 + overdensity) + (1 - sky_masked_fraction[i]))
                     if args.flat_prior:
+                        #print("Test")
                         debug = masked_clusters[i] * np.log(1 + overdensity) - (masked_clusters[i] + unmasked_clusters[i] + 1) \
                                 * np.log(sky_masked_fraction[i] * (1 + overdensity) + (1 - sky_masked_fraction[i]))
                     else:
+                        #print("Test2")
                         debug = masked_clusters[i] * np.log(1 + overdensity) - (masked_clusters[i] + unmasked_clusters[i]) \
                             * np.log(sky_masked_fraction[i] * (1 + overdensity) + (1 - sky_masked_fraction[i]))
                     if np.isnan(debug).all():
