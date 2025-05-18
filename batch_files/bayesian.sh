@@ -2,7 +2,7 @@
 
 file=bayesian_mark_two
 mask="$1"
-flat_prior="$2:-False"
+flat_prior=${2:-"False"}
 target=80000
 
 echo "${flat_prior}"
